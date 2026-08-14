@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Java Executor 与线程池体系认知图</title>
+  <style>
+    :root {
+      --paper: #fffbea;
+      --paper-2: #f8f1d4;
+      --ink: #272b30;
+      --muted: #62686e;
+      --interface: #ffe99a;
+      --common: #ed4b4b;
+      --special: #ed9000;
+      --abstract: #aee6b3;
+      --support: #a7d8f3;
+      --private: #cabbea;
+      --result: #d7c8ee;
+      --panel: rgba(255, 253, 240, 0.95);
+      --shadow: rgba(68, 56, 24, 0.14);
+      --blue: #397da9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas,
+        "Liberation Mono", "Noto Sans Mono CJK SC", "Microsoft YaHei", monospace;
+      background:
+        radial-gradient(circle at 11% 14%, rgba(239, 194, 69, 0.12), transparent 26rem),
+        radial-gradient(circle at 90% 72%, rgba(76, 157, 207, 0.1), transparent 30rem),
+        repeating-linear-gradient(
+          0deg,
+          rgba(80, 70, 35, 0.018) 0,
+          rgba(80, 70, 35, 0.018) 1px,
+          transparent 1px,
+          transparent 5px
+        ),
+        var(--paper);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1960px, 100%);
+      margin: 0 auto;
+      padding: 26px 28px 38px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 4px 2px 18px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #8a5900;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", "Kaiti SC", "Microsoft YaHei", sans-serif;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.08;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      max-width: 880px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .hero-note {
+      flex: 0 0 auto;
+      padding: 10px 13px;
+      border: 1.5px solid var(--ink);
+      background: var(--interface);
+      box-shadow: 3px 4px 0 var(--shadow);
+      font-size: 13px;
+      transform: rotate(-0.35deg);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .mode-group,
+    .zoom-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .control-label {
+      margin-right: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mode-button,
+    .zoom-button {
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      background: rgba(255, 253, 240, 0.84);
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--shadow);
+      transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .mode-button:hover,
+    .zoom-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 3px 4px 0 var(--shadow);
+    }
+
+    .mode-button[aria-pressed="true"] {
+      background: var(--interface);
+      box-shadow: inset 0 -3px 0 rgba(237, 144, 0, 0.34), 2px 2px 0 var(--shadow);
+    }
+
+    .mode-button:focus-visible,
+    .zoom-button:focus-visible,
+    .node:focus-visible {
+      outline: 3px solid rgba(57, 125, 169, 0.42);
+      outline-offset: 3px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 350px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .map-panel,
+    .detail-panel,
+    .flow-panel,
+    .path-panel {
+      border: 1.6px solid var(--ink);
+      background: var(--panel);
+      box-shadow: 6px 7px 0 var(--shadow);
+    }
+
+    .map-panel {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      padding: 11px 14px;
+      border-bottom: 1.5px solid var(--ink);
+      background: var(--support);
+      font-size: 12px;
+    }
+
+    .legend strong {
+      margin-right: 2px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .box-swatch {
+      width: 18px;
+      height: 12px;
+      display: inline-block;
+      background: var(--paper);
+      border: 2px solid var(--common);
+    }
+
+    .box-swatch.interface {
+      border-color: var(--ink);
+      background: var(--interface);
+    }
+
+    .box-swatch.special {
+      border-color: var(--special);
+    }
+
+    .box-swatch.abstract {
+      border-color: var(--ink);
+      background: var(--abstract);
+    }
+
+    .box-swatch.support {
+      border-color: var(--ink);
+      background: var(--support);
+    }
+
+    .line-swatch {
+      position: relative;
+      width: 38px;
+      height: 12px;
+      display: inline-block;
+    }
+
+    .line-swatch::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 8px;
+      top: 5px;
+      border-top: 2px solid var(--ink);
+    }
+
+    .line-swatch::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 1px;
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid var(--ink);
+      border-right: 2px solid var(--ink);
+      transform: rotate(45deg);
+    }
+
+    .line-swatch.implement::before {
+      border-top-style: dashed;
+      border-top-color: var(--common);
+    }
+
+    .line-swatch.implement::after {
+      border-color: var(--common);
+    }
+
+    .line-swatch.flow::before {
+      border-top-style: dotted;
+      border-top-color: var(--special);
+    }
+
+    .line-swatch.flow::after {
+      border-color: var(--special);
+    }
+
+    .map-viewport {
+      position: relative;
+      min-height: 760px;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+      background:
+        linear-gradient(rgba(83, 77, 52, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 77, 52, 0.045) 1px, transparent 1px),
+        rgba(255, 251, 232, 0.72);
+      background-size: 32px 32px;
+    }
+
+    .map-viewport.dragging {
+      cursor: grabbing;
+    }
+
+    #executor-map {
+      display: block;
+      width: 100%;
+      height: 760px;
+      user-select: none;
+    }
+
+    .layer-band {
+      fill: rgba(255, 255, 255, 0.2);
+      stroke: rgba(52, 56, 61, 0.16);
+      stroke-width: 1.2;
+      stroke-dasharray: 7 9;
+    }
+
+    .layer-title {
+      fill: var(--muted);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .edge {
+      fill: none;
+      stroke-width: 2.2;
+      vector-effect: non-scaling-stroke;
+      transition: opacity 180ms ease, stroke-width 180ms ease;
+    }
+
+    .edge.inherit {
+      stroke: var(--ink);
+      marker-end: url(#arrow-black);
+    }
+
+    .edge.implement {
+      stroke: var(--common);
+      stroke-dasharray: 8 7;
+      marker-end: url(#arrow-red);
+    }
+
+    .edge.flow {
+      stroke: var(--special);
+      stroke-dasharray: 3 7;
+      marker-end: url(#arrow-orange);
+    }
+
+    .edge.compose {
+      stroke: var(--blue);
+      stroke-dasharray: 11 5 2 5;
+      marker-end: url(#arrow-blue);
+    }
+
+    .edge.version {
+      stroke: #7960a9;
+      stroke-dasharray: 2 5;
+      marker-end: url(#arrow-purple);
+    }
+
+    .edge-label {
+      fill: var(--muted);
+      font-size: 13px;
+      paint-order: stroke;
+      stroke: var(--paper);
+      stroke-width: 6px;
+      stroke-linejoin: round;
+    }
+
+    .node {
+      cursor: pointer;
+      outline: none;
+      transition: opacity 180ms ease, filter 180ms ease;
+    }
+
+    .node rect {
+      fill: var(--paper);
+      stroke-width: 2.4;
+      vector-effect: non-scaling-stroke;
+      filter: url(#paper-shadow);
+      transition: stroke-width 140ms ease, fill 140ms ease;
+    }
+
+    .node.interface rect {
+      fill: var(--interface);
+      stroke: var(--ink);
+    }
+
+    .node.common rect {
+      stroke: var(--common);
+    }
+
+    .node.special rect {
+      stroke: var(--special);
+    }
+
+    .node.abstract rect {
+      fill: var(--abstract);
+      stroke: var(--ink);
+    }
+
+    .node.support rect {
+      fill: var(--support);
+      stroke: var(--ink);
+    }
+
+    .node.private rect {
+      fill: color-mix(in srgb, var(--private) 58%, var(--paper));
+      stroke: #735d9f;
+      stroke-dasharray: 6 4;
+    }
+
+    .node.result rect {
+      fill: color-mix(in srgb, var(--result) 56%, var(--paper));
+      stroke: #765da8;
+    }
+
+    .node:hover rect,
+    .node.selected rect {
+      stroke-width: 4;
+      filter: url(#paper-shadow-strong);
+    }
+
+    .node.selected rect {
+      fill: #fff1b5;
+    }
+
+    .node text {
+      fill: var(--ink);
+      pointer-events: none;
+      text-anchor: middle;
+    }
+
+    .node-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .node-title.small {
+      font-size: 16px;
+    }
+
+    .node-note {
+      fill: var(--muted) !important;
+      font-size: 12.5px;
+    }
+
+    .version-badge {
+      fill: #775b9d;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #executor-map[data-mode="path"] .node:not(.path-core),
+    #executor-map[data-mode="path"] .edge:not(.path-core),
+    #executor-map[data-mode="types"] .node.runtime:not(.context-node),
+    #executor-map[data-mode="types"] .edge.runtime:not(.context-node),
+    #executor-map[data-mode="flow"] .node.type-only:not(.context-node),
+    #executor-map[data-mode="flow"] .edge.type-only:not(.context-node),
+    #executor-map[data-mode="modern"] .node:not(.modern):not(.context-node),
+    #executor-map[data-mode="modern"] .edge:not(.modern):not(.context-node) {
+      opacity: 0.13;
+    }
+
+    .detail-panel {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 18px 16px;
+      background:
+        linear-gradient(135deg, rgba(167, 216, 243, 0.23), transparent 42%),
+        var(--panel);
+    }
+
+    .detail-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px dashed var(--ink);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .detail-kind {
+      padding: 4px 7px;
+      border: 1px solid var(--ink);
+      background: var(--interface);
+    }
+
+    .detail-panel h2 {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .detail-summary {
+      margin: 0;
+      color: #3c4146;
+      font-family: "STKaiti", "KaiTi", "Kaiti SC", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .detail-section {
+      padding-top: 12px;
+      border-top: 1px solid rgba(39, 43, 48, 0.24);
+    }
+
+    .detail-section h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .detail-list {
+      margin: 0;
+      padding-left: 19px;
+      color: #454a50;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .method-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .method-chip {
+      padding: 5px 7px;
+      border: 1px solid rgba(39, 43, 48, 0.5);
+      background: rgba(255, 233, 154, 0.48);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .judgement {
+      margin-top: auto;
+      padding: 12px;
+      border: 1.5px solid var(--special);
+      background: rgba(255, 233, 154, 0.32);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .flow-panel {
+      margin-top: 20px;
+      padding: 17px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: execute-flow;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 122px;
+      padding: 15px 13px 12px;
+      border: 1.5px solid var(--ink);
+      background: rgba(255, 251, 232, 0.74);
+      counter-increment: execute-flow;
+    }
+
+    .flow-step::before {
+      content: counter(execute-flow);
+      position: absolute;
+      right: 9px;
+      top: 7px;
+      color: rgba(39, 43, 48, 0.18);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .flow-step h3 {
+      margin: 0 31px 7px 0;
+      font-size: 14px;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .flow-step.highlight {
+      background: var(--interface);
+      box-shadow: inset 0 -5px 0 rgba(237, 144, 0, 0.3);
+    }
+
+    .path-panel {
+      margin-top: 20px;
+      padding: 17px;
+    }
+
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 11px;
+      counter-reset: learning;
+    }
+
+    .path-step {
+      position: relative;
+      min-height: 128px;
+      padding: 15px 12px 12px;
+      border: 1.5px solid var(--ink);
+      background: rgba(255, 251, 232, 0.72);
+      counter-increment: learning;
+    }
+
+    .path-step::before {
+      content: counter(learning);
+      position: absolute;
+      right: 8px;
+      top: 7px;
+      color: rgba(39, 43, 48, 0.18);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .path-step.current {
+      background: var(--interface);
+    }
+
+    .path-step h3 {
+      margin: 0 30px 7px 0;
+      font-size: 14px;
+    }
+
+    .path-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .sources {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 19px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .sources p {
+      margin: 0;
+    }
+
+    .sources a {
+      color: #355f7a;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .small-screen-hint {
+      display: none;
+    }
+
+    @media (max-width: 1200px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        min-height: 360px;
+      }
+
+      .path-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .flow-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px 12px 28px;
+      }
+
+      .hero,
+      .controls,
+      .section-header,
+      .sources {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero-note {
+        align-self: stretch;
+      }
+
+      .map-viewport,
+      #executor-map {
+        min-height: 620px;
+        height: 620px;
+      }
+
+      .flow-grid,
+      .path-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .small-screen-hint {
+        display: inline;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        width: 100%;
+        padding: 0;
+      }
+
+      .controls,
+      .detail-panel,
+      .flow-panel,
+      .path-panel,
+      .sources {
+        display: none;
+      }
+
+      .workspace {
+        display: block;
+      }
+
+      .map-panel {
+        box-shadow: none;
+      }
+
+      .map-viewport,
+      #executor-map {
+        height: 950px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">java.util.concurrent · executor framework</p>
+        <h1>Executor 与线程池体系认知图</h1>
+        <p class="subtitle">
+          Executor 体系的核心不是“有多少种线程池”，而是把任务定义、任务执行、生命周期、
+          结果获取和资源治理逐层分开。先看完整地图，再沿主线理解一次任务如何进入线程池。
+        </p>
+      </div>
+      <div class="hero-note">学习主干：Java 8 · 现代变化：JDK 19 / 21 / 25</div>
+    </header>
+
+    <section class="controls" aria-label="体系图控制">
+      <div class="mode-group" role="group" aria-label="观察方式">
+        <span class="control-label">观察方式</span>
+        <button class="mode-button" type="button" data-mode="path" aria-pressed="true">学习主线</button>
+        <button class="mode-button" type="button" data-mode="types" aria-pressed="false">类型关系</button>
+        <button class="mode-button" type="button" data-mode="flow" aria-pressed="false">执行流程</button>
+        <button class="mode-button" type="button" data-mode="modern" aria-pressed="false">现代扩展</button>
+        <button class="mode-button" type="button" data-mode="all" aria-pressed="false">完整体系</button>
+      </div>
+      <div class="zoom-group" role="group" aria-label="缩放控制">
+        <span class="control-label">画布</span>
+        <button class="zoom-button" type="button" id="zoom-out" aria-label="缩小">－</button>
+        <button class="zoom-button" type="button" id="zoom-reset">适应窗口</button>
+        <button class="zoom-button" type="button" id="zoom-in" aria-label="放大">＋</button>
+        <span class="small-screen-hint">可拖动画布</span>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="map-panel" aria-label="Executor 与线程池体系图">
+        <div class="legend" aria-label="图例">
+          <strong>图例</strong>
+          <span class="legend-item"><i class="box-swatch interface"></i>接口</span>
+          <span class="legend-item"><i class="box-swatch"></i>常用类</span>
+          <span class="legend-item"><i class="box-swatch special"></i>专用/工厂类</span>
+          <span class="legend-item"><i class="box-swatch abstract"></i>抽象类</span>
+          <span class="legend-item"><i class="box-swatch support"></i>协作组件</span>
+          <span class="legend-item"><i class="line-swatch"></i>继承/扩展</span>
+          <span class="legend-item"><i class="line-swatch implement"></i>实现</span>
+          <span class="legend-item"><i class="line-swatch flow"></i>提交/返回/依赖</span>
+        </div>
+
+        <div class="map-viewport" id="map-viewport">
+          <svg id="executor-map" data-mode="path" viewBox="0 0 1980 1160"
+               role="img" aria-labelledby="map-title map-desc"
+               preserveAspectRatio="xMidYMid meet">
+            <title id="map-title">Java Executor 与线程池体系关系图</title>
+            <desc id="map-desc">
+              展示 Runnable、Callable、Executor、ExecutorService、ThreadPoolExecutor、
+              ScheduledThreadPoolExecutor、ForkJoinPool、Future 以及线程池协作组件之间的关系。
+            </desc>
+
+            <defs>
+              <filter id="paper-shadow" x="-20%" y="-20%" width="150%" height="160%">
+                <feDropShadow dx="2" dy="3" stdDeviation="1.4" flood-color="#574b27" flood-opacity="0.18"/>
+              </filter>
+              <filter id="paper-shadow-strong" x="-20%" y="-20%" width="150%" height="160%">
+                <feDropShadow dx="3" dy="5" stdDeviation="2" flood-color="#574b27" flood-opacity="0.25"/>
+              </filter>
+
+              <marker id="arrow-black" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#272b30" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-red" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#ed4b4b" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-orange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#ed9000" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#397da9" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#7960a9" stroke-width="1.5"/>
+              </marker>
+            </defs>
+
+            <rect class="layer-band" x="22" y="35" width="1936" height="190" rx="8"/>
+            <rect class="layer-band" x="22" y="245" width="1936" height="200" rx="8"/>
+            <rect class="layer-band" x="22" y="465" width="1936" height="315" rx="8"/>
+            <rect class="layer-band" x="22" y="800" width="1936" height="330" rx="8"/>
+
+            <text class="layer-title" x="45" y="65">任务与结果 · 交什么进去，拿什么回来</text>
+            <text class="layer-title" x="45" y="275">执行契约 · 只承诺能力，不规定一定怎样执行</text>
+            <text class="layer-title" x="45" y="495">实现与工厂 · 谁真正调度任务</text>
+            <text class="layer-title" x="45" y="830">运行部件 · 线程池如何装配与兜底</text>
+
+            <g id="edges">
+              <path class="edge flow runtime path-core context-node" d="M 270 137 C 315 190, 350 250, 390 330"/>
+              <text class="edge-label" x="285" y="235">execute(Runnable)</text>
+
+              <path class="edge flow runtime path-core" d="M 545 137 C 600 205, 690 260, 750 330"/>
+              <text class="edge-label" x="580" y="225">submit(Callable)</text>
+
+              <path class="edge inherit type-only path-core context-node" d="M 735 370 C 620 370, 540 370, 505 370"/>
+              <text class="edge-label" x="608" y="352">extends</text>
+
+              <path class="edge inherit type-only" d="M 1120 370 C 1040 370, 1000 370, 975 370"/>
+              <text class="edge-label" x="1012" y="352">extends</text>
+
+              <path class="edge implement type-only path-core context-node" d="M 855 538 C 855 475, 855 435, 855 412"/>
+              <text class="edge-label" x="870" y="474">implements</text>
+
+              <path class="edge inherit type-only path-core" d="M 720 690 C 720 635, 755 600, 800 578"/>
+              <text class="edge-label" x="665" y="627">extends</text>
+
+              <path class="edge inherit type-only" d="M 970 740 C 940 740, 920 740, 890 740"/>
+              <text class="edge-label" x="910" y="722">extends</text>
+
+              <path class="edge implement type-only" d="M 1150 690 C 1200 600, 1250 490, 1260 412"/>
+              <text class="edge-label" x="1212" y="570">implements</text>
+
+              <path class="edge inherit type-only modern context-node" d="M 1450 538 C 1290 560, 1050 560, 910 558"/>
+              <text class="edge-label" x="1225" y="541">extends AbstractExecutorService</text>
+
+              <path class="edge version modern" d="M 1520 538 C 1460 475, 1370 430, 1290 412"/>
+              <text class="edge-label" x="1450" y="444">JDK 25 还实现 ScheduledExecutorService</text>
+
+              <path class="edge flow runtime path-core" d="M 960 330 C 1120 245, 1370 205, 1515 150"/>
+              <text class="edge-label" x="1190" y="233">submit() 返回 Future</text>
+
+              <path class="edge inherit type-only" d="M 1550 180 C 1570 155, 1580 150, 1585 145"/>
+              <text class="edge-label" x="1490" y="190">extends</text>
+
+              <path class="edge inherit type-only" d="M 1470 133 C 1485 133, 1495 133, 1510 133"/>
+
+              <path class="edge inherit type-only" d="M 1470 210 C 1120 225, 620 225, 285 174"/>
+              <text class="edge-label" x="820" y="214">RunnableFuture 同时 extends Runnable</text>
+
+              <path class="edge implement type-only" d="M 1670 640 C 1660 500, 1640 340, 1600 225"/>
+              <text class="edge-label" x="1655" y="432">implements RunnableFuture</text>
+
+              <path class="edge flow runtime path-core" d="M 940 545 C 1160 555, 1430 590, 1635 640"/>
+              <text class="edge-label" x="1240" y="570">newTaskFor() 默认创建 FutureTask</text>
+
+              <path class="edge implement type-only" d="M 1800 170 C 1760 135, 1715 125, 1680 125"/>
+              <text class="edge-label" x="1735" y="104">implements Future</text>
+
+              <path class="edge implement type-only" d="M 1735 520 C 1735 470, 1735 440, 1735 414"/>
+              <text class="edge-label" x="1752" y="457">implements</text>
+
+              <path class="edge compose runtime" d="M 1660 555 C 1575 520, 1515 465, 1500 410"/>
+              <text class="edge-label" x="1520" y="500">内部使用 Executor + 完成队列</text>
+
+              <path class="edge flow runtime" d="M 180 575 C 330 590, 520 610, 650 690"/>
+              <text class="edge-label" x="330" y="575">fixed / cached / single</text>
+
+              <path class="edge flow runtime" d="M 245 585 C 520 570, 870 610, 1040 690"/>
+              <text class="edge-label" x="705" y="600">scheduled</text>
+
+              <path class="edge flow runtime modern" d="M 245 555 C 660 500, 1180 520, 1450 538"/>
+              <text class="edge-label" x="970" y="509">workStealing → ForkJoinPool</text>
+
+              <path class="edge flow runtime modern" d="M 245 605 C 620 710, 1320 700, 1680 725"/>
+              <text class="edge-label" x="1215" y="727">JDK 21+ virtualThreadPerTask</text>
+
+              <path class="edge compose runtime path-core" d="M 720 770 C 600 835, 450 875, 330 900"/>
+              <text class="edge-label" x="510" y="830">workQueue</text>
+
+              <path class="edge compose runtime path-core" d="M 760 770 C 740 835, 720 865, 710 900"/>
+              <text class="edge-label" x="710" y="835">ThreadFactory 创建 Worker 线程</text>
+
+              <path class="edge compose runtime path-core" d="M 850 770 C 960 820, 1070 860, 1135 900"/>
+              <text class="edge-label" x="1000" y="830">饱和后 reject</text>
+
+              <path class="edge inherit type-only" d="M 1390 1000 C 1320 970, 1270 940, 1230 920"/>
+              <text class="edge-label" x="1310" y="965">四个内置策略</text>
+
+              <path class="edge compose runtime" d="M 370 990 C 500 1030, 620 1025, 700 990"/>
+              <text class="edge-label" x="500" y="1050">Worker 从队列取任务</text>
+
+              <path class="edge compose runtime" d="M 785 990 C 910 1015, 1020 1000, 1135 940"/>
+              <text class="edge-label" x="930" y="1025">异常/饱和处理边界</text>
+            </g>
+
+            <g id="nodes">
+              <g class="node interface runtime path-core context-node" data-id="runnable" role="button" tabindex="0"
+                 transform="translate(90 92)">
+                <rect width="230" height="82" rx="5"/>
+                <text class="node-title" x="115" y="33">Runnable</text>
+                <text class="node-note" x="115" y="57">run() · 无返回值任务</text>
+              </g>
+
+              <g class="node interface runtime path-core" data-id="callable" role="button" tabindex="0"
+                 transform="translate(400 92)">
+                <rect width="250" height="82" rx="5"/>
+                <text class="node-title" x="125" y="33">Callable&lt;V&gt;</text>
+                <text class="node-note" x="125" y="57">call() · 有结果/可抛异常</text>
+              </g>
+
+              <g class="node interface type-only" data-id="scheduled-future" role="button" tabindex="0"
+                 transform="translate(1210 92)">
+                <rect width="260" height="82" rx="5"/>
+                <text class="node-title small" x="130" y="32">ScheduledFuture&lt;V&gt;</text>
+                <text class="node-note" x="130" y="57">Future + Delayed</text>
+              </g>
+
+              <g class="node interface runtime path-core context-node" data-id="future" role="button" tabindex="0"
+                 transform="translate(1510 92)">
+                <rect width="235" height="82" rx="5"/>
+                <text class="node-title" x="117.5" y="33">Future&lt;V&gt;</text>
+                <text class="node-note" x="117.5" y="57">异步结果句柄</text>
+              </g>
+
+              <g class="node special modern" data-id="completable-future" role="button" tabindex="0"
+                 transform="translate(1770 92)">
+                <rect width="185" height="82" rx="5"/>
+                <text class="node-title small" x="92.5" y="30">CompletableFuture</text>
+                <text class="node-note" x="92.5" y="53">Future + CompletionStage</text>
+                <text class="version-badge" x="92.5" y="72">下一张异步编排地图</text>
+              </g>
+
+              <g class="node interface type-only" data-id="runnable-future" role="button" tabindex="0"
+                 transform="translate(1470 180)">
+                <rect width="270" height="58" rx="5"/>
+                <text class="node-title small" x="135" y="24">RunnableFuture&lt;V&gt;</text>
+                <text class="node-note" x="135" y="44">Runnable + Future</text>
+              </g>
+
+              <g class="node interface public path-core context-node" data-id="executor" role="button" tabindex="0"
+                 transform="translate(300 330)">
+                <rect width="250" height="84" rx="5"/>
+                <text class="node-title" x="125" y="34">Executor</text>
+                <text class="node-note" x="125" y="58">execute(Runnable)</text>
+              </g>
+
+              <g class="node interface public path-core context-node" data-id="executor-service" role="button" tabindex="0"
+                 transform="translate(735 330)">
+                <rect width="300" height="84" rx="5"/>
+                <text class="node-title" x="150" y="32">ExecutorService</text>
+                <text class="node-note" x="150" y="56">提交 + Future + 生命周期</text>
+                <text class="version-badge modern" x="150" y="75">JDK 19+ also AutoCloseable</text>
+              </g>
+
+              <g class="node interface public" data-id="scheduled-executor-service" role="button" tabindex="0"
+                 transform="translate(1120 330)">
+                <rect width="340" height="84" rx="5"/>
+                <text class="node-title small" x="170" y="32">ScheduledExecutorService</text>
+                <text class="node-note" x="170" y="57">延迟任务 + 周期任务</text>
+              </g>
+
+              <g class="node interface public" data-id="completion-service" role="button" tabindex="0"
+                 transform="translate(1570 330)">
+                <rect width="300" height="84" rx="5"/>
+                <text class="node-title small" x="150" y="32">CompletionService&lt;V&gt;</text>
+                <text class="node-note" x="150" y="57">按完成顺序消费结果</text>
+              </g>
+
+              <g class="node special runtime path-core" data-id="executors" role="button" tabindex="0"
+                 transform="translate(70 525)">
+                <rect width="250" height="100" rx="5"/>
+                <text class="node-title" x="125" y="34">Executors</text>
+                <text class="node-note" x="125" y="58">静态工厂与适配工具</text>
+                <text class="node-note" x="125" y="80">它自己不是线程池</text>
+              </g>
+
+              <g class="node abstract type-only path-core context-node" data-id="abstract-executor-service"
+                 role="button" tabindex="0" transform="translate(690 520)">
+                <rect width="350" height="92" rx="5"/>
+                <text class="node-title small" x="175" y="34">AbstractExecutorService</text>
+                <text class="node-note" x="175" y="58">实现 submit / invokeAll / invokeAny</text>
+                <text class="node-note" x="175" y="78">把任务包装为 RunnableFuture</text>
+              </g>
+
+              <g class="node special modern context-node" data-id="fork-join-pool" role="button" tabindex="0"
+                 transform="translate(1430 520)">
+                <rect width="300" height="96" rx="5"/>
+                <text class="node-title" x="150" y="32">ForkJoinPool</text>
+                <text class="node-note" x="150" y="56">工作窃取 · 分治任务</text>
+                <text class="version-badge" x="150" y="77">JDK 25 增加调度服务能力</text>
+              </g>
+
+              <g class="node common runtime path-core context-node" data-id="thread-pool-executor"
+                 role="button" tabindex="0" transform="translate(560 690)">
+                <rect width="330" height="98" rx="5"/>
+                <text class="node-title" x="165" y="34">ThreadPoolExecutor</text>
+                <text class="node-note" x="165" y="58">可配置的通用线程池</text>
+                <text class="node-note" x="165" y="79">线程 + 队列 + 拒绝策略</text>
+              </g>
+
+              <g class="node common runtime" data-id="scheduled-thread-pool-executor"
+                 role="button" tabindex="0" transform="translate(970 690)">
+                <rect width="360" height="98" rx="5"/>
+                <text class="node-title small" x="180" y="34">ScheduledThreadPoolExecutor</text>
+                <text class="node-note" x="180" y="58">ThreadPoolExecutor 的定时扩展</text>
+                <text class="node-note" x="180" y="79">替代多线程场景下的 Timer</text>
+              </g>
+
+              <g class="node common public" data-id="executor-completion-service"
+                 role="button" tabindex="0" transform="translate(1580 520)">
+                <rect width="335" height="88" rx="5"/>
+                <text class="node-title small" x="167.5" y="33">ExecutorCompletionService</text>
+                <text class="node-note" x="167.5" y="58">Executor + BlockingQueue&lt;Future&gt;</text>
+              </g>
+
+              <g class="node result runtime path-core" data-id="future-task" role="button" tabindex="0"
+                 transform="translate(1540 635)">
+                <rect width="270" height="82" rx="5"/>
+                <text class="node-title" x="135" y="33">FutureTask&lt;V&gt;</text>
+                <text class="node-note" x="135" y="57">可运行、可取消、可取结果</text>
+              </g>
+
+              <g class="node special modern" data-id="virtual-thread-executor" role="button" tabindex="0"
+                 transform="translate(1615 720)">
+                <rect width="320" height="70" rx="5"/>
+                <text class="node-title small" x="160" y="28">虚拟线程：每任务一个线程</text>
+                <text class="node-note" x="160" y="51">Executors.newVirtualThreadPerTaskExecutor()</text>
+              </g>
+
+              <g class="node interface runtime path-core" data-id="blocking-queue" role="button" tabindex="0"
+                 transform="translate(120 900)">
+                <rect width="340" height="96" rx="5"/>
+                <text class="node-title small" x="170" y="31">BlockingQueue&lt;Runnable&gt;</text>
+                <text class="node-note" x="170" y="55">Array / Linked / Synchronous</text>
+                <text class="node-note" x="170" y="77">决定排队与背压特性</text>
+              </g>
+
+              <g class="node interface runtime path-core" data-id="thread-factory" role="button" tabindex="0"
+                 transform="translate(590 900)">
+                <rect width="270" height="96" rx="5"/>
+                <text class="node-title" x="135" y="32">ThreadFactory</text>
+                <text class="node-note" x="135" y="56">newThread(Runnable)</text>
+                <text class="node-note" x="135" y="77">命名、优先级、异常处理</text>
+              </g>
+
+              <g class="node interface runtime path-core" data-id="rejected-handler" role="button" tabindex="0"
+                 transform="translate(1040 900)">
+                <rect width="360" height="96" rx="5"/>
+                <text class="node-title small" x="180" y="31">RejectedExecutionHandler</text>
+                <text class="node-note" x="180" y="55">线程池无法接收任务时的策略</text>
+                <text class="node-note" x="180" y="77">拒绝不是“偶发异常”，而是容量设计</text>
+              </g>
+
+              <g class="node support runtime" data-id="rejection-policies" role="button" tabindex="0"
+                 transform="translate(1430 900)">
+                <rect width="445" height="110" rx="5"/>
+                <text class="node-title small" x="222.5" y="28">ThreadPoolExecutor 内置拒绝策略</text>
+                <text class="node-note" x="222.5" y="53">AbortPolicy · CallerRunsPolicy</text>
+                <text class="node-note" x="222.5" y="75">DiscardPolicy · DiscardOldestPolicy</text>
+                <text class="node-note" x="222.5" y="96">默认 AbortPolicy</text>
+              </g>
+
+              <g class="node private runtime" data-id="worker" role="button" tabindex="0"
+                 transform="translate(590 1035)">
+                <rect width="300" height="72" rx="5"/>
+                <text class="node-title small" x="150" y="29">ThreadPoolExecutor.Worker</text>
+                <text class="node-note" x="150" y="52">内部工作单元：线程 + 首任务</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <aside class="detail-panel" aria-live="polite" aria-label="节点说明">
+        <div class="detail-kicker">
+          <span>点击左侧节点查看</span>
+          <span class="detail-kind" id="detail-kind">接口</span>
+        </div>
+        <h2 id="detail-title">Executor</h2>
+        <p class="detail-summary" id="detail-summary"></p>
+
+        <section class="detail-section">
+          <h3>在体系中的位置</h3>
+          <ul class="detail-list" id="detail-relations"></ul>
+        </section>
+
+        <section class="detail-section">
+          <h3>抓住这些关键词</h3>
+          <div class="method-list" id="detail-methods"></div>
+        </section>
+
+        <div class="judgement" id="detail-judgement"></div>
+      </aside>
+    </main>
+
+    <section class="flow-panel" aria-label="ThreadPoolExecutor 执行流程">
+      <div class="section-header">
+        <h2>一个任务进入 ThreadPoolExecutor 后怎么走</h2>
+        <p>顺序很重要：核心线程 → 队列 → 最大线程 → 拒绝。</p>
+      </div>
+      <div class="flow-grid">
+        <article class="flow-step highlight">
+          <h3>先看核心线程数</h3>
+          <p>当前工作线程少于 corePoolSize，优先创建 Worker 执行任务，即使已有空闲线程也遵循这一步。</p>
+        </article>
+        <article class="flow-step">
+          <h3>再尝试进入队列</h3>
+          <p>核心线程已满且线程池仍运行，调用 workQueue.offer(task) 尝试排队。</p>
+        </article>
+        <article class="flow-step">
+          <h3>队列成功后复查</h3>
+          <p>任务入队后还会复查线程池状态；若已关闭则移除并拒绝，无工作线程则补一个 Worker。</p>
+        </article>
+        <article class="flow-step">
+          <h3>队列满才扩到 maximum</h3>
+          <p>入队失败时，再尝试创建非核心 Worker，数量最多达到 maximumPoolSize。</p>
+        </article>
+        <article class="flow-step">
+          <h3>最后执行拒绝策略</h3>
+          <p>既不能排队也不能新增 Worker，调用 RejectedExecutionHandler；这就是系统背压边界。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="path-panel" aria-label="推荐学习主线">
+      <div class="section-header">
+        <h2>推荐学习主线</h2>
+        <p>先把“任务—执行者—结果”串起来，再进入参数与源码。</p>
+      </div>
+      <div class="path-grid">
+        <article class="path-step current">
+          <h3>Executor</h3>
+          <p>理解任务提交和执行方式解耦；Executor 不保证异步，也不等于线程池。</p>
+        </article>
+        <article class="path-step">
+          <h3>ExecutorService + Future</h3>
+          <p>学习 submit、生命周期、Future.get/cancel，并区分 execute 与 submit 的异常。</p>
+        </article>
+        <article class="path-step">
+          <h3>ThreadPoolExecutor</h3>
+          <p>掌握核心参数和任务进入顺序，不急着背“最佳线程数公式”。</p>
+        </article>
+        <article class="path-step">
+          <h3>队列与拒绝策略</h3>
+          <p>比较有界、无界、直接移交队列，理解容量、延迟、吞吐与背压。</p>
+        </article>
+        <article class="path-step">
+          <h3>Scheduled / ForkJoin</h3>
+          <p>遇到延时周期任务或分治计算时再学专用执行器。</p>
+        </article>
+        <article class="path-step">
+          <h3>CompletableFuture / 虚拟线程</h3>
+          <p>一个负责异步编排，一个改变阻塞任务的线程成本；它们不是同一个问题。</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="sources">
+      <p>
+        图以 Java 8 的稳定学习主干为中心，并标出版本变化：
+        ExecutorService 从 JDK 19 起也是 AutoCloseable；虚拟线程每任务执行器始于 JDK 21；
+        ForkJoinPool 在 JDK 25 增加 ScheduledExecutorService 能力。
+      </p>
+      <p>
+        官方核对：
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ExecutorService.html">ExecutorService</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html">ThreadPoolExecutor</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Executors.html">Executors</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/package-tree.html">包层次</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var details = {
+        "runnable": {
+          kind: "任务接口",
+          title: "Runnable",
+          summary: "只描述一段可执行动作，没有返回值。它并不决定由哪个线程、何时执行。",
+          relations: [
+            "Executor.execute() 的任务参数。",
+            "ExecutorService.submit(Runnable) 会把它包装成可追踪的 FutureTask。",
+            "Runnable 本身不是异步，也不是线程。"
+          ],
+          methods: ["run()"],
+          judgement: "关键认知：任务是什么，与谁来执行任务，是两件分开的事。"
+        },
+        "callable": {
+          kind: "任务接口",
+          title: "Callable<V>",
+          summary: "可以返回结果并抛出受检异常的任务描述，通常通过 ExecutorService.submit 提交。",
+          relations: [
+            "submit(Callable) 返回 Future<V>。",
+            "AbstractExecutorService 默认把它包装为 FutureTask。",
+            "不能直接传给只接受 Runnable 的 Executor.execute。"
+          ],
+          methods: ["V call() throws Exception"],
+          judgement: "当业务需要结果或明确传播异常时使用；不要为了“看起来异步”就把所有 Runnable 改成 Callable。"
+        },
+        "future": {
+          kind: "结果接口",
+          title: "Future<V>",
+          summary: "异步计算的结果句柄，可以查询、取消或等待结果，但基础 Future 不擅长编排多个异步步骤。",
+          relations: [
+            "ExecutorService.submit() 返回它。",
+            "FutureTask、CompletableFuture、ForkJoinTask 都实现它。",
+            "任务动作 happens-before 另一个线程成功 Future.get() 之后的动作。"
+          ],
+          methods: ["get()", "get(timeout)", "cancel()", "isDone()", "isCancelled()"],
+          judgement: "Future.get() 会阻塞当前线程。拿到 Future 不等于已经并行完成，也不等于调用 get 就是异步。"
+        },
+        "scheduled-future": {
+          kind: "结果接口",
+          title: "ScheduledFuture<V>",
+          summary: "带延迟信息的 Future，通常由 ScheduledExecutorService 的 schedule 方法返回。",
+          relations: [
+            "extends Future<V> 与 Delayed。",
+            "RunnableScheduledFuture 又把它与 RunnableFuture 结合。"
+          ],
+          methods: ["getDelay()", "get()", "cancel()"],
+          judgement: "它代表“可取消的延迟结果”，不是调度器本身。"
+        },
+        "completable-future": {
+          kind: "异步编排类",
+          title: "CompletableFuture<T>",
+          summary: "同时实现 Future 与 CompletionStage，重点是依赖编排、结果转换和异常链，而不是替代线程池。",
+          relations: [
+            "默认异步方法常使用 ForkJoinPool.commonPool()。",
+            "可以显式传入 Executor。",
+            "属于下一层异步编排体系。"
+          ],
+          methods: ["supplyAsync()", "thenApply()", "thenCompose()", "thenCombine()", "exceptionally()"],
+          judgement: "先学清 ExecutorService 与 Future，再学 CompletableFuture；否则很容易只会串 API，不懂任务实际跑在哪。"
+        },
+        "runnable-future": {
+          kind: "任务结果接口",
+          title: "RunnableFuture<V>",
+          summary: "同时是 Runnable 和 Future：线程池可以执行它，调用方又可以通过它观察结果。",
+          relations: [
+            "extends Runnable 与 Future<V>。",
+            "FutureTask 是它的常用实现。",
+            "是理解 submit 如何从任务产生 Future 的桥。"
+          ],
+          methods: ["run()", "get()", "cancel()"],
+          judgement: "submit 不是凭空生成一个旁观者 Future，而是把任务本身包装成既能运行又能记录结果的对象。"
+        },
+        "executor": {
+          kind: "执行接口",
+          title: "Executor",
+          summary: "最小执行契约，只负责接收 Runnable。它把“提交任务”与“具体怎样运行”解耦。",
+          relations: [
+            "ExecutorService extends Executor。",
+            "只有 execute(Runnable) 一个核心方法。",
+            "实现可以新建线程、使用线程池，甚至直接在调用线程执行。"
+          ],
+          methods: ["execute(Runnable)"],
+          judgement: "最容易误解的一点：Executor 不等于线程池，也不保证异步；Runnable::run 就是合法的 Executor。"
+        },
+        "executor-service": {
+          kind: "服务接口",
+          title: "ExecutorService",
+          summary: "在 Executor 之上增加任务结果、批量提交和完整生命周期，因此它才像一个可管理的执行服务。",
+          relations: [
+            "extends Executor；JDK 19+ 还 extends AutoCloseable。",
+            "ScheduledExecutorService 继续扩展它。",
+            "AbstractExecutorService 提供大量通用实现。"
+          ],
+          methods: ["submit()", "invokeAll()", "shutdown()", "shutdownNow()", "awaitTermination()"],
+          judgement: "学习重点不是记方法，而是同时掌握提交、结果和关闭。创建了 ExecutorService 就要明确谁负责关闭它。"
+        },
+        "scheduled-executor-service": {
+          kind: "服务接口",
+          title: "ScheduledExecutorService",
+          summary: "在 ExecutorService 之上增加延迟执行与周期执行能力。",
+          relations: [
+            "extends ExecutorService。",
+            "ScheduledThreadPoolExecutor 是传统常用实现。",
+            "JDK 25 的 ForkJoinPool 也实现该接口。"
+          ],
+          methods: ["schedule()", "scheduleAtFixedRate()", "scheduleWithFixedDelay()"],
+          judgement: "fixedRate 关心时间节奏，fixedDelay 关心上次完成后的间隔，两者不能只凭名字记忆。"
+        },
+        "completion-service": {
+          kind: "结果协调接口",
+          title: "CompletionService<V>",
+          summary: "把任务提交与已完成结果的消费解耦，让调用方按完成顺序而不是提交顺序拿 Future。",
+          relations: [
+            "自身不是 ExecutorService 的子接口。",
+            "ExecutorCompletionService 是常用实现。",
+            "内部通常依赖一个 Executor 和一个完成队列。"
+          ],
+          methods: ["submit()", "take()", "poll()"],
+          judgement: "适合多个任务耗时不同、谁先完成就先处理谁；如果只按提交顺序逐个 Future.get，慢任务会挡住后面的快结果。"
+        },
+        "executors": {
+          kind: "静态工具类",
+          title: "Executors",
+          summary: "提供常见 Executor 配置的工厂和适配方法。它自己不执行任务，也不是线程池对象。",
+          relations: [
+            "fixed/cached/single 通常返回 ThreadPoolExecutor 或其包装。",
+            "scheduled 返回 ScheduledThreadPoolExecutor。",
+            "workStealing 返回 ForkJoinPool；JDK 21+ 可创建虚拟线程每任务执行器。"
+          ],
+          methods: ["newFixedThreadPool()", "newCachedThreadPool()", "newScheduledThreadPool()", "newWorkStealingPool()"],
+          judgement: "工厂适合学习和简单场景，但要知道它隐藏的队列与上限：例如 fixed/single 使用无界队列，cached 的最大线程数非常大。"
+        },
+        "abstract-executor-service": {
+          kind: "抽象类",
+          title: "AbstractExecutorService",
+          summary: "把 ExecutorService 的高级提交方法建立在 execute 之上，统一完成任务包装、批量执行与结果处理。",
+          relations: [
+            "implements ExecutorService。",
+            "ThreadPoolExecutor 与 ForkJoinPool 都继承它。",
+            "newTaskFor 默认创建 FutureTask。"
+          ],
+          methods: ["submit()", "invokeAll()", "invokeAny()", "newTaskFor()"],
+          judgement: "它说明了 Executor 体系的分层设计：具体子类只要把 execute 的调度机制做好，就能复用大量上层服务能力。"
+        },
+        "thread-pool-executor": {
+          kind: "常用实现类",
+          title: "ThreadPoolExecutor",
+          summary: "通用、可配置的线程池实现，管理 Worker、任务队列、线程生命周期和饱和处理。",
+          relations: [
+            "extends AbstractExecutorService。",
+            "ScheduledThreadPoolExecutor 继续继承它。",
+            "组合 BlockingQueue、ThreadFactory 和 RejectedExecutionHandler。"
+          ],
+          methods: ["execute()", "shutdown()", "setCorePoolSize()", "getQueue()", "beforeExecute()"],
+          judgement: "学习它时先吃透任务进入顺序，再理解七个构造参数；线程数公式不是脱离业务测量的标准答案。"
+        },
+        "scheduled-thread-pool-executor": {
+          kind: "专用实现类",
+          title: "ScheduledThreadPoolExecutor",
+          summary: "支持延迟和周期任务的 ThreadPoolExecutor 扩展，并实现 ScheduledExecutorService。",
+          relations: [
+            "extends ThreadPoolExecutor。",
+            "implements ScheduledExecutorService。",
+            "内部使用延迟队列组织定时任务。"
+          ],
+          methods: ["schedule()", "scheduleAtFixedRate()", "setRemoveOnCancelPolicy()"],
+          judgement: "有延迟/周期业务再学；普通任务池不要为了“以后可能定时”就默认使用它。"
+        },
+        "fork-join-pool": {
+          kind: "专用执行器",
+          title: "ForkJoinPool",
+          summary: "面向可拆分任务和大量小任务的工作窃取线程池，每个工作线程有自己的队列并可窃取其他线程的任务。",
+          relations: [
+            "extends AbstractExecutorService。",
+            "Java 8 已提供 commonPool 与 work-stealing。",
+            "JDK 25 开始还实现 ScheduledExecutorService。"
+          ],
+          methods: ["commonPool()", "invoke()", "submit()", "getStealCount()"],
+          judgement: "它不是 ThreadPoolExecutor 的升级版；适合 CPU 分治与 ForkJoinTask，阻塞 I/O 需要额外谨慎。"
+        },
+        "executor-completion-service": {
+          kind: "协调实现类",
+          title: "ExecutorCompletionService<V>",
+          summary: "把提交的任务交给某个 Executor 执行，并把已完成的 Future 放入完成队列。",
+          relations: [
+            "implements CompletionService。",
+            "组合而不是继承 Executor。",
+            "常用 take() 按完成顺序获取结果。"
+          ],
+          methods: ["submit()", "take()", "poll()"],
+          judgement: "它解决的是结果消费顺序，不负责创造一种新的线程池。"
+        },
+        "future-task": {
+          kind: "任务结果实现",
+          title: "FutureTask<V>",
+          summary: "既能被线程执行，又能保存完成、失败或取消状态，是 submit 默认任务包装的重要实现。",
+          relations: [
+            "implements RunnableFuture<V>。",
+            "可包装 Runnable 或 Callable。",
+            "AbstractExecutorService.newTaskFor 默认创建它。"
+          ],
+          methods: ["run()", "get()", "cancel()", "done()"],
+          judgement: "execute 与 submit 异常表现不同的重要原因之一：submit 的异常会被 FutureTask 记录，通常要 get 才能观察。"
+        },
+        "virtual-thread-executor": {
+          kind: "JDK 21+ 执行器",
+          title: "虚拟线程：每任务一个线程",
+          summary: "每个任务启动一个新的虚拟线程，核心目标是降低大量阻塞任务的线程成本，而不是复用固定数量的平台线程。",
+          relations: [
+            "Executors.newVirtualThreadPerTaskExecutor() 返回 ExecutorService。",
+            "它不是 ThreadPoolExecutor。",
+            "仍然需要关闭并处理任务失败。"
+          ],
+          methods: ["newVirtualThreadPerTaskExecutor()", "submit()", "close()"],
+          judgement: "虚拟线程不是让 CPU 计算无限并行；它主要改变阻塞并发的成本模型，外部资源仍需限流。"
+        },
+        "blocking-queue": {
+          kind: "协作接口",
+          title: "BlockingQueue<Runnable>",
+          summary: "保存暂时没有 Worker 执行的任务；队列类型直接影响线程扩张、内存风险、延迟和背压。",
+          relations: [
+            "ThreadPoolExecutor 组合一个工作队列。",
+            "ArrayBlockingQueue 有界；LinkedBlockingQueue 可配置容量。",
+            "SynchronousQueue 不存储任务，要求直接移交。"
+          ],
+          methods: ["offer()", "take()", "remainingCapacity()"],
+          judgement: "队列不是线程池的附属细节。无界队列会让 maximumPoolSize 很可能失去作用，并把压力转成排队与内存风险。"
+        },
+        "thread-factory": {
+          kind: "协作接口",
+          title: "ThreadFactory",
+          summary: "把“如何创建工作线程”从线程池调度逻辑中抽离出来。",
+          relations: [
+            "ThreadPoolExecutor 构造参数之一。",
+            "Executors.defaultThreadFactory() 提供默认实现。",
+            "可以统一线程名、守护属性和未捕获异常处理器。"
+          ],
+          methods: ["newThread(Runnable)"],
+          judgement: "生产环境至少应让线程名可诊断；线程工厂不是单纯为了少写 new Thread。"
+        },
+        "rejected-handler": {
+          kind: "饱和策略接口",
+          title: "RejectedExecutionHandler",
+          summary: "线程池关闭或容量耗尽时，决定新任务如何处理，是系统过载策略的一部分。",
+          relations: [
+            "ThreadPoolExecutor 构造参数之一。",
+            "ThreadPoolExecutor 提供四个内置策略。",
+            "默认 AbortPolicy 抛 RejectedExecutionException。"
+          ],
+          methods: ["rejectedExecution(Runnable, ThreadPoolExecutor)"],
+          judgement: "不能静默丢失的重要业务任务；选择策略前必须回答调用方是否允许阻塞、降级、重试或失败。"
+        },
+        "rejection-policies": {
+          kind: "内置策略类",
+          title: "四个内置拒绝策略",
+          summary: "Abort 抛异常；CallerRuns 让提交线程执行；Discard 静默丢弃；DiscardOldest 丢掉队列最老任务后重试。",
+          relations: [
+            "都实现 RejectedExecutionHandler。",
+            "作为 ThreadPoolExecutor 的静态内部类提供。",
+            "CallerRuns 可能形成一种向提交方传递压力的反馈。"
+          ],
+          methods: ["AbortPolicy", "CallerRunsPolicy", "DiscardPolicy", "DiscardOldestPolicy"],
+          judgement: "没有一种策略普遍最好；静默丢弃只适合明确允许丢数据并有监控的业务。"
+        },
+        "worker": {
+          kind: "私有内部类",
+          title: "ThreadPoolExecutor.Worker",
+          summary: "线程池内部的工作单元，持有实际 Thread 和可能存在的首任务，并不断从工作队列取任务。",
+          relations: [
+            "implements Runnable。",
+            "内部还基于 AQS 提供简单独占状态。",
+            "不是业务代码应直接操作的公开类型。"
+          ],
+          methods: ["run()", "firstTask", "thread", "completedTasks"],
+          judgement: "源码阶段再学：它把“一个工作线程”与“这个线程当前/累计执行任务的状态”封装在一起。"
+        }
+      };
+
+      var svg = document.getElementById("executor-map");
+      var viewport = document.getElementById("map-viewport");
+      var modeButtons = Array.prototype.slice.call(document.querySelectorAll(".mode-button"));
+      var nodes = Array.prototype.slice.call(document.querySelectorAll(".node"));
+      var kindElement = document.getElementById("detail-kind");
+      var titleElement = document.getElementById("detail-title");
+      var summaryElement = document.getElementById("detail-summary");
+      var relationsElement = document.getElementById("detail-relations");
+      var methodsElement = document.getElementById("detail-methods");
+      var judgementElement = document.getElementById("detail-judgement");
+
+      function selectNode(id) {
+        var info = details[id];
+        if (!info) {
+          return;
+        }
+
+        nodes.forEach(function (node) {
+          node.classList.toggle("selected", node.getAttribute("data-id") === id);
+        });
+
+        kindElement.textContent = info.kind;
+        titleElement.textContent = info.title;
+        summaryElement.textContent = info.summary;
+
+        relationsElement.replaceChildren();
+        info.relations.forEach(function (relation) {
+          var item = document.createElement("li");
+          item.textContent = relation;
+          relationsElement.appendChild(item);
+        });
+
+        methodsElement.replaceChildren();
+        info.methods.forEach(function (method) {
+          var chip = document.createElement("span");
+          chip.className = "method-chip";
+          chip.textContent = method;
+          methodsElement.appendChild(chip);
+        });
+
+        judgementElement.textContent = info.judgement;
+      }
+
+      nodes.forEach(function (node) {
+        node.addEventListener("click", function (event) {
+          event.stopPropagation();
+          selectNode(node.getAttribute("data-id"));
+        });
+        node.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectNode(node.getAttribute("data-id"));
+          }
+        });
+      });
+
+      modeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var mode = button.getAttribute("data-mode");
+          svg.setAttribute("data-mode", mode);
+          modeButtons.forEach(function (candidate) {
+            candidate.setAttribute(
+              "aria-pressed",
+              String(candidate.getAttribute("data-mode") === mode)
+            );
+          });
+        });
+      });
+
+      var initialView = { x: 0, y: 0, width: 1980, height: 1160 };
+      var view = { x: 0, y: 0, width: 1980, height: 1160 };
+      var dragState = null;
+
+      function applyViewBox() {
+        svg.setAttribute("viewBox", [view.x, view.y, view.width, view.height].join(" "));
+      }
+
+      function zoom(factor) {
+        var nextWidth = Math.max(760, Math.min(2500, view.width * factor));
+        var nextHeight = nextWidth * initialView.height / initialView.width;
+        var centerX = view.x + view.width / 2;
+        var centerY = view.y + view.height / 2;
+        view.width = nextWidth;
+        view.height = nextHeight;
+        view.x = centerX - nextWidth / 2;
+        view.y = centerY - nextHeight / 2;
+        applyViewBox();
+      }
+
+      document.getElementById("zoom-in").addEventListener("click", function () {
+        zoom(0.82);
+      });
+
+      document.getElementById("zoom-out").addEventListener("click", function () {
+        zoom(1.22);
+      });
+
+      document.getElementById("zoom-reset").addEventListener("click", function () {
+        view = {
+          x: initialView.x,
+          y: initialView.y,
+          width: initialView.width,
+          height: initialView.height
+        };
+        applyViewBox();
+      });
+
+      svg.addEventListener("pointerdown", function (event) {
+        if (event.target.closest(".node")) {
+          return;
+        }
+        var rect = svg.getBoundingClientRect();
+        dragState = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          viewX: view.x,
+          viewY: view.y,
+          ratioX: view.width / rect.width,
+          ratioY: view.height / rect.height
+        };
+        svg.setPointerCapture(event.pointerId);
+        viewport.classList.add("dragging");
+      });
+
+      svg.addEventListener("pointermove", function (event) {
+        if (!dragState || dragState.pointerId !== event.pointerId) {
+          return;
+        }
+        view.x = dragState.viewX - (event.clientX - dragState.startX) * dragState.ratioX;
+        view.y = dragState.viewY - (event.clientY - dragState.startY) * dragState.ratioY;
+        applyViewBox();
+      });
+
+      function endDrag(event) {
+        if (!dragState || dragState.pointerId !== event.pointerId) {
+          return;
+        }
+        dragState = null;
+        viewport.classList.remove("dragging");
+      }
+
+      svg.addEventListener("pointerup", endDrag);
+      svg.addEventListener("pointercancel", endDrag);
+
+      selectNode("executor");
+      applyViewBox();
+    }());
+  </script>
+</body>
+</html>

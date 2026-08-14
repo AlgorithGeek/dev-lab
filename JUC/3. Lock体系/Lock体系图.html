@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Java Lock 体系认知图</title>
+  <style>
+    :root {
+      --paper: #fffbea;
+      --paper-deep: #f7f0cf;
+      --ink: #262a2f;
+      --muted: #62676d;
+      --line: #34383d;
+      --interface: #ffe99a;
+      --common: #ef4949;
+      --special: #ef9000;
+      --abstract: #aee7b2;
+      --support: #a8d8f5;
+      --private: #c7b8e8;
+      --panel: rgba(255, 253, 239, 0.94);
+      --shadow: rgba(64, 53, 24, 0.13);
+      --focus: #1769aa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas,
+        "Liberation Mono", "Noto Sans Mono CJK SC", "Microsoft YaHei", monospace;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(237, 207, 107, 0.12), transparent 24rem),
+        radial-gradient(circle at 88% 74%, rgba(99, 174, 219, 0.09), transparent 28rem),
+        repeating-linear-gradient(
+          0deg,
+          rgba(80, 70, 35, 0.018) 0,
+          rgba(80, 70, 35, 0.018) 1px,
+          transparent 1px,
+          transparent 5px
+        ),
+        var(--paper);
+      min-height: 100vh;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1880px, 100%);
+      margin: 0 auto;
+      padding: 26px 28px 38px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 4px 2px 18px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #8a5a00;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", "Kaiti SC", "Microsoft YaHei", sans-serif;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.08;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .hero-note {
+      flex: 0 0 auto;
+      padding: 10px 13px;
+      border: 1.5px solid var(--ink);
+      background: var(--interface);
+      box-shadow: 3px 4px 0 var(--shadow);
+      font-size: 13px;
+      transform: rotate(-0.4deg);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .mode-group,
+    .zoom-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .control-label {
+      margin-right: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mode-button,
+    .zoom-button {
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      background: rgba(255, 253, 239, 0.82);
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--shadow);
+      transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .mode-button:hover,
+    .zoom-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 3px 4px 0 var(--shadow);
+    }
+
+    .mode-button[aria-pressed="true"] {
+      background: var(--interface);
+      box-shadow: inset 0 -3px 0 rgba(239, 144, 0, 0.34), 2px 2px 0 var(--shadow);
+    }
+
+    .mode-button:focus-visible,
+    .zoom-button:focus-visible,
+    .node:focus-visible {
+      outline: 3px solid rgba(23, 105, 170, 0.42);
+      outline-offset: 3px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .map-panel,
+    .detail-panel,
+    .path-panel {
+      border: 1.6px solid var(--ink);
+      background: var(--panel);
+      box-shadow: 6px 7px 0 var(--shadow);
+    }
+
+    .map-panel {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px 18px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 11px 14px;
+      border-bottom: 1.5px solid var(--ink);
+      background: var(--support);
+      font-size: 12px;
+    }
+
+    .legend strong {
+      margin-right: 2px;
+      font-weight: 700;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .box-swatch {
+      width: 18px;
+      height: 12px;
+      display: inline-block;
+      background: var(--paper);
+      border: 2px solid var(--common);
+    }
+
+    .box-swatch.interface {
+      border-color: var(--ink);
+      background: var(--interface);
+    }
+
+    .box-swatch.special {
+      border-color: var(--special);
+    }
+
+    .box-swatch.abstract {
+      border-color: var(--ink);
+      background: var(--abstract);
+    }
+
+    .box-swatch.support {
+      border-color: var(--ink);
+      background: var(--support);
+    }
+
+    .line-swatch {
+      position: relative;
+      width: 38px;
+      height: 12px;
+      display: inline-block;
+    }
+
+    .line-swatch::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 8px;
+      top: 5px;
+      border-top: 2px solid var(--ink);
+    }
+
+    .line-swatch::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 1px;
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid var(--ink);
+      border-right: 2px solid var(--ink);
+      transform: rotate(45deg);
+    }
+
+    .line-swatch.implement::before {
+      border-top-style: dashed;
+      border-top-color: var(--common);
+    }
+
+    .line-swatch.implement::after {
+      border-color: var(--common);
+    }
+
+    .line-swatch.provide::before {
+      border-top-style: dotted;
+      border-top-color: var(--special);
+    }
+
+    .line-swatch.provide::after {
+      border-color: var(--special);
+    }
+
+    .map-viewport {
+      position: relative;
+      min-height: 720px;
+      overflow: hidden;
+      cursor: grab;
+      background:
+        linear-gradient(rgba(83, 77, 52, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 77, 52, 0.045) 1px, transparent 1px),
+        rgba(255, 251, 232, 0.72);
+      background-size: 32px 32px;
+      touch-action: none;
+    }
+
+    .map-viewport.dragging {
+      cursor: grabbing;
+    }
+
+    #lock-map {
+      display: block;
+      width: 100%;
+      height: 720px;
+      user-select: none;
+    }
+
+    .layer-band {
+      fill: rgba(255, 255, 255, 0.2);
+      stroke: rgba(52, 56, 61, 0.16);
+      stroke-width: 1.2;
+      stroke-dasharray: 7 9;
+    }
+
+    .layer-title {
+      fill: var(--muted);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .edge {
+      fill: none;
+      stroke-width: 2.2;
+      vector-effect: non-scaling-stroke;
+      transition: opacity 180ms ease, stroke-width 180ms ease;
+    }
+
+    .edge.inherit {
+      stroke: var(--line);
+      marker-end: url(#arrow-black);
+    }
+
+    .edge.implement {
+      stroke: var(--common);
+      stroke-dasharray: 8 7;
+      marker-end: url(#arrow-red);
+    }
+
+    .edge.provide {
+      stroke: var(--special);
+      stroke-dasharray: 3 7;
+      marker-end: url(#arrow-orange);
+    }
+
+    .edge.use {
+      stroke: #397eae;
+      stroke-dasharray: 11 5 2 5;
+      marker-end: url(#arrow-blue);
+    }
+
+    .edge.compare {
+      stroke: #777;
+      stroke-dasharray: 4 6;
+      marker-end: url(#arrow-gray);
+    }
+
+    .edge-label {
+      fill: var(--muted);
+      font-size: 14px;
+      paint-order: stroke;
+      stroke: var(--paper);
+      stroke-width: 6px;
+      stroke-linejoin: round;
+    }
+
+    .node {
+      cursor: pointer;
+      transition: opacity 180ms ease, filter 180ms ease;
+      outline: none;
+    }
+
+    .node rect {
+      fill: var(--paper);
+      stroke-width: 2.4;
+      vector-effect: non-scaling-stroke;
+      filter: url(#paper-shadow);
+      transition: stroke-width 140ms ease, fill 140ms ease;
+    }
+
+    .node.interface rect {
+      fill: var(--interface);
+      stroke: var(--ink);
+    }
+
+    .node.common rect {
+      stroke: var(--common);
+    }
+
+    .node.special rect {
+      stroke: var(--special);
+    }
+
+    .node.abstract rect {
+      fill: var(--abstract);
+      stroke: var(--ink);
+    }
+
+    .node.support rect {
+      fill: var(--support);
+      stroke: var(--ink);
+    }
+
+    .node.private rect {
+      fill: color-mix(in srgb, var(--private) 58%, var(--paper));
+      stroke: #715c9c;
+      stroke-dasharray: 6 4;
+    }
+
+    .node.reference rect {
+      fill: #f0eee2;
+      stroke: #666;
+    }
+
+    .node:hover rect,
+    .node.selected rect {
+      stroke-width: 4;
+      filter: url(#paper-shadow-strong);
+    }
+
+    .node.selected rect {
+      fill: #fff2b9;
+    }
+
+    .node text {
+      fill: var(--ink);
+      pointer-events: none;
+      text-anchor: middle;
+    }
+
+    .node-title {
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .node-title.small {
+      font-size: 17px;
+    }
+
+    .node-note {
+      font-size: 13px;
+      fill: var(--muted) !important;
+    }
+
+    .badge-text {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    #lock-map[data-mode="path"] .node:not(.path-core),
+    #lock-map[data-mode="path"] .edge:not(.path-core),
+    #lock-map[data-mode="api"] .node.internal,
+    #lock-map[data-mode="api"] .edge.internal,
+    #lock-map[data-mode="internal"] .node.public:not(.context-node),
+    #lock-map[data-mode="internal"] .edge.public:not(.context-node) {
+      opacity: 0.14;
+    }
+
+    #lock-map[data-mode="path"] .node.path-core,
+    #lock-map[data-mode="path"] .edge.path-core {
+      filter: saturate(1.08);
+    }
+
+    .detail-panel {
+      padding: 18px 18px 16px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background:
+        linear-gradient(135deg, rgba(168, 216, 245, 0.22), transparent 42%),
+        var(--panel);
+    }
+
+    .detail-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px dashed var(--ink);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .detail-kind {
+      padding: 4px 7px;
+      border: 1px solid var(--ink);
+      background: var(--interface);
+    }
+
+    .detail-panel h2 {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .detail-summary {
+      margin: 0;
+      color: #3c4146;
+      font-family: "STKaiti", "KaiTi", "Kaiti SC", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .detail-section {
+      padding-top: 12px;
+      border-top: 1px solid rgba(38, 42, 47, 0.24);
+    }
+
+    .detail-section h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .detail-list {
+      margin: 0;
+      padding-left: 19px;
+      color: #454a50;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .method-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .method-chip {
+      padding: 5px 7px;
+      border: 1px solid rgba(38, 42, 47, 0.5);
+      background: rgba(255, 233, 154, 0.48);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .judgement {
+      margin-top: auto;
+      padding: 12px;
+      border: 1.5px solid var(--special);
+      background: rgba(255, 233, 154, 0.32);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .path-panel {
+      margin-top: 20px;
+      padding: 17px;
+    }
+
+    .path-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .path-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .path-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      counter-reset: lesson;
+    }
+
+    .path-step {
+      position: relative;
+      min-height: 130px;
+      padding: 15px 13px 12px;
+      border: 1.5px solid var(--ink);
+      background: rgba(255, 251, 232, 0.72);
+      counter-increment: lesson;
+    }
+
+    .path-step::before {
+      content: counter(lesson);
+      position: absolute;
+      right: 9px;
+      top: 7px;
+      color: rgba(38, 42, 47, 0.18);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .path-step.current {
+      background: var(--interface);
+      box-shadow: inset 0 -5px 0 rgba(239, 144, 0, 0.3);
+    }
+
+    .path-step h3 {
+      margin: 0 32px 7px 0;
+      font-size: 15px;
+    }
+
+    .path-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .path-arrow {
+      color: var(--special);
+    }
+
+    .sources {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 19px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .sources p {
+      margin: 0;
+    }
+
+    .sources a {
+      color: #355f7a;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .small-screen-hint {
+      display: none;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        min-height: 360px;
+      }
+
+      .path-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px 12px 28px;
+      }
+
+      .hero {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero-note {
+        align-self: stretch;
+      }
+
+      .controls {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .map-viewport,
+      #lock-map {
+        height: 600px;
+        min-height: 600px;
+      }
+
+      .legend {
+        gap: 8px 12px;
+      }
+
+      .path-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .path-header,
+      .sources {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .small-screen-hint {
+        display: inline;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        width: 100%;
+        padding: 0;
+      }
+
+      .controls,
+      .detail-panel,
+      .path-panel,
+      .sources {
+        display: none;
+      }
+
+      .workspace {
+        display: block;
+      }
+
+      .map-panel {
+        box-shadow: none;
+      }
+
+      .map-viewport,
+      #lock-map {
+        height: 900px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">java.util.concurrent.locks · cognition map</p>
+        <h1>Lock 体系认知图</h1>
+        <p class="subtitle">
+          这不是一张“类名清单”，而是一张分层地图：先分清公开契约、具体实现和底层支撑，
+          再沿着学习主线逐个深入。点击任意节点可查看它在体系里的职责。
+        </p>
+      </div>
+      <div class="hero-note">JDK 25 API 核对 · Java 8+ 主干关系稳定</div>
+    </header>
+
+    <section class="controls" aria-label="体系图控制">
+      <div class="mode-group" role="group" aria-label="显示层次">
+        <span class="control-label">观察方式</span>
+        <button class="mode-button" type="button" data-mode="path" aria-pressed="true">学习主线</button>
+        <button class="mode-button" type="button" data-mode="api" aria-pressed="false">公开 API</button>
+        <button class="mode-button" type="button" data-mode="internal" aria-pressed="false">底层原理</button>
+        <button class="mode-button" type="button" data-mode="all" aria-pressed="false">完整体系</button>
+      </div>
+      <div class="zoom-group" role="group" aria-label="缩放控制">
+        <span class="control-label">画布</span>
+        <button class="zoom-button" type="button" id="zoom-out" aria-label="缩小">－</button>
+        <button class="zoom-button" type="button" id="zoom-reset">适应窗口</button>
+        <button class="zoom-button" type="button" id="zoom-in" aria-label="放大">＋</button>
+        <span class="small-screen-hint">可拖动画布</span>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="map-panel" aria-label="Lock 体系图">
+        <div class="legend" aria-label="图例">
+          <strong>图例</strong>
+          <span class="legend-item"><i class="box-swatch interface"></i>接口</span>
+          <span class="legend-item"><i class="box-swatch"></i>常用类</span>
+          <span class="legend-item"><i class="box-swatch special"></i>专用类</span>
+          <span class="legend-item"><i class="box-swatch abstract"></i>抽象基础</span>
+          <span class="legend-item"><i class="box-swatch support"></i>底层工具</span>
+          <span class="legend-item"><i class="line-swatch"></i>继承/分出</span>
+          <span class="legend-item"><i class="line-swatch implement"></i>实现</span>
+          <span class="legend-item"><i class="line-swatch provide"></i>提供/依赖</span>
+        </div>
+
+        <div class="map-viewport" id="map-viewport">
+          <svg id="lock-map" data-mode="path" viewBox="0 0 1700 1040"
+               role="img" aria-labelledby="map-title map-desc"
+               preserveAspectRatio="xMidYMid meet">
+            <title id="map-title">Java Lock 体系关系图</title>
+            <desc id="map-desc">
+              展示 Lock、Condition、ReadWriteLock 接口，ReentrantLock、
+              ReentrantReadWriteLock、StampedLock 实现，以及 AQS 和 LockSupport 底层支撑。
+            </desc>
+
+            <defs>
+              <filter id="paper-shadow" x="-20%" y="-20%" width="150%" height="160%">
+                <feDropShadow dx="2" dy="3" stdDeviation="1.4" flood-color="#574b27" flood-opacity="0.18"/>
+              </filter>
+              <filter id="paper-shadow-strong" x="-20%" y="-20%" width="150%" height="160%">
+                <feDropShadow dx="3" dy="5" stdDeviation="2" flood-color="#574b27" flood-opacity="0.25"/>
+              </filter>
+
+              <marker id="arrow-black" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#34383d" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-red" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#ef4949" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-orange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#ef9000" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#397eae" stroke-width="1.5"/>
+              </marker>
+              <marker id="arrow-gray" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M 1 1 L 10 6 L 1 11 Z" fill="#fffbea" stroke="#777" stroke-width="1.5"/>
+              </marker>
+            </defs>
+
+            <rect class="layer-band" x="22" y="35" width="1656" height="130" rx="8"/>
+            <rect class="layer-band" x="22" y="185" width="1656" height="190" rx="8"/>
+            <rect class="layer-band" x="22" y="395" width="1656" height="270" rx="8"/>
+            <rect class="layer-band" x="22" y="685" width="1656" height="325" rx="8"/>
+
+            <text class="layer-title" x="45" y="65">语言内置锁 · 对照区</text>
+            <text class="layer-title" x="45" y="215">公开契约 · 我能要求什么</text>
+            <text class="layer-title" x="45" y="425">公开实现 · 谁真正完成工作</text>
+            <text class="layer-title" x="45" y="715">底层支撑 · 它们大致靠什么实现</text>
+
+            <g id="edges">
+              <path class="edge compare public path-core context-node" d="M 360 118 C 455 145, 400 245, 360 270"/>
+              <text class="edge-label" x="430" y="188">语义对照</text>
+
+              <path class="edge provide public path-core" d="M 560 292 C 635 292, 625 292, 700 292"/>
+              <text class="edge-label" x="595" y="274">newCondition()</text>
+
+              <path class="edge implement public path-core" d="M 380 470 C 380 405, 415 365, 430 332"/>
+              <text class="edge-label" x="305" y="398">implements</text>
+
+              <path class="edge implement public path-core" d="M 870 470 C 895 410, 1020 380, 1050 332"/>
+              <text class="edge-label" x="908" y="397">implements</text>
+
+              <path class="edge inherit public path-core" d="M 825 565 C 825 535, 820 528, 820 515"/>
+              <path class="edge inherit public path-core" d="M 1035 565 C 1020 535, 1000 525, 980 510"/>
+              <text class="edge-label" x="890" y="548">分为两个 Lock 视图</text>
+
+              <path class="edge implement public path-core" d="M 790 565 C 710 500, 580 400, 480 332"/>
+              <path class="edge implement public path-core" d="M 1010 565 C 870 460, 680 365, 480 312"/>
+
+              <path class="edge provide public" d="M 930 610 C 825 520, 785 410, 805 332"/>
+              <text class="edge-label" x="750" y="468">WriteLock 支持 Condition</text>
+
+              <path class="edge provide public path-core" d="M 1380 520 C 1405 565, 1400 572, 1390 592"/>
+              <text class="edge-label" x="1410" y="565">可转换为接口视图</text>
+
+              <path class="edge provide public" d="M 1280 610 C 1110 540, 1040 420, 1050 332"/>
+              <path class="edge provide public" d="M 1350 610 C 1090 520, 760 405, 480 312"/>
+
+              <path class="edge provide internal path-core context-node" d="M 380 565 C 380 625, 380 660, 380 735"/>
+              <text class="edge-label" x="397" y="655">内部持有 Sync</text>
+
+              <path class="edge provide internal context-node" d="M 870 625 C 870 665, 820 695, 800 735"/>
+              <text class="edge-label" x="850" y="691">内部持有 Sync</text>
+
+              <path class="edge inherit internal path-core" d="M 430 795 C 520 805, 610 810, 690 848"/>
+              <path class="edge inherit internal" d="M 820 795 C 790 810, 760 825, 750 848"/>
+
+              <path class="edge inherit internal" d="M 735 900 C 735 935, 730 943, 725 960"/>
+              <path class="edge inherit internal" d="M 1020 900 C 1005 930, 930 948, 840 970"/>
+              <text class="edge-label" x="850" y="947">extends</text>
+
+              <path class="edge implement internal" d="M 250 890 C 290 760, 520 455, 735 332"/>
+              <text class="edge-label" x="340" y="720">ConditionObject implements</text>
+
+              <path class="edge provide internal path-core" d="M 820 875 C 1010 875, 1175 875, 1300 875"/>
+              <text class="edge-label" x="1060" y="854">阻塞/唤醒常借助 park/unpark</text>
+
+              <path class="edge provide internal" d="M 750 920 C 620 950, 470 955, 350 915"/>
+              <text class="edge-label" x="470" y="979">创建 ConditionObject</text>
+
+              <path class="edge provide internal" d="M 755 920 C 720 970, 590 1000, 460 1000"/>
+            </g>
+
+            <g id="nodes">
+              <g class="node reference public path-core" data-id="synchronized" role="button" tabindex="0"
+                 transform="translate(105 82)">
+                <rect width="255" height="72" rx="5"/>
+                <text class="node-title" x="127.5" y="31">synchronized</text>
+                <text class="node-note" x="127.5" y="53">JVM 内置 Monitor 锁</text>
+              </g>
+
+              <g class="node reference public" data-id="object-monitor" role="button" tabindex="0"
+                 transform="translate(510 82)">
+                <rect width="260" height="72" rx="5"/>
+                <text class="node-title" x="130" y="31">Object Monitor</text>
+                <text class="node-note" x="130" y="53">wait / notify / notifyAll</text>
+              </g>
+
+              <g class="node interface public path-core" data-id="lock" role="button" tabindex="0"
+                 transform="translate(260 245)">
+                <rect width="300" height="88" rx="5"/>
+                <text class="node-title" x="150" y="37">Lock</text>
+                <text class="node-note" x="150" y="62">显式互斥锁的统一契约</text>
+              </g>
+
+              <g class="node interface public path-core" data-id="condition" role="button" tabindex="0"
+                 transform="translate(700 245)">
+                <rect width="270" height="88" rx="5"/>
+                <text class="node-title" x="135" y="37">Condition</text>
+                <text class="node-note" x="135" y="62">await / signal / signalAll</text>
+              </g>
+
+              <g class="node interface public path-core" data-id="read-write-lock" role="button" tabindex="0"
+                 transform="translate(1050 245)">
+                <rect width="320" height="88" rx="5"/>
+                <text class="node-title" x="160" y="37">ReadWriteLock</text>
+                <text class="node-note" x="160" y="62">提供 readLock 与 writeLock</text>
+              </g>
+
+              <g class="node common public path-core context-node" data-id="reentrant-lock" role="button" tabindex="0"
+                 transform="translate(230 470)">
+                <rect width="300" height="96" rx="5"/>
+                <text class="node-title" x="150" y="35">ReentrantLock</text>
+                <text class="node-note" x="150" y="59">通用可重入互斥锁</text>
+                <text class="node-note" x="150" y="79">公平 · 可中断 · 可超时</text>
+              </g>
+
+              <g class="node common public path-core context-node" data-id="reentrant-read-write-lock"
+                 role="button" tabindex="0" transform="translate(700 470)">
+                <rect width="340" height="96" rx="5"/>
+                <text class="node-title small" x="170" y="35">ReentrantReadWriteLock</text>
+                <text class="node-note" x="170" y="59">ReadWriteLock 的常用实现</text>
+                <text class="node-note" x="170" y="79">读共享 · 写独占</text>
+              </g>
+
+              <g class="node special public path-core context-node" data-id="stamped-lock" role="button" tabindex="0"
+                 transform="translate(1230 470)">
+                <rect width="300" height="96" rx="5"/>
+                <text class="node-title" x="150" y="35">StampedLock</text>
+                <text class="node-note" x="150" y="59">写锁 · 悲观读 · 乐观读</text>
+                <text class="node-note" x="150" y="79">自身不实现 Lock / ReadWriteLock</text>
+              </g>
+
+              <g class="node common public path-core" data-id="read-lock" role="button" tabindex="0"
+                 transform="translate(690 565)">
+                <rect width="210" height="82" rx="5"/>
+                <text class="node-title small" x="105" y="33">ReadLock</text>
+                <text class="node-note" x="105" y="56">implements Lock</text>
+              </g>
+
+              <g class="node common public path-core" data-id="write-lock" role="button" tabindex="0"
+                 transform="translate(930 565)">
+                <rect width="210" height="82" rx="5"/>
+                <text class="node-title small" x="105" y="33">WriteLock</text>
+                <text class="node-note" x="105" y="56">implements Lock</text>
+              </g>
+
+              <g class="node special public" data-id="stamped-views" role="button" tabindex="0"
+                 transform="translate(1210 600)">
+                <rect width="350" height="62" rx="5"/>
+                <text class="node-title small" x="175" y="26">Lock / ReadWriteLock 视图</text>
+                <text class="node-note" x="175" y="47">asReadLock / asWriteLock / asReadWriteLock</text>
+              </g>
+
+              <g class="node private internal path-core" data-id="reentrant-sync" role="button" tabindex="0"
+                 transform="translate(245 735)">
+                <rect width="290" height="62" rx="5"/>
+                <text class="node-title small" x="145" y="26">ReentrantLock.Sync</text>
+                <text class="node-note" x="145" y="47">私有内部同步器 → extends AQS</text>
+              </g>
+
+              <g class="node private internal" data-id="read-write-sync" role="button" tabindex="0"
+                 transform="translate(675 735)">
+                <rect width="300" height="62" rx="5"/>
+                <text class="node-title small" x="150" y="26">ReadWriteLock.Sync</text>
+                <text class="node-note" x="150" y="47">私有内部同步器 → extends AQS</text>
+              </g>
+
+              <g class="node abstract internal" data-id="condition-object" role="button" tabindex="0"
+                 transform="translate(90 835)">
+                <rect width="310" height="88" rx="5"/>
+                <text class="node-title small" x="155" y="34">AQS.ConditionObject</text>
+                <text class="node-note" x="155" y="59">Condition 的典型实现</text>
+              </g>
+
+              <g class="node abstract internal path-core context-node" data-id="aqs" role="button" tabindex="0"
+                 transform="translate(620 848)">
+                <rect width="270" height="76" rx="5"/>
+                <text class="node-title small" x="135" y="30">AbstractQueuedSynchronizer</text>
+                <text class="node-note" x="135" y="54">AQS · int state</text>
+              </g>
+
+              <g class="node abstract internal" data-id="aqls" role="button" tabindex="0"
+                 transform="translate(930 848)">
+                <rect width="330" height="76" rx="5"/>
+                <text class="node-title small" x="165" y="30">AbstractQueuedLongSynchronizer</text>
+                <text class="node-note" x="165" y="54">AQLS · long state</text>
+              </g>
+
+              <g class="node support internal path-core" data-id="lock-support" role="button" tabindex="0"
+                 transform="translate(1300 835)">
+                <rect width="275" height="82" rx="5"/>
+                <text class="node-title" x="137.5" y="32">LockSupport</text>
+                <text class="node-note" x="137.5" y="57">park / unpark</text>
+              </g>
+
+              <g class="node abstract internal" data-id="aos" role="button" tabindex="0"
+                 transform="translate(600 960)">
+                <rect width="330" height="66" rx="5"/>
+                <text class="node-title small" x="165" y="27">AbstractOwnableSynchronizer</text>
+                <text class="node-note" x="165" y="49">记录独占模式的持有线程</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <aside class="detail-panel" aria-live="polite" aria-label="节点说明">
+        <div class="detail-kicker">
+          <span>点击左侧节点查看</span>
+          <span class="detail-kind" id="detail-kind">接口</span>
+        </div>
+        <h2 id="detail-title">Lock</h2>
+        <p class="detail-summary" id="detail-summary"></p>
+
+        <section class="detail-section">
+          <h3>在体系中的位置</h3>
+          <ul class="detail-list" id="detail-relations"></ul>
+        </section>
+
+        <section class="detail-section">
+          <h3>抓住这些关键词</h3>
+          <div class="method-list" id="detail-methods"></div>
+        </section>
+
+        <div class="judgement" id="detail-judgement"></div>
+      </aside>
+    </main>
+
+    <section class="path-panel" aria-label="推荐学习主线">
+      <div class="path-header">
+        <h2>推荐学习主线</h2>
+        <p>体系要看全，学习要一层一层落地；当前只需先走稳第 1 步。</p>
+      </div>
+      <div class="path-grid">
+        <article class="path-step current">
+          <h3>Lock + ReentrantLock</h3>
+          <p>从 synchronized 迁移一个具体例子，掌握显式加锁、finally 解锁、超时和中断。</p>
+        </article>
+        <article class="path-step">
+          <h3>Condition</h3>
+          <p>把一个等待集合拆成 notEmpty / notFull 两个业务条件，完成有界订单队列。</p>
+        </article>
+        <article class="path-step">
+          <h3>ReadWriteLock</h3>
+          <p>理解“读共享、写独占”，再使用 ReentrantReadWriteLock；不要默认它一定更快。</p>
+        </article>
+        <article class="path-step">
+          <h3>StampedLock</h3>
+          <p>在读多写少且确有性能需要时，再理解 stamp、乐观读和 validate。</p>
+        </article>
+        <article class="path-step">
+          <h3>AQS + LockSupport</h3>
+          <p>最后向下看同步状态、等待队列和 park/unpark，解释前面工具为何能工作。</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="sources">
+      <p>
+        关系基线：Java SE 25 官方 API。图中“内部持有 Sync → AQS”表示实现依赖，
+        不是说 ReentrantLock 本身继承 AQS。
+      </p>
+      <p>
+        官方核对：
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/locks/package-tree.html">locks 包层次</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html">ReentrantLock</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/locks/ReentrantReadWriteLock.html">ReentrantReadWriteLock</a> ·
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/locks/StampedLock.html">StampedLock</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var details = {
+        "synchronized": {
+          kind: "语言关键字",
+          title: "synchronized",
+          summary: "Java 语言内置的监视器锁。简单互斥场景通常先考虑它；Lock 不是它的上位替代品，而是另一套显式锁 API。",
+          relations: [
+            "不属于 java.util.concurrent.locks 包。",
+            "基本互斥语义可与 ReentrantLock 对照。",
+            "线程协作使用 Object.wait / notify / notifyAll。"
+          ],
+          methods: ["monitorenter", "monitorexit", "wait()", "notifyAll()"],
+          judgement: "学习判断：你已经掌握 synchronized，它是理解 ReentrantLock 的最佳参照物。"
+        },
+        "object-monitor": {
+          kind: "语言运行时",
+          title: "Object Monitor",
+          summary: "每个 Java 对象都可关联监视器。synchronized 负责进入和退出，wait/notify 负责在同一监视器上协作。",
+          relations: [
+            "属于 Java 内置同步机制。",
+            "Condition 提供与其相似但可拆分等待集合的能力。"
+          ],
+          methods: ["wait()", "notify()", "notifyAll()"],
+          judgement: "关键边界：调用 wait/notify 前必须持有同一个对象的监视器。"
+        },
+        "lock": {
+          kind: "接口",
+          title: "Lock",
+          summary: "显式锁的统一契约。它规定实现必须提供哪些加锁能力，但接口自己不保存锁状态，也不能直接 new。",
+          relations: [
+            "ReentrantLock、ReadLock、WriteLock 直接实现它。",
+            "newCondition() 可创建与该锁绑定的 Condition。",
+            "StampedLock 本身不实现它，但可以提供 Lock 视图。"
+          ],
+          methods: ["lock()", "unlock()", "tryLock()", "lockInterruptibly()", "newCondition()"],
+          judgement: "学习判断：先认识接口契约，再用 ReentrantLock 把每个能力跑起来；这叫同时学习 Lock 与它的具体实现。"
+        },
+        "condition": {
+          kind: "接口",
+          title: "Condition",
+          summary: "把线程等待条件从一个 Monitor 等待集合，拆成多个具有业务含义的等待集合。",
+          relations: [
+            "通常由 Lock.newCondition() 创建。",
+            "AQS.ConditionObject 是它的典型实现。",
+            "与某一把 Lock 绑定，不能脱离锁独立使用。"
+          ],
+          methods: ["await()", "awaitNanos()", "signal()", "signalAll()"],
+          judgement: "最合适的练习：有界队列中的 notEmpty 和 notFull，让员工与顾客分别等待。"
+        },
+        "read-write-lock": {
+          kind: "接口",
+          title: "ReadWriteLock",
+          summary: "不直接表示一把锁，而是约定提供一对相关的 Lock：读锁和写锁。",
+          relations: [
+            "ReentrantReadWriteLock 是它的常用实现。",
+            "readLock() 与 writeLock() 的返回类型都是 Lock。",
+            "StampedLock 可以提供一个 ReadWriteLock 兼容视图。"
+          ],
+          methods: ["readLock()", "writeLock()"],
+          judgement: "关键认知：ReentrantReadWriteLock 实现的是 ReadWriteLock，不是 Lock；真正实现 Lock 的是它给出的 ReadLock 和 WriteLock。"
+        },
+        "reentrant-lock": {
+          kind: "常用实现类",
+          title: "ReentrantLock",
+          summary: "通用可重入互斥锁，基本语义类似 synchronized，但提供超时、可中断、公平策略和多个 Condition。",
+          relations: [
+            "直接 implements Lock。",
+            "内部通过私有 Sync 同步器复用 AQS。",
+            "可创建一个或多个 ConditionObject。"
+          ],
+          methods: ["lock()", "tryLock()", "unlock()", "newCondition()", "isFair()"],
+          judgement: "为什么先学它：不是因为其他锁没用，而是它用一个具体对象覆盖了 Lock 接口最核心的能力。简单互斥仍可优先 synchronized。"
+        },
+        "reentrant-read-write-lock": {
+          kind: "常用实现类",
+          title: "ReentrantReadWriteLock",
+          summary: "可重入读写锁。多个读线程可以并行，写线程需要独占；适合确实存在大量读取且临界区有一定成本的场景。",
+          relations: [
+            "直接 implements ReadWriteLock。",
+            "对外提供 ReadLock 与 WriteLock。",
+            "内部 Sync 基于 AQS 管理读写状态。"
+          ],
+          methods: ["readLock()", "writeLock()", "getReadLockCount()", "isFair()"],
+          judgement: "不要把它当成默认优化：读写竞争模式、临界区大小和写线程饥饿风险都会影响收益。"
+        },
+        "read-lock": {
+          kind: "Lock 实现",
+          title: "ReadLock",
+          summary: "ReentrantReadWriteLock 返回的读锁视图。没有写线程占用时，多个读线程可以共同持有。",
+          relations: [
+            "直接 implements Lock。",
+            "由 ReentrantReadWriteLock.readLock() 提供。",
+            "不支持创建 Condition。"
+          ],
+          methods: ["lock()", "tryLock()", "unlock()"],
+          judgement: "它保护的是只读临界区，不是说共享对象从此永远只读。写操作必须使用配套 WriteLock。"
+        },
+        "write-lock": {
+          kind: "Lock 实现",
+          title: "WriteLock",
+          summary: "ReentrantReadWriteLock 返回的写锁视图。写入时独占，并且它支持 Condition。",
+          relations: [
+            "直接 implements Lock。",
+            "由 ReentrantReadWriteLock.writeLock() 提供。",
+            "与同一外部读写锁的 ReadLock 协同。"
+          ],
+          methods: ["lock()", "tryLock()", "unlock()", "newCondition()"],
+          judgement: "写锁可以降级为读锁；从读锁直接升级到写锁则容易阻塞，学习时要单独验证。"
+        },
+        "stamped-lock": {
+          kind: "专用类",
+          title: "StampedLock",
+          summary: "以 stamp 表示访问资格，提供写锁、悲观读和乐观读三种模式，面向特定的读多写少优化场景。",
+          relations: [
+            "自身不 implements Lock 或 ReadWriteLock。",
+            "可以通过 asReadLock 等方法提供兼容视图。",
+            "不具备 ReentrantLock 那样的线程所有权与可重入语义。"
+          ],
+          methods: ["writeLock()", "readLock()", "tryOptimisticRead()", "validate()", "unlock(stamp)"],
+          judgement: "学习顺序靠后：它的价值来自乐观读，但 stamp 校验、不可重入和异常路径都更容易写错。"
+        },
+        "stamped-views": {
+          kind: "适配视图",
+          title: "StampedLock 的接口视图",
+          summary: "StampedLock 可以包装出 Lock 或 ReadWriteLock 视图，用统一接口使用部分能力，但这不会让 StampedLock 本身变成接口实现类。",
+          relations: [
+            "asReadLock() 返回 Lock。",
+            "asWriteLock() 返回 Lock。",
+            "asReadWriteLock() 返回 ReadWriteLock。"
+          ],
+          methods: ["asReadLock()", "asWriteLock()", "asReadWriteLock()"],
+          judgement: "类型关系看类声明，适配关系看方法返回值；两者不要混在一起画成 implements。"
+        },
+        "reentrant-sync": {
+          kind: "私有内部类",
+          title: "ReentrantLock.Sync",
+          summary: "ReentrantLock 内部真正承接同步状态与队列逻辑的抽象内部类，公平和非公平版本在它之上分化。",
+          relations: [
+            "ReentrantLock 持有 Sync，而不是自身 extends AQS。",
+            "Sync extends AbstractQueuedSynchronizer。",
+            "FairSync 与 NonfairSync 是具体策略。"
+          ],
+          methods: ["tryAcquire()", "tryRelease()", "isHeldExclusively()"],
+          judgement: "这是源码层知识。会使用 ReentrantLock 后再下来看，才能理解 state 与等待队列在解决什么问题。"
+        },
+        "read-write-sync": {
+          kind: "私有内部类",
+          title: "ReadWriteLock.Sync",
+          summary: "ReentrantReadWriteLock 的内部同步器，用同一个同步状态编码读持有数与写持有数。",
+          relations: [
+            "外部类持有 Sync。",
+            "Sync extends AbstractQueuedSynchronizer。",
+            "公平与非公平版本在内部策略上分化。"
+          ],
+          methods: ["tryAcquire()", "tryAcquireShared()", "tryReleaseShared()"],
+          judgement: "先掌握读写锁的公开语义，再理解 AQS 独占模式和共享模式如何同时参与。"
+        },
+        "condition-object": {
+          kind: "公开内部类",
+          title: "AQS.ConditionObject",
+          summary: "AQS 提供的 Condition 实现，把条件等待队列与同步等待队列连接起来。",
+          relations: [
+            "implements Condition。",
+            "由基于 AQS 的独占锁创建并绑定。",
+            "signal 后线程还需要回到同步队列重新竞争锁。"
+          ],
+          methods: ["await()", "signal()", "signalAll()"],
+          judgement: "它解释了一个关键现象：signal 只是转移等待资格，不等于被唤醒线程立刻拿到锁。"
+        },
+        "aqs": {
+          kind: "抽象基础类",
+          title: "AbstractQueuedSynchronizer",
+          summary: "AQS 是构建锁和同步器的框架：用一个 int state 表示同步状态，并组织获取失败线程的等待。",
+          relations: [
+            "extends AbstractOwnableSynchronizer。",
+            "ReentrantLock 与 ReentrantReadWriteLock 的内部 Sync 基于它。",
+            "常配合 LockSupport 挂起和唤醒等待线程。"
+          ],
+          methods: ["getState()", "compareAndSetState()", "acquire()", "release()"],
+          judgement: "AQS 不是 Lock 实现，也不是初学 Lock 的前置知识；它是学完常用工具后用来统一解释内部机制的第二层地图。"
+        },
+        "aqls": {
+          kind: "抽象基础类",
+          title: "AbstractQueuedLongSynchronizer",
+          summary: "与 AQS 思路相同，但同步状态使用 long，适合需要更大状态空间的自定义同步器。",
+          relations: [
+            "extends AbstractOwnableSynchronizer。",
+            "自身不是 Lock 实现。",
+            "提供对应的 ConditionObject。"
+          ],
+          methods: ["getState()", "compareAndSetState()", "acquire()", "release()"],
+          judgement: "普通业务几乎不会直接使用；认识它在体系中的位置即可。"
+        },
+        "lock-support": {
+          kind: "底层工具类",
+          title: "LockSupport",
+          summary: "提供 park/unpark 线程阻塞原语。它更接近同步器的基础设施，而不是面向业务的锁。",
+          relations: [
+            "不 implements Lock。",
+            "AQS 等同步器常借助它挂起和唤醒等待线程。",
+            "permit 语义不同于 Object.wait/notify。"
+          ],
+          methods: ["park()", "parkNanos()", "unpark(thread)", "getBlocker()"],
+          judgement: "不要用它直接替代业务层 Condition；先理解上层同步协议，再看 park/unpark 如何支撑协议。"
+        },
+        "aos": {
+          kind: "抽象基础类",
+          title: "AbstractOwnableSynchronizer",
+          summary: "很薄的一层抽象，只负责记录独占同步模式下当前的拥有线程。",
+          relations: [
+            "AQS 与 AQLS 都 extends 它。",
+            "自身不组织等待队列，也不实现 Lock。"
+          ],
+          methods: ["setExclusiveOwnerThread()", "getExclusiveOwnerThread()"],
+          judgement: "知道它承担“记录所有者”这一件事就够了，不需要单独进行使用练习。"
+        }
+      };
+
+      var svg = document.getElementById("lock-map");
+      var viewport = document.getElementById("map-viewport");
+      var modeButtons = Array.prototype.slice.call(document.querySelectorAll(".mode-button"));
+      var nodes = Array.prototype.slice.call(document.querySelectorAll(".node"));
+      var kindElement = document.getElementById("detail-kind");
+      var titleElement = document.getElementById("detail-title");
+      var summaryElement = document.getElementById("detail-summary");
+      var relationsElement = document.getElementById("detail-relations");
+      var methodsElement = document.getElementById("detail-methods");
+      var judgementElement = document.getElementById("detail-judgement");
+
+      function selectNode(id) {
+        var info = details[id];
+        if (!info) {
+          return;
+        }
+
+        nodes.forEach(function (node) {
+          node.classList.toggle("selected", node.getAttribute("data-id") === id);
+        });
+
+        kindElement.textContent = info.kind;
+        titleElement.textContent = info.title;
+        summaryElement.textContent = info.summary;
+
+        relationsElement.replaceChildren();
+        info.relations.forEach(function (relation) {
+          var item = document.createElement("li");
+          item.textContent = relation;
+          relationsElement.appendChild(item);
+        });
+
+        methodsElement.replaceChildren();
+        info.methods.forEach(function (method) {
+          var chip = document.createElement("span");
+          chip.className = "method-chip";
+          chip.textContent = method;
+          methodsElement.appendChild(chip);
+        });
+
+        judgementElement.textContent = info.judgement;
+      }
+
+      nodes.forEach(function (node) {
+        node.addEventListener("click", function (event) {
+          event.stopPropagation();
+          selectNode(node.getAttribute("data-id"));
+        });
+        node.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectNode(node.getAttribute("data-id"));
+          }
+        });
+      });
+
+      modeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var selectedMode = button.getAttribute("data-mode");
+          svg.setAttribute("data-mode", selectedMode);
+          modeButtons.forEach(function (candidate) {
+            candidate.setAttribute(
+              "aria-pressed",
+              String(candidate.getAttribute("data-mode") === selectedMode)
+            );
+          });
+        });
+      });
+
+      var initialView = { x: 0, y: 0, width: 1700, height: 1040 };
+      var view = { x: 0, y: 0, width: 1700, height: 1040 };
+      var dragState = null;
+
+      function applyViewBox() {
+        svg.setAttribute(
+          "viewBox",
+          [view.x, view.y, view.width, view.height].join(" ")
+        );
+      }
+
+      function zoom(factor) {
+        var nextWidth = Math.max(680, Math.min(2200, view.width * factor));
+        var nextHeight = nextWidth * initialView.height / initialView.width;
+        var centerX = view.x + view.width / 2;
+        var centerY = view.y + view.height / 2;
+        view.width = nextWidth;
+        view.height = nextHeight;
+        view.x = centerX - nextWidth / 2;
+        view.y = centerY - nextHeight / 2;
+        applyViewBox();
+      }
+
+      document.getElementById("zoom-in").addEventListener("click", function () {
+        zoom(0.82);
+      });
+
+      document.getElementById("zoom-out").addEventListener("click", function () {
+        zoom(1.22);
+      });
+
+      document.getElementById("zoom-reset").addEventListener("click", function () {
+        view = {
+          x: initialView.x,
+          y: initialView.y,
+          width: initialView.width,
+          height: initialView.height
+        };
+        applyViewBox();
+      });
+
+      svg.addEventListener("pointerdown", function (event) {
+        if (event.target.closest(".node")) {
+          return;
+        }
+        var rect = svg.getBoundingClientRect();
+        dragState = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          viewX: view.x,
+          viewY: view.y,
+          ratioX: view.width / rect.width,
+          ratioY: view.height / rect.height
+        };
+        svg.setPointerCapture(event.pointerId);
+        viewport.classList.add("dragging");
+      });
+
+      svg.addEventListener("pointermove", function (event) {
+        if (!dragState || dragState.pointerId !== event.pointerId) {
+          return;
+        }
+        view.x = dragState.viewX - (event.clientX - dragState.startX) * dragState.ratioX;
+        view.y = dragState.viewY - (event.clientY - dragState.startY) * dragState.ratioY;
+        applyViewBox();
+      });
+
+      function endDrag(event) {
+        if (!dragState || dragState.pointerId !== event.pointerId) {
+          return;
+        }
+        dragState = null;
+        viewport.classList.remove("dragging");
+      }
+
+      svg.addEventListener("pointerup", endDrag);
+      svg.addEventListener("pointercancel", endDrag);
+
+      selectNode("lock");
+      applyViewBox();
+    }());
+  </script>
+</body>
+</html>
