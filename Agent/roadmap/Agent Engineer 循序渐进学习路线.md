@@ -306,15 +306,15 @@ Output
 搞清：
 
 ```text
-模型训练
-≠
-Prompt
-≠
-RAG
-≠
-Memory
-≠
-Fine-tuning
+Training（会更新模型参数）
+├── Pre-training
+└── Fine-tuning / 其他后续训练
+
+Inference / 应用层（普通调用不更新模型参数）
+├── Prompt
+├── RAG
+├── Memory
+└── Tool Calling
 ```
 
 ---

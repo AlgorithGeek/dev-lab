@@ -10,20 +10,20 @@
 # 当前状态
 
 ```text
-状态：🟡 准备开始
+状态：🟡 学习中
 阶段：Phase 0 / Agent 基础认知
-当前节点：Day 1 - LLM 到底是什么
+当前节点：Day 3 - LLM 幻觉
 主项目：projects/agent-learning-lab
 主要语言：Java
 主要后端框架：Spring Boot
 前期模型：DeepSeek
 ```
 
-目前已经完成学习环境和长期路线的基本规划。
+目前已经完成 Day 1「LLM 到底是什么」和 Day 2「训练与推理」。
 
-下一步正式开始：
+下一步：
 
-> **Day 1：LLM 到底是什么**
+> **Day 3：LLM 幻觉**
 
 ------
 
@@ -63,13 +63,13 @@
 
 # Phase 0：建立 Agent 世界观
 
--  Day 001：LLM 到底是什么
--  Day 002：训练与推理
--  Day 003：LLM 幻觉
--  Day 004：Token
--  Day 005：Context Window
--  Day 006：什么是 Agent
--  Day 007：Workflow 与 Agent
+- ✅ Day 001：LLM 到底是什么
+- ✅ Day 002：训练与推理
+- 🟡 Day 003：LLM 幻觉
+- ⬜ Day 004：Token
+- ⬜ Day 005：Context Window
+- ⬜ Day 006：什么是 Agent
+- ⬜ Day 007：Workflow 与 Agent
 
 ------
 
@@ -305,20 +305,24 @@ Codex 的定位：
 
 ✅ 创建 progress
 
-⬜ 正式开始 Day 001
+✅ 正式开始 Day 001
 
-⬜ 创建第一份学习笔记
+✅ 创建第一份学习笔记
 
 ⬜ 创建第一个 Codex 学习 Prompt
 
 ⬜ 创建 agent-learning-lab
 
-⬜ 完成第一次 Agent 学习 Git Commit
+✅ 完成第一次 Agent 学习 Git Commit
 ```
 
 ------
 
-# 最近一次进度
+# 进度记录
+
+## 2026-09-22
+
+完成 Day 001「LLM 到底是什么」和 Day 002「训练与推理」，当前进入 Day 003「LLM 幻觉」。
 
 ## 2026-08-25
 
@@ -363,15 +367,15 @@ Git Commit
 
 # 下一步
 
-> **Day 001：LLM 到底是什么**
+> **Day 003：LLM 幻觉**
 
 完成后更新：
 
 ```text
-Day 001：✅
+Day 003：✅
 
 当前节点：
-Day 002
+Day 004
 ```
 
-并开始留下第一份真正的 Agent 学习记录。
+重点理解模型为什么会在缺少可靠依据时生成看似合理但错误的内容，以及 Grounding 为什么比一句“不要胡说”更可靠。
