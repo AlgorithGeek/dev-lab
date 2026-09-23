@@ -163,7 +163,7 @@ Eval    Tracing   Security
 
 回答：
 
-- 昨天学了什么？
+- 上次学了什么？
 - 为什么需要它？
 - 它解决什么问题？
 
@@ -2543,6 +2543,26 @@ Request / Response
 实践时要注意：
 
 > MCP 规范演进速度很快，Java SDK 的具体 API 与其支持的协议版本以学习当时的官方稳定版为准。
+
+当前兼容性提醒（2026-09）：
+
+```text
+MCP 最新正式规范：2026-07-28
+MCP Java SDK 稳定 2.0.x：主要对应 2025-11-25
+Java SDK 对 2026-07-28 的完整支持：仍在后续 3.x 规划 / 开发中
+```
+
+所以这一 Node 的实践原则是：
+
+- **概念层**：按 Node 102 理解最新的 2026-07-28 规范以及新旧协议差异。
+- **Java 代码层**：优先使用当时已发布的稳定 Java SDK，不强行照着尚未稳定的 API 写代码。
+- 如果学习到这里时 Java SDK 已经发布稳定的新版本并完整支持 2026-07-28，则直接使用新的稳定版本。
+
+目标不是死记某个 SDK 版本，而是建立：
+
+> **规范版本 ≠ 某个语言 SDK 已经同步支持。**
+
+的工程意识。
  
 ---
 
@@ -2802,6 +2822,22 @@ Spring Boot
  ↓
 MCP Server
 ```
+
+同时建立版本意识：
+
+> **Spring AI 的 MCP 能力建立在 MCP Java SDK 之上，因此 Spring AI 能实际支持哪一版 MCP 规范，要看它当时集成的 Java SDK 版本，而不能只看 MCP 官网最新规范。**
+
+学习到这里时必须检查：
+
+```text
+Spring AI Version
+        ↓
+MCP Java SDK Version
+        ↓
+Supported MCP Spec Revision
+```
+
+如果框架集成版本暂时落后于最新 MCP 规范，这是生态版本节奏问题，不要把“最新规范”和“当前 Java 实践 API”强行混在一起。
 
 ---
 
@@ -4564,9 +4600,9 @@ Node 003
 每完成一个知识点，就标记：
 
 ```text
-✅ Node 036 Tool Calling
-✅ Node 037 Tool Definition
-⬜ Node 038 Tool Schema
+✅ Node 022 Tool Calling 是什么
+✅ Node 023 Tool Definition
+⬜ Node 024 参数 Schema
 ```
 
 如果某个 Node 没有理解：

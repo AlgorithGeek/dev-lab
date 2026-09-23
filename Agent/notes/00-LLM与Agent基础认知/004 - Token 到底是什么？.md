@@ -3548,7 +3548,7 @@ Input / Output Token是什么
 那么：
 
 ```text
-Day 004：Token 到底是什么？
+Node 004：Token 到底是什么？
 
 ✅ PASS
 ```
