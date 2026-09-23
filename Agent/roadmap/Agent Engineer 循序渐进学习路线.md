@@ -1,17 +1,25 @@
-# Java 后端 → AI Agent Engineer：180 日循序渐进学习路线
+# Java 后端 → AI Agent Engineer：循序渐进学习路线
 
 > 适用方向：AI Agent / LLM 应用开发 / Agent 工程化 / AI 后端  
 > 主技术栈：Java + Spring Boot + Spring AI + Python + OpenAI Agents SDK + LangGraph + MCP  
 > 非目标：大模型训练、算法研究、CUDA、深度学习科研  
 > 建议周期：6～9 个月  
-> 推荐强度：每天 45～90 分钟  
+> 单次学习建议：45～90 分钟  
 > 核心原则：**概念 → 自己实现 → 框架实现 → 真实项目 → 生产工程**
+
+> 路线结构：**Phase → Node → Note**
+>
+> - **Phase**：一个大的学习阶段。
+> - **Node**：一个需要真正掌握的知识节点，不对应自然日。
+> - **Note**：为了掌握某个 Node 而产生的学习材料；一个 Node 可以有主笔记、补充笔记和实验记录等多个 Note。
+> - 不要求一天完成一个 Node。当前 Node 没有真正理解时，可以继续补充 Note、提问或做实验，再进入下一个 Node。
+> - Roadmap 负责记录完整学习路线，当前实际学习位置以 `../progress.md` 为准。
 
 ---
 
 # 一、最终学习目标
 
-完成这 180 个学习日后，你的目标不是：
+完成这条学习路线后，你的目标不是：
 
 > “我会调用 ChatGPT API。”
 
@@ -144,13 +152,13 @@ Tool Calling
 
 ---
 
-# 三、每天应该怎么学习
+# 三、每个 Node 应该怎么学习
 
-不要一天看三个小时视频。
+不建议一次连续看三个小时视频。
 
-建议每个知识点按照固定模板学习。
+建议每个 Node 按照固定模板学习。
 
-## 每日 60 分钟模板
+## 单次学习参考模板
 
 ### ① 5 分钟：回忆
 
@@ -232,26 +240,26 @@ public String getWeather(String city) {
 
 # 四、阶段总览
 
-| 阶段 | Day | 核心主题 |
+| 阶段 | Node | 核心主题 |
 |---|---:|---|
-| Phase 0 | 1～7 | 建立 AI / Agent 世界观 |
-| Phase 1 | 8～21 | LLM 应用开发基础 |
-| Phase 2 | 22～35 | Python Agent 必要基础 |
-| Phase 3 | 36～56 | Tool Calling 与 Agent Loop |
-| Phase 4 | 57～77 | RAG |
-| Phase 5 | 78～91 | Memory / Context / State |
-| Phase 6 | 92～112 | Workflow / Agent Orchestration |
-| Phase 7 | 113～126 | MCP |
-| Phase 8 | 127～140 | Java AI 工程化 |
-| Phase 9 | 141～154 | Python Agent 框架 |
-| Phase 10 | 155～168 | 生产级 Agent 工程 |
-| Phase 11 | 169～180 | 综合实战项目 |
+| Phase 0 | Node 001～007 | LLM 与 Agent 基础认知 |
+| Phase 1 | Node 008～021 | LLM 应用开发基础 |
+| Phase 2 | Node 022～035 | Python Agent 必要基础 |
+| Phase 3 | Node 036～056 | Tool Calling 与 Agent Loop |
+| Phase 4 | Node 057～077 | RAG |
+| Phase 5 | Node 078～091 | Memory / Context / State |
+| Phase 6 | Node 092～112 | Workflow / Agent Orchestration |
+| Phase 7 | Node 113～126 | MCP |
+| Phase 8 | Node 127～140 | Java AI 工程化 |
+| Phase 9 | Node 141～154 | Python Agent 框架 |
+| Phase 10 | Node 155～168 | 生产级 Agent 工程 |
+| Phase 11 | Node 169～180 | 综合实战项目 |
 
 ---
 
-# Phase 0：建立 Agent 世界观
+# Phase 0：LLM 与 Agent 基础认知
 
-## Day 1：LLM 到底是什么
+## Node 001：LLM 到底是什么
 
 学习：
 
@@ -291,7 +299,7 @@ Output
 
 ---
 
-## Day 2：训练与推理
+## Node 002：训练与推理
 
 学习：
 
@@ -319,7 +327,7 @@ Inference / 应用层（普通调用不更新模型参数）
 
 ---
 
-## Day 3：幻觉
+## Node 003：幻觉
 
 学习：
 
@@ -341,7 +349,7 @@ Inference / 应用层（普通调用不更新模型参数）
 
 ---
 
-## Day 4：Token
+## Node 004：Token
 
 学习：
 
@@ -368,7 +376,7 @@ Spring Boot
 
 ---
 
-## Day 5：Context Window
+## Node 005：Context Window
 
 学习：
 
@@ -389,7 +397,7 @@ Memory
 
 ---
 
-## Day 6：什么是 Agent
+## Node 006：什么是 Agent
 
 掌握：
 
@@ -441,7 +449,7 @@ Answer
 
 ---
 
-## Day 7：Workflow 与 Agent
+## Node 007：Workflow 与 Agent
 
 区分：
 
@@ -474,7 +482,7 @@ LLM ─┼→ Tool B
 
 # Phase 1：LLM 应用开发基础
 
-# Day 8：第一次调用模型 API
+# Node 008：第一次调用模型 API
 
 理解：
 
@@ -492,7 +500,7 @@ HTTP Response
 
 ---
 
-# Day 9：Message 模型
+# Node 009：Message 模型
 
 学习：
 
@@ -518,7 +526,7 @@ HTTP Response
 
 ---
 
-# Day 10：System Prompt
+# Node 010：System Prompt
 
 学习：
 
@@ -540,7 +548,7 @@ Java Code Review Assistant
 
 ---
 
-# Day 11：Prompt 基础
+# Node 011：Prompt 基础
 
 学习：
 
@@ -565,7 +573,7 @@ Output Format
 
 ---
 
-# Day 12：Few-shot
+# Node 012：Few-shot
 
 学习：
 
@@ -579,7 +587,7 @@ Few-shot
 
 ---
 
-# Day 13：Structured Output
+# Node 013：Structured Output
 
 这是重点。
 
@@ -604,7 +612,7 @@ Few-shot
 
 ---
 
-# Day 14：JSON Schema
+# Node 014：JSON Schema
 
 学习：
 
@@ -633,7 +641,7 @@ Few-shot
 
 ---
 
-# Day 15：Java DTO 与 Structured Output
+# Node 015：Java DTO 与 Structured Output
 
 完成：
 
@@ -652,7 +660,7 @@ class CampaignAnalysis {
 
 ---
 
-# Day 16：Streaming
+# Node 016：Streaming
 
 学习：
 
@@ -685,7 +693,7 @@ token
 
 ---
 
-# Day 17：模型参数
+# Node 017：模型参数
 
 理解：
 
@@ -705,7 +713,7 @@ token
 
 ---
 
-# Day 18：模型选择
+# Node 018：模型选择
 
 建立意识：
 
@@ -729,7 +737,7 @@ Structured Output
 
 ---
 
-# Day 19：Context Engineering
+# Node 019：Context Engineering
 
 开始理解一个非常重要的概念：
 
@@ -755,7 +763,7 @@ Memory
 
 ---
 
-# Day 20：LLM API 异常
+# Node 020：LLM API 异常
 
 学习：
 
@@ -776,7 +784,7 @@ Error Handling
 
 ---
 
-# Day 21：第一阶段项目
+# Node 021：第一阶段项目
 
 实现：
 
@@ -830,7 +838,7 @@ POST /ai/analyze
 
 ---
 
-# Day 22：Python 环境
+# Node 022：Python 环境
 
 学习：
 
@@ -845,7 +853,7 @@ uv
 
 ---
 
-# Day 23：Python 基础语法
+# Node 023：Python 基础语法
 
 学习：
 
@@ -862,7 +870,7 @@ uv
 
 ---
 
-# Day 24：List / Dict / Set / Tuple
+# Node 024：List / Dict / Set / Tuple
 
 重点掌握：
 
@@ -883,7 +891,7 @@ AI 项目极其常见。
 
 ---
 
-# Day 25：函数
+# Node 025：函数
 
 学习：
 
@@ -896,7 +904,7 @@ keyword argument
 
 ---
 
-# Day 26：类型注解
+# Node 026：类型注解
 
 学习：
 
@@ -915,7 +923,7 @@ Python 虽然动态类型，但现代 Agent 项目大量使用 typing。
 
 ---
 
-# Day 27：Class
+# Node 027：Class
 
 学习：
 
@@ -929,7 +937,7 @@ Python 虽然动态类型，但现代 Agent 项目大量使用 typing。
 
 ---
 
-# Day 28：Dataclass
+# Node 028：Dataclass
 
 学习：
 
@@ -941,7 +949,7 @@ Python 虽然动态类型，但现代 Agent 项目大量使用 typing。
 
 ---
 
-# Day 29：Pydantic
+# Node 029：Pydantic
 
 重点。
 
@@ -958,7 +966,7 @@ serialization
 
 ---
 
-# Day 30：Exception
+# Node 030：Exception
 
 掌握：
 
@@ -971,7 +979,7 @@ raise
 
 ---
 
-# Day 31：Module 与 Package
+# Node 031：Module 与 Package
 
 理解：
 
@@ -992,7 +1000,7 @@ from xxx import xxx
 
 ---
 
-# Day 32：HTTP Client
+# Node 032：HTTP Client
 
 学习：
 
@@ -1004,7 +1012,7 @@ httpx
 
 ---
 
-# Day 33：async / await
+# Node 033：async / await
 
 重点理解：
 
@@ -1026,7 +1034,7 @@ asyncio
 
 ---
 
-# Day 34：FastAPI
+# Node 034：FastAPI
 
 完成：
 
@@ -1039,7 +1047,7 @@ POST /chat
 
 ---
 
-# Day 35：Python 小项目
+# Node 035：Python 小项目
 
 写：
 
@@ -1063,7 +1071,7 @@ Structured Output
 
 这是整个路线第一个超级核心阶段。
 
-# Day 36：Tool Calling 是什么
+# Node 036：Tool Calling 是什么
 
 牢记：
 
@@ -1090,7 +1098,7 @@ getWeather("Beijing");
 
 ---
 
-# Day 37：Tool Definition
+# Node 037：Tool Definition
 
 Tool 包含：
 
@@ -1107,7 +1115,7 @@ Schema
 
 ---
 
-# Day 38：参数 Schema
+# Node 038：参数 Schema
 
 设计：
 
@@ -1131,7 +1139,7 @@ queryCampaign
 
 ---
 
-# Day 39：Tool Dispatcher
+# Node 039：Tool Dispatcher
 
 自己实现：
 
@@ -1150,7 +1158,7 @@ switch (toolName) {
 
 ---
 
-# Day 40：第一次完整 Tool Call
+# Node 040：第一次完整 Tool Call
 
 实现：
 
@@ -1172,7 +1180,7 @@ Answer
 
 ---
 
-# Day 41：多个 Tools
+# Node 041：多个 Tools
 
 创建：
 
@@ -1187,7 +1195,7 @@ getBudget
 
 ---
 
-# Day 42：Tool Description 设计
+# Node 042：Tool Description 设计
 
 对比：
 
@@ -1205,7 +1213,7 @@ getCampaignPerformanceMetrics
 
 ---
 
-# Day 43：Tool 参数校验
+# Node 043：Tool 参数校验
 
 不要相信模型参数。
 
@@ -1220,7 +1228,7 @@ permission check
 
 ---
 
-# Day 44：Tool Error
+# Node 044：Tool Error
 
 模拟：
 
@@ -1244,7 +1252,7 @@ Invalid ID
 
 ---
 
-# Day 45：Tool Result 设计
+# Node 045：Tool Result 设计
 
 不要一股脑返回：
 
@@ -1256,7 +1264,7 @@ Invalid ID
 
 ---
 
-# Day 46：Read Tool 与 Write Tool
+# Node 046：Read Tool 与 Write Tool
 
 区分：
 
@@ -1276,7 +1284,7 @@ pauseCampaign
 
 ---
 
-# Day 47：权限
+# Node 047：权限
 
 学习：
 
@@ -1300,7 +1308,7 @@ Tool 永远不能因为：
 
 ---
 
-# Day 48：Human Approval
+# Node 048：Human Approval
 
 设计：
 
@@ -1319,7 +1327,7 @@ pauseCampaign()
 
 ---
 
-# Day 49：幂等性
+# Node 049：幂等性
 
 思考：
 
@@ -1343,7 +1351,7 @@ Operation State
 
 ---
 
-# Day 50：Agent Loop
+# Node 050：Agent Loop
 
 自己实现：
 
@@ -1366,11 +1374,11 @@ while (turn < MAX_TURNS) {
 }
 ```
 
-这是 Agent 最重要的一天之一。
+这是 Agent 最重要的 Node 之一。
 
 ---
 
-# Day 51：Termination Condition
+# Node 051：Termination Condition
 
 学习：
 
@@ -1387,7 +1395,7 @@ Manual Stop
 
 ---
 
-# Day 52：无限循环
+# Node 052：无限循环
 
 模拟：
 
@@ -1411,7 +1419,7 @@ MAX_TURNS
 
 ---
 
-# Day 53：并行 Tool Call
+# Node 053：并行 Tool Call
 
 例如：
 
@@ -1427,7 +1435,7 @@ Agent ───────┼→ Meta Ads
 
 ---
 
-# Day 54：Tool Context
+# Node 054：Tool Context
 
 Tool 不应该只拿模型参数。
 
@@ -1444,7 +1452,7 @@ sessionId
 
 ---
 
-# Day 55：Tool Search
+# Node 055：Tool Search
 
 理解问题：
 
@@ -1466,7 +1474,7 @@ Dynamic Tool Loading
 
 ---
 
-# Day 56：Tool Agent 项目
+# Node 056：Tool Agent 项目
 
 实现：
 
@@ -1495,7 +1503,7 @@ Agent 自动决定需要调用哪些接口。
 
 第二个超级核心阶段。
 
-# Day 57：为什么需要 RAG
+# Node 057：为什么需要 RAG
 
 理解：
 
@@ -1514,7 +1522,7 @@ LLM 参数知识
 
 ---
 
-# Day 58：RAG 全流程
+# Node 058：RAG 全流程
 
 掌握：
 
@@ -1548,7 +1556,7 @@ Answer
 
 ---
 
-# Day 59：Embedding
+# Node 059：Embedding
 
 理解：
 
@@ -1569,7 +1577,7 @@ Vector
 
 ---
 
-# Day 60：向量
+# Node 060：向量
 
 只学必要数学：
 
@@ -1584,7 +1592,7 @@ Similarity
 
 ---
 
-# Day 61：Cosine Similarity
+# Node 061：Cosine Similarity
 
 理解：
 
@@ -1598,7 +1606,7 @@ cosine similarity
 
 ---
 
-# Day 62：Vector Database
+# Node 062：Vector Database
 
 了解：
 
@@ -1615,7 +1623,7 @@ cosine similarity
 
 ---
 
-# Day 63：Chunking
+# Node 063：Chunking
 
 理解为什么不能：
 
@@ -1633,7 +1641,7 @@ Semantic Chunking
 
 ---
 
-# Day 64：Chunk Size 实验
+# Node 064：Chunk Size 实验
 
 分别：
 
@@ -1647,7 +1655,7 @@ Semantic Chunking
 
 ---
 
-# Day 65：Metadata
+# Node 065：Metadata
 
 Chunk 不只存：
 
@@ -1670,7 +1678,7 @@ embedding
 
 ---
 
-# Day 66：Metadata Filter
+# Node 066：Metadata Filter
 
 例如：
 
@@ -1683,7 +1691,7 @@ tenant_id = 123
 
 ---
 
-# Day 67：Top K
+# Node 067：Top K
 
 理解：
 
@@ -1697,7 +1705,7 @@ Top 20
 
 ---
 
-# Day 68：Keyword Search
+# Node 068：Keyword Search
 
 学习：
 
@@ -1714,7 +1722,7 @@ BM25
 
 ---
 
-# Day 69：Hybrid Search
+# Node 069：Hybrid Search
 
 组合：
 
@@ -1728,7 +1736,7 @@ BM25
 
 ---
 
-# Day 70：Query Rewrite
+# Node 070：Query Rewrite
 
 用户：
 
@@ -1744,7 +1752,7 @@ campaign 123 昨日表现
 
 ---
 
-# Day 71：Multi Query
+# Node 071：Multi Query
 
 一个问题生成多个检索查询：
 
@@ -1758,7 +1766,7 @@ Query C
 
 ---
 
-# Day 72：Rerank
+# Node 072：Rerank
 
 流程：
 
@@ -1776,7 +1784,7 @@ Retrieval 和 Rerank 的区别。
 
 ---
 
-# Day 73：Source Citation
+# Node 073：Source Citation
 
 Agent 回答：
 
@@ -1795,7 +1803,7 @@ chunkId
 
 ---
 
-# Day 74：RAG 数据更新
+# Node 074：RAG 数据更新
 
 考虑：
 
@@ -1808,7 +1816,7 @@ Embedding 更新
 
 ---
 
-# Day 75：RAG 权限
+# Node 075：RAG 权限
 
 必须理解：
 
@@ -1826,7 +1834,7 @@ LLM
 
 ---
 
-# Day 76：RAG Evaluation
+# Node 076：RAG Evaluation
 
 建立测试集：
 
@@ -1844,7 +1852,7 @@ Expected Answer
 
 ---
 
-# Day 77：RAG 项目
+# Node 077：RAG 项目
 
 实现：
 
@@ -1866,7 +1874,7 @@ Source Citation
 
 # Phase 5：Memory / Context / State
 
-# Day 78：History 与 Memory
+# Node 078：History 与 Memory
 
 理解：
 
@@ -1888,7 +1896,7 @@ Memory
 
 ---
 
-# Day 79：Short-term Memory
+# Node 079：Short-term Memory
 
 实现：
 
@@ -1902,7 +1910,7 @@ Message Window。
 
 ---
 
-# Day 80：Token Window Memory
+# Node 080：Token Window Memory
 
 比：
 
@@ -1918,7 +1926,7 @@ Message Window。
 
 ---
 
-# Day 81：Summary Memory
+# Node 081：Summary Memory
 
 历史：
 
@@ -1935,7 +1943,7 @@ Message Window。
 
 ---
 
-# Day 82：Long-term Memory
+# Node 082：Long-term Memory
 
 理解：
 
@@ -1952,7 +1960,7 @@ Message Window。
 
 ---
 
-# Day 83：Semantic Memory
+# Node 083：Semantic Memory
 
 保存“事实”。
 
@@ -1964,7 +1972,7 @@ Message Window。
 
 ---
 
-# Day 84：Episodic Memory
+# Node 084：Episodic Memory
 
 保存“事件”。
 
@@ -1976,7 +1984,7 @@ Message Window。
 
 ---
 
-# Day 85：Working Memory
+# Node 085：Working Memory
 
 当前任务：
 
@@ -1990,7 +1998,7 @@ Message Window。
 
 ---
 
-# Day 86：Agent State
+# Node 086：Agent State
 
 设计：
 
@@ -2011,7 +2019,7 @@ class AgentState {
 
 ---
 
-# Day 87：State Persistence
+# Node 087：State Persistence
 
 实现：
 
@@ -2025,7 +2033,7 @@ Redis / MySQL
 
 ---
 
-# Day 88：State Version
+# Node 088：State Version
 
 考虑 Agent 升级：
 
@@ -2038,7 +2046,7 @@ State V2
 
 ---
 
-# Day 89：Memory 隐私
+# Node 089：Memory 隐私
 
 考虑：
 
@@ -2052,7 +2060,7 @@ State V2
 
 ---
 
-# Day 90：Memory Retrieval
+# Node 090：Memory Retrieval
 
 长期 Memory 很多时：
 
@@ -2070,7 +2078,7 @@ Memory Search
 
 ---
 
-# Day 91：Memory 项目
+# Node 091：Memory 项目
 
 给 Campaign Assistant 加：
 
@@ -2095,7 +2103,7 @@ Agent 能理解上下文。
 
 第三个超级核心阶段。
 
-# Day 92：Workflow vs Agent 再理解
+# Node 092：Workflow vs Agent 再理解
 
 Workflow：
 
@@ -2115,7 +2123,7 @@ Agent：
 
 ---
 
-# Day 93：State Machine
+# Node 093：State Machine
 
 复习：
 
@@ -2129,7 +2137,7 @@ Agent Workflow 可以理解为一种智能状态机。
 
 ---
 
-# Day 94：Node
+# Node 094：Node
 
 例如：
 
@@ -2145,7 +2153,7 @@ ExecuteAction
 
 ---
 
-# Day 95：Edge
+# Node 095：Edge
 
 理解：
 
@@ -2157,7 +2165,7 @@ Node B
 
 ---
 
-# Day 96：Conditional Edge
+# Node 096：Conditional Edge
 
 例如：
 
@@ -2169,7 +2177,7 @@ Risk ─────┤
 
 ---
 
-# Day 97：Sequential Workflow
+# Node 097：Sequential Workflow
 
 实现：
 
@@ -2185,7 +2193,7 @@ Review
 
 ---
 
-# Day 98：Parallel Workflow
+# Node 098：Parallel Workflow
 
 实现：
 
@@ -2199,7 +2207,7 @@ Query ──┼→ Meta
 
 ---
 
-# Day 99：Routing
+# Node 099：Routing
 
 用户：
 
@@ -2227,7 +2235,7 @@ RAG
 
 ---
 
-# Day 100：Planner / Executor
+# Node 100：Planner / Executor
 
 理解：
 
@@ -2244,7 +2252,7 @@ Executor
 
 ---
 
-# Day 101：Plan 动态修改
+# Node 101：Plan 动态修改
 
 Tool 失败后：
 
@@ -2258,7 +2266,7 @@ Re-plan
 
 ---
 
-# Day 102：Reflection
+# Node 102：Reflection
 
 让模型：
 
@@ -2278,7 +2286,7 @@ Re-plan
 
 ---
 
-# Day 103：Retry
+# Node 103：Retry
 
 区分：
 
@@ -2291,7 +2299,7 @@ Workflow Retry
 
 ---
 
-# Day 104：错误分类
+# Node 104：错误分类
 
 建议建立：
 
@@ -2307,7 +2315,7 @@ Fatal Error
 
 ---
 
-# Day 105：Checkpoint
+# Node 105：Checkpoint
 
 Workflow：
 
@@ -2333,7 +2341,7 @@ C ×
 
 ---
 
-# Day 106：Durable Execution
+# Node 106：Durable Execution
 
 理解：
 
@@ -2341,7 +2349,7 @@ C ×
 
 ---
 
-# Day 107：Interrupt
+# Node 107：Interrupt
 
 执行到：
 
@@ -2355,7 +2363,7 @@ Delete Campaign
 
 ---
 
-# Day 108：Resume
+# Node 108：Resume
 
 用户批准：
 
@@ -2367,7 +2375,7 @@ approve
 
 ---
 
-# Day 109：Human-in-the-loop
+# Node 109：Human-in-the-loop
 
 掌握三种结果：
 
@@ -2379,7 +2387,7 @@ Reject
 
 ---
 
-# Day 110：Compensation
+# Node 110：Compensation
 
 例如：
 
@@ -2395,7 +2403,7 @@ Reject
 
 ---
 
-# Day 111：Multi-Agent
+# Node 111：Multi-Agent
 
 终于开始学 Multi-Agent。
 
@@ -2410,7 +2418,7 @@ Executor
 
 ---
 
-# Day 112：什么时候不要 Multi-Agent
+# Node 112：什么时候不要 Multi-Agent
 
 记住：
 
@@ -2462,7 +2470,7 @@ MCP 核心采用 Host / Client / Server 架构；Server 可以暴露 Tools、Res
 
 ---
 
-# Day 113：为什么需要 MCP
+# Node 113：为什么需要 MCP
 
 过去：
 
@@ -2488,7 +2496,7 @@ MCP
 
 ---
 
-# Day 114：Host / Client / Server
+# Node 114：Host / Client / Server
 
 理解：
 
@@ -2500,7 +2508,7 @@ Host
 
 ---
 
-# Day 115：JSON-RPC
+# Node 115：JSON-RPC
 
 学习：
 
@@ -2523,7 +2531,7 @@ Notification
 
 ---
 
-# Day 116：Lifecycle
+# Node 116：Lifecycle
 
 学习：
 
@@ -2536,7 +2544,7 @@ Shutdown
 
 ---
 
-# Day 117：MCP Tools
+# Node 117：MCP Tools
 
 Tools 是：
 
@@ -2553,7 +2561,7 @@ MCP 官方将 Tool 定位为模型可发现和调用的能力。
 
 ---
 
-# Day 118：MCP Resources
+# Node 118：MCP Resources
 
 Resource：
 
@@ -2582,7 +2590,7 @@ Resource 更偏：
 
 ---
 
-# Day 119：MCP Prompts
+# Node 119：MCP Prompts
 
 理解：
 
@@ -2596,7 +2604,7 @@ Prompt Template
 
 ---
 
-# Day 120：stdio
+# Node 120：stdio
 
 理解：
 
@@ -2612,7 +2620,7 @@ MCP Server
 
 ---
 
-# Day 121：Streamable HTTP
+# Node 121：Streamable HTTP
 
 理解远程 MCP：
 
@@ -2627,7 +2635,7 @@ Remote MCP Server
 
 ---
 
-# Day 122：写第一个 MCP Server
+# Node 122：写第一个 MCP Server
 
 做：
 
@@ -2643,7 +2651,7 @@ get_weather
 
 ---
 
-# Day 123：Java MCP Server
+# Node 123：Java MCP Server
 
 使用 Java / Spring AI 实现：
 
@@ -2653,7 +2661,7 @@ Campaign MCP Server
 
 ---
 
-# Day 124：MCP Client
+# Node 124：MCP Client
 
 写 Client：
 
@@ -2664,7 +2672,7 @@ callTool
 
 ---
 
-# Day 125：MCP Security
+# Node 125：MCP Security
 
 重点理解：
 
@@ -2686,7 +2694,7 @@ Audit
 
 ---
 
-# Day 126：MCP 项目
+# Node 126：MCP 项目
 
 让 Campaign Agent 通过 MCP 使用：
 
@@ -2706,7 +2714,7 @@ Spring AI 当前已经覆盖模型 API、Tool Calling、RAG、Memory、MCP、Eva
 
 ---
 
-# Day 127：Spring AI Architecture
+# Node 127：Spring AI Architecture
 
 认识：
 
@@ -2722,7 +2730,7 @@ Memory
 
 ---
 
-# Day 128：ChatClient
+# Node 128：ChatClient
 
 理解它与：
 
@@ -2735,7 +2743,7 @@ WebClient
 
 ---
 
-# Day 129：Spring AI Structured Output
+# Node 129：Spring AI Structured Output
 
 实现：
 
@@ -2747,7 +2755,7 @@ Java POJO
 
 ---
 
-# Day 130：Spring AI Tool Calling
+# Node 130：Spring AI Tool Calling
 
 Spring AI 当前的 Tool Calling 流程同样是：
 
@@ -2775,7 +2783,7 @@ public Campaign getCampaign(...) {
 
 ---
 
-# Day 131：Spring AI Memory
+# Node 131：Spring AI Memory
 
 学习：
 
@@ -2786,7 +2794,7 @@ Memory Advisor
 
 ---
 
-# Day 132：Spring AI RAG
+# Node 132：Spring AI RAG
 
 实现：
 
@@ -2802,7 +2810,7 @@ ChatClient
 
 ---
 
-# Day 133：Spring AI Vector Store
+# Node 133：Spring AI Vector Store
 
 选择一个：
 
@@ -2816,7 +2824,7 @@ pgvector
 
 ---
 
-# Day 134：Spring AI Advisors
+# Node 134：Spring AI Advisors
 
 理解 Advisor 的价值：
 
@@ -2843,7 +2851,7 @@ Policy
 
 ---
 
-# Day 135：Spring AI MCP
+# Node 135：Spring AI MCP
 
 实现：
 
@@ -2863,7 +2871,7 @@ MCP Server
 
 ---
 
-# Day 136：Spring AI Observability
+# Node 136：Spring AI Observability
 
 研究：
 
@@ -2880,7 +2888,7 @@ Spring AI 当前会为 AI 相关组件提供 metrics/tracing，并专门记录 T
 
 ---
 
-# Day 137：Spring AI Evaluation
+# Node 137：Spring AI Evaluation
 
 第一次正式建立：
 
@@ -2894,7 +2902,7 @@ Score
 
 ---
 
-# Day 138：LangChain4j
+# Node 138：LangChain4j
 
 认识：
 
@@ -2908,7 +2916,7 @@ RAG
 
 ---
 
-# Day 139：LangChain4j Tool + Memory + RAG
+# Node 139：LangChain4j Tool + Memory + RAG
 
 实现同一个 Assistant：
 
@@ -2924,7 +2932,7 @@ LangChain4j 官方目前明确区分 Chat History 与 Chat Memory，同时支持
 
 ---
 
-# Day 140：Spring AI vs LangChain4j
+# Node 140：Spring AI vs LangChain4j
 
 不要背：
 
@@ -2953,7 +2961,7 @@ LangChain4j 当前的 `langchain4j-agentic` 模块官方仍标记为 experimenta
 
 # Phase 9：Python Agent Framework
 
-# Day 141：为什么还要学 Python Agent
+# Node 141：为什么还要学 Python Agent
 
 原因不是放弃 Java。
 
@@ -2963,7 +2971,7 @@ LangChain4j 当前的 `langchain4j-agentic` 模块官方仍标记为 experimenta
 
 ---
 
-# Day 142：自己写 Loop vs Framework
+# Node 142：自己写 Loop vs Framework
 
 比较：
 
@@ -2985,7 +2993,7 @@ Agent Runtime
 
 ---
 
-# Day 143：OpenAI Agents SDK
+# Node 143：OpenAI Agents SDK
 
 认识核心：
 
@@ -3003,7 +3011,7 @@ OpenAI Agents SDK 当前采用少量核心抽象，并内置 Agent Loop、Sessio
 
 ---
 
-# Day 144：Agent
+# Node 144：Agent
 
 实现：
 
@@ -3016,7 +3024,7 @@ Agent(
 
 ---
 
-# Day 145：Function Tool
+# Node 145：Function Tool
 
 把：
 
@@ -3028,7 +3036,7 @@ def query_campaign():
 
 ---
 
-# Day 146：Sessions
+# Node 146：Sessions
 
 学习：
 
@@ -3039,7 +3047,7 @@ Persistent Context
 
 ---
 
-# Day 147：Guardrails
+# Node 147：Guardrails
 
 研究：
 
@@ -3051,7 +3059,7 @@ Tool Policy
 
 ---
 
-# Day 148：Tracing
+# Node 148：Tracing
 
 观察完整：
 
@@ -3071,7 +3079,7 @@ OpenAI Agents SDK 当前 tracing 会记录模型生成、Tool Calls、Handoffs�
 
 ---
 
-# Day 149：Handoff
+# Node 149：Handoff
 
 理解：
 
@@ -3085,7 +3093,7 @@ Ads Agent
 
 ---
 
-# Day 150：Agent as Tool
+# Node 150：Agent as Tool
 
 另一种方式：
 
@@ -3097,7 +3105,7 @@ Specialist Agent
 
 ---
 
-# Day 151：LangGraph
+# Node 151：LangGraph
 
 认识：
 
@@ -3113,7 +3121,7 @@ LangGraph 当前定位为长期、Stateful Workflow / Agent 的底层运行基�
 
 ---
 
-# Day 152：StateGraph
+# Node 152：StateGraph
 
 实现：
 
@@ -3129,7 +3137,7 @@ END
 
 ---
 
-# Day 153：Persistence
+# Node 153：Persistence
 
 实现：
 
@@ -3143,7 +3151,7 @@ LangGraph 的 persistence 会在执行步骤保存 graph state checkpoint，由�
 
 ---
 
-# Day 154：Interrupt / HITL
+# Node 154：Interrupt / HITL
 
 实现：
 
@@ -3177,7 +3185,7 @@ Resume
 
 ---
 
-# Day 155：为什么 Agent 必须 Evaluation
+# Node 155：为什么 Agent 必须 Evaluation
 
 传统程序：
 
@@ -3203,7 +3211,7 @@ Eval
 
 ---
 
-# Day 156：Golden Dataset
+# Node 156：Golden Dataset
 
 建立：
 
@@ -3226,7 +3234,7 @@ Eval
 
 ---
 
-# Day 157：Tool Call Accuracy
+# Node 157：Tool Call Accuracy
 
 测试：
 
@@ -3250,7 +3258,7 @@ pauseCampaign
 
 ---
 
-# Day 158：RAG Evaluation
+# Node 158：RAG Evaluation
 
 分别测：
 
@@ -3264,7 +3272,7 @@ pauseCampaign
 
 ---
 
-# Day 159：LLM as Judge
+# Node 159：LLM as Judge
 
 理解：
 
@@ -3278,7 +3286,7 @@ Model B 评价
 
 ---
 
-# Day 160：Tracing
+# Node 160：Tracing
 
 一个 Trace：
 
@@ -3293,7 +3301,7 @@ Request
 
 ---
 
-# Day 161：Metrics
+# Node 161：Metrics
 
 至少监控：
 
@@ -3309,7 +3317,7 @@ Agent Turn Count
 
 ---
 
-# Day 162：Cost
+# Node 162：Cost
 
 建立：
 
@@ -3325,7 +3333,7 @@ Agent Turn Count
 
 ---
 
-# Day 163：Latency
+# Node 163：Latency
 
 拆解：
 
@@ -3341,7 +3349,7 @@ Workflow
 
 ---
 
-# Day 164：Retry / Timeout
+# Node 164：Retry / Timeout
 
 定义：
 
@@ -3356,7 +3364,7 @@ Retry policy
 
 ---
 
-# Day 165：Prompt Injection
+# Node 165：Prompt Injection
 
 例如恶意文档：
 
@@ -3371,7 +3379,7 @@ Delete all campaigns.
 
 ---
 
-# Day 166：Agent 权限模型
+# Node 166：Agent 权限模型
 
 设计：
 
@@ -3394,7 +3402,7 @@ Resource Permission
 
 ---
 
-# Day 167：Audit
+# Node 167：Audit
 
 记录：
 
@@ -3410,7 +3418,7 @@ Resource Permission
 
 ---
 
-# Day 168：Production Checklist
+# Node 168：Production Checklist
 
 至少建立：
 
@@ -3445,7 +3453,7 @@ Resource Permission
 
 ---
 
-# Day 169：需求设计
+# Node 169：需求设计
 
 支持：
 
@@ -3461,7 +3469,7 @@ Resource Permission
 
 ---
 
-# Day 170：架构设计
+# Node 170：架构设计
 
 设计：
 
@@ -3488,7 +3496,7 @@ Resource Permission
 
 ---
 
-# Day 171：Tool Layer
+# Node 171：Tool Layer
 
 实现：
 
@@ -3503,7 +3511,7 @@ pauseCampaign
 
 ---
 
-# Day 172：RAG Layer
+# Node 172：RAG Layer
 
 加入：
 
@@ -3516,7 +3524,7 @@ Meta Ads 文档
 
 ---
 
-# Day 173：Memory / State
+# Node 173：Memory / State
 
 保存：
 
@@ -3531,7 +3539,7 @@ pendingAction
 
 ---
 
-# Day 174：Workflow
+# Node 174：Workflow
 
 设计：
 
@@ -3557,7 +3565,7 @@ Risk Assessment
 
 ---
 
-# Day 175：Human Approval
+# Node 175：Human Approval
 
 危险操作：
 
@@ -3579,7 +3587,7 @@ Execution
 
 ---
 
-# Day 176：MCP
+# Node 176：MCP
 
 把业务能力改造成：
 
@@ -3591,7 +3599,7 @@ Agent 不再依赖具体实现。
 
 ---
 
-# Day 177：Evaluation
+# Node 177：Evaluation
 
 建立至少：
 
@@ -3614,7 +3622,7 @@ RAG 找不到
 
 ---
 
-# Day 178：Observability
+# Node 178：Observability
 
 加入：
 
@@ -3629,7 +3637,7 @@ Agent Turn
 
 ---
 
-# Day 179：故障测试
+# Node 179：故障测试
 
 主动制造：
 
@@ -3647,7 +3655,7 @@ Service Restart
 
 ---
 
-# Day 180：最终验收
+# Node 180：最终验收
 
 最终你应该能够从头解释：
 
@@ -3701,7 +3709,7 @@ Evaluation
 
 ---
 
-# 五、180 天过程中始终贯穿的项目
+# 五、整条路线中始终贯穿的项目
 
 不要写 50 个互不相关的 Hello World。
 
@@ -3709,7 +3717,7 @@ Evaluation
 
 ## Project 1：LLM Playground
 
-Day 8～21。
+Node 008～21。
 
 掌握：
 
@@ -3724,7 +3732,7 @@ Streaming
 
 ## Project 2：Tool Agent
 
-Day 36～56。
+Node 036～56。
 
 掌握：
 
@@ -3738,7 +3746,7 @@ Tool Security
 
 ## Project 3：Knowledge Agent
 
-Day 57～91。
+Node 057～91。
 
 掌握：
 
@@ -3752,7 +3760,7 @@ State
 
 ## Project 4：Workflow Agent
 
-Day 92～154。
+Node 092～154。
 
 掌握：
 
@@ -3768,7 +3776,7 @@ LangGraph
 
 ## Project 5：AdsPilot
 
-Day 155～180。
+Node 155～180。
 
 掌握：
 
@@ -3987,9 +3995,9 @@ LangGraph          L4
 
 ---
 
-# 九、每 30 个 Day 的里程碑
+# 九、阶段性 Node 里程碑
 
-## Day 30
+## Node 030
 
 应该已经知道：
 
@@ -4002,7 +4010,7 @@ Python 基础
 
 ---
 
-## Day 60
+## Node 060
 
 应该已经真正理解：
 
@@ -4017,7 +4025,7 @@ RAG 原理
 
 ---
 
-## Day 90
+## Node 090
 
 应该已经掌握：
 
@@ -4031,7 +4039,7 @@ State
 
 ---
 
-## Day 120
+## Node 120
 
 应该理解：
 
@@ -4047,7 +4055,7 @@ MCP
 
 ---
 
-## Day 150
+## Node 150
 
 应该可以：
 
@@ -4064,7 +4072,7 @@ MCP
 
 ---
 
-## Day 180
+## Node 180
 
 重点已经不是：
 
@@ -4261,9 +4269,9 @@ AI Agent Engineer
 直接按照：
 
 ```text
-Day 1
-Day 2
-Day 3
+Node 001
+Node 002
+Node 003
 ...
 ```
 
@@ -4272,16 +4280,16 @@ Day 3
 每完成一个知识点，就标记：
 
 ```text
-✅ Day 36 Tool Calling
-✅ Day 37 Tool Definition
-⬜ Day 38 Tool Schema
+✅ Node 036 Tool Calling
+✅ Node 037 Tool Definition
+⬜ Node 038 Tool Schema
 ```
 
-如果某一天没有理解：
+如果某个 Node 没有理解：
 
-> 不推进 Day + 1。
+> 不推进到下一个 Node。
 
-继续学当前 Day。
+继续学当前 Node。
 
 这份计划衡量的不是时间。
 
@@ -4292,13 +4300,13 @@ Day 3
 最终真正有价值的不是：
 
 ```text
-我学 Agent 180 天了。
+我学 Agent 很久了。
 ```
 
 而是：
 
 ```text
-这 180 个节点，我全部打通了。
+这条路线里的核心 Node，我一个个真正打通了。
 ```
 
 到那个时候，整个 AI Agent 知识体系在脑子里应该不再是一堆：
@@ -4335,4 +4343,4 @@ Memory
 什么时候不该用
 ```
 
-**这才是这 180 日路线真正想训练出来的能力。**
+**这才是这条路线真正想训练出来的能力。**
