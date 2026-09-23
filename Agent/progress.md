@@ -12,18 +12,18 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 0 / Agent 基础认知
-当前节点：Day 4 - Token
+当前节点：Day 5 - Context Window
 主项目：projects/agent-learning-lab
 主要语言：Java
 主要后端框架：Spring Boot
 前期模型：DeepSeek
 ```
 
-目前已经完成 Day 1「LLM 到底是什么」、Day 2「训练与推理」和 Day 3「LLM 幻觉」。
+目前已经完成 Day 1「LLM 到底是什么」、Day 2「训练与推理」、Day 3「LLM 幻觉」和 Day 4「Token」。
 
 下一步：
 
-> **Day 4：Token**
+> **Day 5：Context Window**
 
 ------
 
@@ -66,8 +66,8 @@
 - ✅ Day 001：LLM 到底是什么
 - ✅ Day 002：训练与推理
 - ✅ Day 003：LLM 幻觉
-- 🟡 Day 004：Token
-- ⬜ Day 005：Context Window
+- ✅ Day 004：Token
+- 🟡 Day 005：Context Window
 - ⬜ Day 006：什么是 Agent
 - ⬜ Day 007：Workflow 与 Agent
 
@@ -322,7 +322,7 @@ Codex 的定位：
 
 ## 2026-09-23
 
-完成 Day 003「LLM 幻觉」，当前进入 Day 004「Token」。
+完成 Day 003「LLM 幻觉」和 Day 004「Token」，当前进入 Day 005「Context Window」。Token 切分对比实验留待首次接入模型时进行。
 
 ## 2026-09-22
 
@@ -371,15 +371,15 @@ Git Commit
 
 # 下一步
 
-> **Day 004：Token**
+> **Day 005：Context Window**
 
 完成后更新：
 
 ```text
-Day 004：✅
+Day 005：✅
 
 当前节点：
-Day 005
+Day 006
 ```
 
-重点理解 Token、Tokenizer、Input Token、Output Token，以及 Token 为什么同时影响 API 成本和 Context Window。
+重点理解 Context、Context Window、上下文长度、Lost in the Middle 和 Context Overflow，以及为什么 Memory 不等于模型永久记住。
