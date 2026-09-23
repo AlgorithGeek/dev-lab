@@ -394,6 +394,33 @@ Memory
 模型真的永久记住
 ```
 
+实践提醒：
+
+> 即使当前主模型支持超长 Context，也不要形成“能塞就全塞”的习惯。
+
+后续做本 Node 实验时，主动设置不同 Context Budget，例如：
+
+```text
+4k
+16k
+32k
+64k
+```
+
+比较：
+
+```text
+回答质量
+信息遗漏
+Lost in the Middle
+Token 消耗
+延迟
+```
+
+重点验证：
+
+> **Context 更长，不等于 Context 更好。**
+
 ---
 
 ## Node 006：什么是 Agent
@@ -556,6 +583,12 @@ Response
 
 > **先学通用协议和调用链，再学习 Provider 的高级特性。**
 
+实践提醒：
+
+- 真正创建 `agent-learning-lab` 时，优先固定当时可用的稳定模型快照，避免模型版本漂移影响实验复现。
+- 本 Node 暂时不要提前设计复杂的 `ModelClient / ProviderFactory / ModelRouter`。
+- 第一目标是亲眼看懂 HTTP、Message、Model、Usage 和 Response；Provider 抽象留到 Node 018 再正式做。
+
 ---
 
 # Node 009：Message 模型
@@ -668,6 +701,34 @@ Few-shot
 
 理解为什么企业应用更喜欢后者。
 
+这一组 Node（013～015）要明确区分：
+
+```text
+自然语言输出
+↓
+JSON Object
+↓
+JSON Schema
+↓
+strict 结构约束
+↓
+Java DTO
+```
+
+不要把：
+
+```text
+“模型输出了一个看起来像 JSON 的字符串”
+```
+
+和：
+
+```text
+“模型按 Schema 契约输出可稳定反序列化的数据”
+```
+
+当成同一件事。
+
 ---
 
 # Node 014：JSON Schema
@@ -697,6 +758,20 @@ Few-shot
 }
 ```
 
+实践时继续区分：
+
+```text
+json_object
+vs
+json_schema
+vs
+json_schema + strict
+```
+
+重点不是背 Provider 参数，而是理解：
+
+> **JSON Schema 是程序与模型之间的数据契约。**
+
 ---
 
 # Node 015：Java DTO 与 Structured Output
@@ -715,6 +790,26 @@ class CampaignAnalysis {
 ```
 
 让模型输出并反序列化成 DTO。
+
+完成这一 Node 时，要能够从头解释：
+
+```text
+Schema
+↓
+Model Output
+↓
+Validation
+↓
+Deserialization
+↓
+Java DTO
+↓
+Business Logic
+```
+
+并理解：
+
+> **Structured Output 的终点不是“得到 JSON”，而是让不确定的模型输出进入确定的程序类型系统。**
 
 ---
 
@@ -792,6 +887,28 @@ Tool Calling
 Structured Output
 稳定性
 ```
+
+从这一 Node 开始，再正式引入 Provider 抽象。
+
+建议先比较：
+
+```text
+Qwen
+OpenAI-compatible Provider
+其他 Provider
+```
+
+然后再根据已经真实出现的差异设计：
+
+```text
+ModelClient
+Provider Config
+Provider Adapter
+```
+
+原则：
+
+> **先有两个真实 Provider 的差异，再抽象；不要为了“以后可能会换模型”过早设计一套空抽象。**
 
 ---
 
