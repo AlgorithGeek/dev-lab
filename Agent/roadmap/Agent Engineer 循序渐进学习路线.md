@@ -2137,7 +2137,7 @@ Agent Workflow 可以理解为一种智能状态机。
 
 ---
 
-# Node 094：Node
+# Node 094：Workflow Node（工作流节点）
 
 例如：
 
@@ -3717,7 +3717,7 @@ Evaluation
 
 ## Project 1：LLM Playground
 
-Node 008～21。
+Node 008～021。
 
 掌握：
 
@@ -3732,7 +3732,7 @@ Streaming
 
 ## Project 2：Tool Agent
 
-Node 036～56。
+Node 036～056。
 
 掌握：
 
@@ -3746,7 +3746,7 @@ Tool Security
 
 ## Project 3：Knowledge Agent
 
-Node 057～91。
+Node 057～091。
 
 掌握：
 
