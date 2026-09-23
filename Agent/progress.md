@@ -12,18 +12,18 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 0 / Agent 基础认知
-当前节点：Day 3 - LLM 幻觉
+当前节点：Day 4 - Token
 主项目：projects/agent-learning-lab
 主要语言：Java
 主要后端框架：Spring Boot
 前期模型：DeepSeek
 ```
 
-目前已经完成 Day 1「LLM 到底是什么」和 Day 2「训练与推理」。
+目前已经完成 Day 1「LLM 到底是什么」、Day 2「训练与推理」和 Day 3「LLM 幻觉」。
 
 下一步：
 
-> **Day 3：LLM 幻觉**
+> **Day 4：Token**
 
 ------
 
@@ -65,8 +65,8 @@
 
 - ✅ Day 001：LLM 到底是什么
 - ✅ Day 002：训练与推理
-- 🟡 Day 003：LLM 幻觉
-- ⬜ Day 004：Token
+- ✅ Day 003：LLM 幻觉
+- 🟡 Day 004：Token
 - ⬜ Day 005：Context Window
 - ⬜ Day 006：什么是 Agent
 - ⬜ Day 007：Workflow 与 Agent
@@ -320,6 +320,10 @@ Codex 的定位：
 
 # 进度记录
 
+## 2026-09-23
+
+完成 Day 003「LLM 幻觉」，当前进入 Day 004「Token」。
+
 ## 2026-09-22
 
 完成 Day 001「LLM 到底是什么」和 Day 002「训练与推理」，当前进入 Day 003「LLM 幻觉」。
@@ -367,15 +371,15 @@ Git Commit
 
 # 下一步
 
-> **Day 003：LLM 幻觉**
+> **Day 004：Token**
 
 完成后更新：
 
 ```text
-Day 003：✅
+Day 004：✅
 
 当前节点：
-Day 004
+Day 005
 ```
 
-重点理解模型为什么会在缺少可靠依据时生成看似合理但错误的内容，以及 Grounding 为什么比一句“不要胡说”更可靠。
+重点理解 Token、Tokenizer、Input Token、Output Token，以及 Token 为什么同时影响 API 成本和 Context Window。
