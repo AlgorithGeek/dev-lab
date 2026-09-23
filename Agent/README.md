@@ -38,9 +38,9 @@ Tool Calling
 ↓
 Agent Loop
 ↓
-Memory / State
-↓
 RAG
+↓
+Memory / State
 ↓
 Workflow
 ↓
@@ -146,7 +146,7 @@ Note
 
 - Phase 0：LLM 与 Agent 基础认知
 - Phase 1：LLM 应用开发基础
-- Phase 3：Tool Calling 与 Agent Loop
+- Phase 2：Tool Calling 与 Agent Loop
 
 ### Node
 
@@ -229,11 +229,16 @@ Agent/
 ```text
 00-LLM与Agent基础认知
 01-LLM应用开发基础
-02-Python-Agent必要基础
-03-Tool-Calling与Agent-Loop
-04-RAG
-05-Memory-Context-State
-...
+02-Tool-Calling与Agent-Loop
+03-RAG
+04-Memory-Context-State
+05-Workflow与Agent-Orchestration
+06-MCP
+07-Java-AI工程化
+08-Python-Agent必要基础
+09-Python-Agent-Framework
+10-生产级Agent工程
+11-综合实战项目
 ```
 
 其中：
