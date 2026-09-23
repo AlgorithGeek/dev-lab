@@ -460,7 +460,7 @@ Inference
 例如模型已经训练完：
 
 ```text
-DeepSeek 模型
+Qwen3.8-Max 模型
 Parameters 已经确定
 ```
 
@@ -492,23 +492,23 @@ Inference
 
 ------
 
-# 十、所以我们以后调用 DeepSeek API 是什么？
+# 十、所以我们以后调用 Qwen3.8-Max API 是什么？
 
 比如：
 
 ```text
 Spring Boot
    ↓
-POST DeepSeek API
+百炼 OpenAI-compatible API
    ↓
-DeepSeek 模型
+Qwen3.8-Max
    ↓
 生成回答
    ↓
 Spring Boot
 ```
 
-DeepSeek 那边发生的核心事情就是：
+百炼提供的推理服务里发生的核心事情就是：
 
 ```text
 Inference
@@ -1250,22 +1250,24 @@ Deployment
 
 ------
 
-# 二十六、DeepSeek API 场景里是谁 Deployment？
+# 二十六、Qwen3.8-Max API 场景里是谁 Deployment？
 
 以后我们写：
 
 ```text
 Spring Boot
 ↓
-DeepSeek API
+百炼 OpenAI-compatible API
+↓
+Qwen3.8-Max
 ```
 
-你并没有部署 DeepSeek 模型。
+你并没有部署 Qwen3.8-Max 模型。
 
 是谁干的？
 
 ```text
-DeepSeek
+模型提供方 / 阿里云百炼
 ```
 
 他们负责：
@@ -1496,7 +1498,7 @@ agent-learning-lab
 
 ## 第一步
 
-DeepSeek 公司以前进行了：
+模型提供方在模型发布前已经进行了：
 
 ```text
 Training
@@ -1519,7 +1521,7 @@ Post-training
 
 ## 第二步
 
-DeepSeek 把模型：
+阿里云百炼把可调用的 Qwen3.8-Max：
 
 ```text
 Deployment
@@ -1530,7 +1532,7 @@ Deployment
 所以：
 
 ```text
-https://api.deepseek.com
+百炼 OpenAI-compatible API Endpoint
 ```
 
 可以使用。
@@ -1542,14 +1544,14 @@ https://api.deepseek.com
 你的 Spring Boot：
 
 ```text
-POST DeepSeek API
+POST 百炼 OpenAI-compatible API
 ```
 
 ------
 
 ## 第四步
 
-DeepSeek：
+阿里云百炼的推理服务：
 
 ```text
 Inference
@@ -1765,7 +1767,7 @@ Response
 
 ## Q1
 
-DeepSeek 花大量算力和海量数据训练下一代模型。
+模型提供方花大量算力和海量数据训练下一代 Qwen 模型。
 
 这是：
 
@@ -1783,7 +1785,7 @@ Pre-training
 
 ## Q2
 
-DeepSeek 把训练完成的模型加载到 GPU 集群，启动 API 服务。
+阿里云百炼把可服务的 Qwen 模型加载到推理基础设施并启动 API 服务。
 
 这是：
 
@@ -1798,7 +1800,7 @@ Deployment / Serving
 你的 Spring Boot 调：
 
 ```text
-DeepSeek API
+百炼中的 Qwen3.8-Max API
 ```
 
 模型收到：

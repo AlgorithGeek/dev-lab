@@ -2087,9 +2087,9 @@ total tokens
 
 ------
 
-# 五十、以后我们的 DeepSeek 项目为什么要打印 Usage？
+# 五十、以后我们的 Qwen 项目为什么要打印 Usage？
 
-第一次 Java 调 DeepSeek 时，除了看：
+第一次 Java 调 Qwen3.8-Max 时，除了看：
 
 ```text
 回答内容
@@ -3559,7 +3559,7 @@ Node 004：Token 到底是什么？
 
 这一篇目前依然不需要正式建 Agent 项目。
 
-等第一次接 DeepSeek API 时，要专门观察：
+等 Node 008 第一次接入 Qwen3.8-Max API 时，要专门观察：
 
 ```text
 usage

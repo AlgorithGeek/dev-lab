@@ -24,7 +24,9 @@
 
 主要语言：Java
 主要后端框架：Spring Boot
-前期模型：DeepSeek
+当前 Provider：阿里云百炼 Model Studio
+当前主模型：qwen3.8-max
+API 风格：OpenAI-compatible
 ```
 
 ---
@@ -49,7 +51,7 @@
 
 - ⬜ Token 切分 / Token Usage 对比实验
   - 暂不单独折腾 Tokenizer
-  - 留到首次接入 DeepSeek API 时，结合真实 API Usage 一起观察
+  - 留到首次接入 Qwen3.8-Max API 时，结合真实 API Usage 一起观察
 - ⬜ 创建 `projects/agent-learning-lab`
   - 等进入首次模型 API 实践时正式创建
 - ⬜ 第一次 Codex 学习协作

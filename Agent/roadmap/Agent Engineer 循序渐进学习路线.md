@@ -504,17 +504,57 @@ Apifox / cURL
   ↓
 先看懂原始 HTTP Request / Response
   ↓
-Java 调用 DeepSeek API
+OpenAI-compatible Chat Completions
+  ↓
+Java 调用阿里云百炼
+  ↓
+model = qwen3.8-max
   ↓
 读取并打印模型返回
+```
+
+当前约定：
+
+```text
+Provider = 阿里云百炼 Model Studio
+Model = qwen3.8-max
+API = OpenAI-compatible
+API Key = DASHSCOPE_API_KEY
 ```
 
 同时建立几个工程习惯：
 
 - API Key 放环境变量，不写死进代码和 Git
+- Base URL、Model、API Key 都视为 Provider 配置，不散落在业务代码里
 - 能看懂 HTTP Status / Headers / Body
 - 记录并观察 Input Token / Output Token / Usage
 - 把 Node 004 暂缓的 Token Usage 实验放到这里一起完成
+
+这一阶段先使用 Chat Completions，是为了把 Message、Streaming、Structured Output 和 Tool Calling 的原始调用链看清楚。
+
+Qwen3.8-Max 默认会进行较强推理。第一轮基础实验建议显式设置：
+
+```text
+reasoning_effort = none
+```
+
+先把最基本的：
+
+```text
+Request
+↓
+Model
+↓
+Response
+```
+
+看明白。
+
+之后再打开 Thinking / Reasoning 做对比，并在后续 Agent 学习中继续理解 Responses API。
+
+原则：
+
+> **先学通用协议和调用链，再学习 Provider 的高级特性。**
 
 ---
 

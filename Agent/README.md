@@ -370,7 +370,9 @@ projects/agent-learning-lab
 ```text
 Java
 ↓
-DeepSeek API
+OpenAI-compatible API
+↓
+Qwen3.8-Max
 ↓
 Response
 ```
@@ -407,33 +409,67 @@ Response
 
 ## 模型
 
-学习前期优先使用：
+当前学习项目正式采用：
 
 ```text
-DeepSeek API
+Provider：阿里云百炼 Model Studio
+Model：qwen3.8-max
+API 风格：OpenAI-compatible
+API Key 环境变量：DASHSCOPE_API_KEY
 ```
 
-主要考虑：
+选择它的主要原因：
 
-- 国内调用方便
-- 成本适合长期实验
-- 能学习标准 LLM API 调用方式
-- 支持 Structured Output、Tool Calling 等 Agent 基础能力
+- 国内可以通过官方渠道正常开通和付费
+- 模型能力足够强，适合长期 Agent 学习与实验
+- 支持 Structured Output、Function Calling、Streaming 等核心能力
+- 提供 OpenAI-compatible 接口，便于学习通用 LLM / Agent API 结构
+- 后续切换到 OpenAI 等 Provider 时，可以尽量把差异限制在 Key、Base URL、Model 和少量 Provider-specific 参数
+
+前期 API 学习顺序：
+
+```text
+OpenAI-compatible Chat Completions
+        ↓
+Message / Streaming
+        ↓
+Structured Output
+        ↓
+Tool Calling
+        ↓
+Agent Loop
+        ↓
+再理解 Responses API
+```
+
+前期优先使用 OpenAI-compatible 接口，而不是先绑定百炼专有 SDK。
+
+这样学习重点会放在：
+
+> **HTTP、Message、Schema、Tool Call、Agent Loop 等通用机制本身。**
+
+Qwen3.8-Max 默认会进行较强推理。为了先看清最基础的请求与响应链路，早期实验可以显式关闭思考，例如使用：
+
+```text
+reasoning_effort = none
+```
+
+等基础链路掌握以后，再专门比较不同 Reasoning / Thinking 配置。
 
 后续会逐渐接触：
 
 ```text
 OpenAI
+DeepSeek
 Claude
-Qwen
-其他模型
+其他模型 / Provider
 ```
 
-目标不是绑定某一家模型，而是建立：
+目标不是绑定 Qwen，而是建立：
 
-> **模型是可替换基础设施**
+> **模型是可替换基础设施。**
 
-的工程意识。
+当前的 Qwen3.8-Max 只是我们的第一套主力实现。
 
 ------
 
@@ -452,7 +488,7 @@ dev-lab
 学习过程中的关键变化都会尽量留下 Commit，例如：
 
 ```text
-首次接入 DeepSeek API
+首次接入 Qwen3.8-Max API
 
 新增 Structured Output 实验
 
