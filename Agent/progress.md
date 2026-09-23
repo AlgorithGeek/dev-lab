@@ -2,6 +2,8 @@
 
 > 这里记录当前实际学习状态。
 >
+> Node 表示知识节点，不对应自然日。
+>
 > - `README.md`：说明这个 Agent 学习区怎么使用
 > - `roadmap/`：记录完整学习路线
 > - `progress.md`：只记录当前学到哪里
@@ -14,8 +16,8 @@
 
 ```text
 状态：🟡 学习中
-阶段：Phase 0 / Agent 基础认知
-当前节点：Day 005 - Context Window
+阶段：Phase 0 / LLM 与 Agent 基础认知
+当前节点：Node 005 - Context Window
 
 主项目：projects/agent-learning-lab
 项目状态：⬜ 尚未正式创建
@@ -29,15 +31,15 @@
 
 ## 当前阶段进度
 
-### Phase 0：建立 Agent 世界观
+### Phase 0：LLM 与 Agent 基础认知
 
-- ✅ Day 001：LLM 到底是什么
-- ✅ Day 002：训练与推理
-- ✅ Day 003：LLM 幻觉
-- ✅ Day 004：Token
-- 🟡 Day 005：Context Window
-- ⬜ Day 006：什么是 Agent
-- ⬜ Day 007：Workflow 与 Agent
+- ✅ Node 001：LLM 到底是什么
+- ✅ Node 002：训练与推理
+- ✅ Node 003：LLM 幻觉
+- ✅ Node 004：Token
+- 🟡 Node 005：Context Window
+- ⬜ Node 006：什么是 Agent
+- ⬜ Node 007：Workflow 与 Agent
 
 > 这里只展开当前 Phase。后续完整节点请查看 roadmap。
 
@@ -57,7 +59,7 @@
 
 ## 下一步
 
-> **Day 005：Context Window**
+> **Node 005：Context Window**
 
 重点理解：
 
@@ -74,8 +76,8 @@ Memory ≠ 模型永久记住
 完成后：
 
 ```text
-Day 005：✅
-当前节点：Day 006 - 什么是 Agent
+Node 005：✅
+当前节点：Node 006 - 什么是 Agent
 ```
 
 ---
@@ -84,15 +86,15 @@ Day 005：✅
 
 ### 2026-09-23
 
-- 完成 Day 003「LLM 幻觉」
-- 完成 Day 004「Token」
+- 完成 Node 003「LLM 幻觉」
+- 完成 Node 004「Token」
 - Token 实验留待首次模型 API 实践时进行
-- 当前进入 Day 005「Context Window」
+- 当前进入 Node 005「Context Window」
 
 ### 2026-09-22
 
-- 完成 Day 001「LLM 到底是什么」
-- 完成 Day 002「训练与推理」
+- 完成 Node 001「LLM 到底是什么」
+- 完成 Node 002「训练与推理」
 - 针对 Training / Pre-training / Inference / Reasoning / Deployment 增加补充笔记
 
 ---
