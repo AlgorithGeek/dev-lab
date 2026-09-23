@@ -104,9 +104,6 @@ LLM 基础
    └── Context
    │
    ▼
-Python Agent 必要基础
-   │
-   ▼
 Tool Calling
    │
    ▼
@@ -129,25 +126,27 @@ Tool Calling
      │         │
      └────┬────┘
           ▼
-   Agent Framework
-     │          │
-     ▼          ▼
- Spring AI   Python Agent
- LangChain4j Agents SDK
-                │
-                ▼
-             LangGraph
-                │
-                ▼
-          Production
-                │
-     ┌──────────┼───────────┐
-     ▼          ▼           ▼
-   Eval       Tracing     Security
-     │          │           │
-     └──────────┼───────────┘
-                ▼
-          完整 Agent 项目
+    Java AI 工程化
+          │
+          ▼
+ Python Agent 必要基础
+          │
+          ▼
+   Python Agent Framework
+     │               │
+     ▼               ▼
+ Agents SDK       LangGraph
+          │
+          ▼
+      Production
+          │
+ ┌────────┼─────────┐
+ ▼        ▼         ▼
+Eval    Tracing   Security
+ │        │         │
+ └────────┼─────────┘
+          ▼
+    完整 Agent 项目
 ```
 
 ---
@@ -244,13 +243,13 @@ public String getWeather(String city) {
 |---|---:|---|
 | Phase 0 | Node 001～007 | LLM 与 Agent 基础认知 |
 | Phase 1 | Node 008～021 | LLM 应用开发基础 |
-| Phase 2 | Node 022～035 | Python Agent 必要基础 |
-| Phase 3 | Node 036～056 | Tool Calling 与 Agent Loop |
-| Phase 4 | Node 057～077 | RAG |
-| Phase 5 | Node 078～091 | Memory / Context / State |
-| Phase 6 | Node 092～112 | Workflow / Agent Orchestration |
-| Phase 7 | Node 113～126 | MCP |
-| Phase 8 | Node 127～140 | Java AI 工程化 |
+| Phase 2 | Node 022～042 | Tool Calling 与 Agent Loop |
+| Phase 3 | Node 043～063 | RAG |
+| Phase 4 | Node 064～077 | Memory / Context / State |
+| Phase 5 | Node 078～098 | Workflow / Agent Orchestration |
+| Phase 6 | Node 099～112 | MCP |
+| Phase 7 | Node 113～126 | Java AI 工程化 |
+| Phase 8 | Node 127～140 | Python Agent 必要基础 |
 | Phase 9 | Node 141～154 | Python Agent 框架 |
 | Phase 10 | Node 155～168 | 生产级 Agent 工程 |
 | Phase 11 | Node 169～180 | 综合实战项目 |
@@ -497,6 +496,25 @@ HTTP Response
 ```
 
 亲手完成一次 API 调用。
+
+建议第一轮按这个顺序：
+
+```text
+Apifox / cURL
+  ↓
+先看懂原始 HTTP Request / Response
+  ↓
+Java 调用 DeepSeek API
+  ↓
+读取并打印模型返回
+```
+
+同时建立几个工程习惯：
+
+- API Key 放环境变量，不写死进代码和 Git
+- 能看懂 HTTP Status / Headers / Body
+- 记录并观察 Input Token / Output Token / Usage
+- 把 Node 004 暂缓的 Token Usage 实验放到这里一起完成
 
 ---
 
@@ -823,255 +841,22 @@ POST /ai/analyze
 - DTO
 - Exception Handling
 - Streaming 可选
+- 至少准备 10 个固定测试 Case，记录输入、期望结果、实际结果
+- 修改 Prompt / Model / 参数后重新跑一遍，开始建立最小回归测试意识
+
+此时不用学习复杂 Eval 平台。
+
+先建立一个习惯：
+
+> **AI 功能不能只靠“我看起来觉得还不错”来验收。**
 
 ---
 
-# Phase 2：Python Agent 必要基础
-
-目标：
-
-> 不是成为 Python 后端专家。
-
-而是达到：
-
-> 看得懂 Agent 项目，并能独立写 Python Agent。
-
----
-
-# Node 022：Python 环境
-
-学习：
-
-```text
-python
-pip
-venv
-uv
-```
-
-理解虚拟环境为什么存在。
-
----
-
-# Node 023：Python 基础语法
-
-学习：
-
-- int
-- float
-- str
-- bool
-- None
-- if
-- for
-- while
-
-不用刷算法题。
-
----
-
-# Node 024：List / Dict / Set / Tuple
-
-重点掌握：
-
-```python
-list
-dict
-set
-tuple
-```
-
-尤其是：
-
-```python
-dict
-```
-
-AI 项目极其常见。
-
----
-
-# Node 025：函数
-
-学习：
-
-```python
-def
-return
-default parameter
-keyword argument
-```
-
----
-
-# Node 026：类型注解
-
-学习：
-
-```python
-str
-int
-list[str]
-dict[str, Any]
-Optional
-Union
-```
-
-理解：
-
-Python 虽然动态类型，但现代 Agent 项目大量使用 typing。
-
----
-
-# Node 027：Class
-
-学习：
-
-- class
-- `__init__`
-- self
-- instance
-- inheritance 基础
-
-不要深入 Python 元编程。
-
----
-
-# Node 028：Dataclass
-
-学习：
-
-```python
-@dataclass
-```
-
-理解数据对象。
-
----
-
-# Node 029：Pydantic
-
-重点。
-
-学习：
-
-```python
-BaseModel
-Field
-validation
-serialization
-```
-
-理解它与 Java DTO + Validation 的对应关系。
-
----
-
-# Node 030：Exception
-
-掌握：
-
-```python
-try
-except
-finally
-raise
-```
-
----
-
-# Node 031：Module 与 Package
-
-理解：
-
-```text
-project/
-  app/
-    agent/
-    tools/
-    models/
-```
-
-以及：
-
-```python
-import
-from xxx import xxx
-```
-
----
-
-# Node 032：HTTP Client
-
-学习：
-
-```python
-httpx
-```
-
-调用一个 REST API。
-
----
-
-# Node 033：async / await
-
-重点理解：
-
-```text
-同步等待
-vs
-异步等待
-```
-
-学习：
-
-```python
-async def
-await
-asyncio
-```
-
-无需深入事件循环源码。
-
----
-
-# Node 034：FastAPI
-
-完成：
-
-```text
-GET /hello
-POST /chat
-```
-
-理解它与 Spring MVC 的对应关系。
-
----
-
-# Node 035：Python 小项目
-
-写：
-
-```text
-FastAPI
-  ↓
-POST /chat
-  ↓
-LLM API
-  ↓
-Structured Output
-```
-
-做到：
-
-> Python Agent 代码已经不再看不懂。
-
----
-
-# Phase 3：Tool Calling 与 Agent Loop
+# Phase 2：Tool Calling 与 Agent Loop
 
 这是整个路线第一个超级核心阶段。
 
-# Node 036：Tool Calling 是什么
+# Node 022：Tool Calling 是什么
 
 牢记：
 
@@ -1098,7 +883,7 @@ getWeather("Beijing");
 
 ---
 
-# Node 037：Tool Definition
+# Node 023：Tool Definition
 
 Tool 包含：
 
@@ -1115,7 +900,7 @@ Schema
 
 ---
 
-# Node 038：参数 Schema
+# Node 024：参数 Schema
 
 设计：
 
@@ -1139,7 +924,7 @@ queryCampaign
 
 ---
 
-# Node 039：Tool Dispatcher
+# Node 025：Tool Dispatcher
 
 自己实现：
 
@@ -1158,7 +943,7 @@ switch (toolName) {
 
 ---
 
-# Node 040：第一次完整 Tool Call
+# Node 026：第一次完整 Tool Call
 
 实现：
 
@@ -1180,7 +965,7 @@ Answer
 
 ---
 
-# Node 041：多个 Tools
+# Node 027：多个 Tools
 
 创建：
 
@@ -1195,7 +980,7 @@ getBudget
 
 ---
 
-# Node 042：Tool Description 设计
+# Node 028：Tool Description 设计
 
 对比：
 
@@ -1213,7 +998,7 @@ getCampaignPerformanceMetrics
 
 ---
 
-# Node 043：Tool 参数校验
+# Node 029：Tool 参数校验
 
 不要相信模型参数。
 
@@ -1228,7 +1013,7 @@ permission check
 
 ---
 
-# Node 044：Tool Error
+# Node 030：Tool Error
 
 模拟：
 
@@ -1252,7 +1037,7 @@ Invalid ID
 
 ---
 
-# Node 045：Tool Result 设计
+# Node 031：Tool Result 设计
 
 不要一股脑返回：
 
@@ -1264,7 +1049,7 @@ Invalid ID
 
 ---
 
-# Node 046：Read Tool 与 Write Tool
+# Node 032：Read Tool 与 Write Tool
 
 区分：
 
@@ -1284,7 +1069,7 @@ pauseCampaign
 
 ---
 
-# Node 047：权限
+# Node 033：权限
 
 学习：
 
@@ -1308,7 +1093,7 @@ Tool 永远不能因为：
 
 ---
 
-# Node 048：Human Approval
+# Node 034：Human Approval
 
 设计：
 
@@ -1327,7 +1112,7 @@ pauseCampaign()
 
 ---
 
-# Node 049：幂等性
+# Node 035：幂等性
 
 思考：
 
@@ -1351,7 +1136,7 @@ Operation State
 
 ---
 
-# Node 050：Agent Loop
+# Node 036：Agent Loop
 
 自己实现：
 
@@ -1378,7 +1163,7 @@ while (turn < MAX_TURNS) {
 
 ---
 
-# Node 051：Termination Condition
+# Node 037：Termination Condition
 
 学习：
 
@@ -1395,7 +1180,7 @@ Manual Stop
 
 ---
 
-# Node 052：无限循环
+# Node 038：无限循环
 
 模拟：
 
@@ -1419,7 +1204,7 @@ MAX_TURNS
 
 ---
 
-# Node 053：并行 Tool Call
+# Node 039：并行 Tool Call
 
 例如：
 
@@ -1435,7 +1220,7 @@ Agent ───────┼→ Meta Ads
 
 ---
 
-# Node 054：Tool Context
+# Node 040：Tool Context
 
 Tool 不应该只拿模型参数。
 
@@ -1452,7 +1237,7 @@ sessionId
 
 ---
 
-# Node 055：Tool Search
+# Node 041：Tool Search
 
 理解问题：
 
@@ -1474,7 +1259,7 @@ Dynamic Tool Loading
 
 ---
 
-# Node 056：Tool Agent 项目
+# Node 042：Tool Agent 项目
 
 实现：
 
@@ -1499,11 +1284,11 @@ Agent 自动决定需要调用哪些接口。
 
 ---
 
-# Phase 4：RAG
+# Phase 3：RAG
 
 第二个超级核心阶段。
 
-# Node 057：为什么需要 RAG
+# Node 043：为什么需要 RAG
 
 理解：
 
@@ -1522,14 +1307,22 @@ LLM 参数知识
 
 ---
 
-# Node 058：RAG 全流程
+# Node 044：RAG 全流程
 
-掌握：
+掌握两条链路。
+
+### 数据摄取 / Indexing
 
 ```text
-Document
+PDF / HTML / Markdown / Word / 数据库
  ↓
 Parse
+ ↓
+Cleaning
+ ↓
+Deduplication
+ ↓
+Metadata / Version
  ↓
 Chunk
  ↓
@@ -1538,12 +1331,21 @@ Embedding
 Vector Store
 ```
 
-查询：
+重点理解：
+
+- Document Parsing
+- Cleaning
+- 去重
+- Metadata
+- 文档版本与更新
+- 为什么“垃圾数据进去，垃圾检索出来”
+
+### 查询 / Retrieval
 
 ```text
 Question
  ↓
-Embedding
+Query Processing
  ↓
 Retrieve
  ↓
@@ -1554,9 +1356,11 @@ LLM
 Answer
 ```
 
+以后学习 Spring AI 时，再对应理解它的 ETL / DocumentReader / DocumentTransformer / DocumentWriter 抽象。
+
 ---
 
-# Node 059：Embedding
+# Node 045：Embedding
 
 理解：
 
@@ -1577,7 +1381,7 @@ Vector
 
 ---
 
-# Node 060：向量
+# Node 046：向量
 
 只学必要数学：
 
@@ -1592,7 +1396,7 @@ Similarity
 
 ---
 
-# Node 061：Cosine Similarity
+# Node 047：Cosine Similarity
 
 理解：
 
@@ -1606,7 +1410,7 @@ cosine similarity
 
 ---
 
-# Node 062：Vector Database
+# Node 048：Vector Database
 
 了解：
 
@@ -1623,7 +1427,7 @@ cosine similarity
 
 ---
 
-# Node 063：Chunking
+# Node 049：Chunking
 
 理解为什么不能：
 
@@ -1641,7 +1445,7 @@ Semantic Chunking
 
 ---
 
-# Node 064：Chunk Size 实验
+# Node 050：Chunk Size 实验
 
 分别：
 
@@ -1655,7 +1459,7 @@ Semantic Chunking
 
 ---
 
-# Node 065：Metadata
+# Node 051：Metadata
 
 Chunk 不只存：
 
@@ -1678,7 +1482,7 @@ embedding
 
 ---
 
-# Node 066：Metadata Filter
+# Node 052：Metadata Filter
 
 例如：
 
@@ -1691,7 +1495,7 @@ tenant_id = 123
 
 ---
 
-# Node 067：Top K
+# Node 053：Top K
 
 理解：
 
@@ -1705,7 +1509,7 @@ Top 20
 
 ---
 
-# Node 068：Keyword Search
+# Node 054：Keyword Search
 
 学习：
 
@@ -1722,7 +1526,7 @@ BM25
 
 ---
 
-# Node 069：Hybrid Search
+# Node 055：Hybrid Search
 
 组合：
 
@@ -1736,7 +1540,7 @@ BM25
 
 ---
 
-# Node 070：Query Rewrite
+# Node 056：Query Rewrite
 
 用户：
 
@@ -1752,7 +1556,7 @@ campaign 123 昨日表现
 
 ---
 
-# Node 071：Multi Query
+# Node 057：Multi Query
 
 一个问题生成多个检索查询：
 
@@ -1766,7 +1570,7 @@ Query C
 
 ---
 
-# Node 072：Rerank
+# Node 058：Rerank
 
 流程：
 
@@ -1784,7 +1588,7 @@ Retrieval 和 Rerank 的区别。
 
 ---
 
-# Node 073：Source Citation
+# Node 059：Source Citation
 
 Agent 回答：
 
@@ -1803,7 +1607,7 @@ chunkId
 
 ---
 
-# Node 074：RAG 数据更新
+# Node 060：RAG 数据更新
 
 考虑：
 
@@ -1816,7 +1620,7 @@ Embedding 更新
 
 ---
 
-# Node 075：RAG 权限
+# Node 061：RAG 权限
 
 必须理解：
 
@@ -1834,7 +1638,7 @@ LLM
 
 ---
 
-# Node 076：RAG Evaluation
+# Node 062：RAG Evaluation
 
 建立测试集：
 
@@ -1852,7 +1656,7 @@ Expected Answer
 
 ---
 
-# Node 077：RAG 项目
+# Node 063：RAG 项目
 
 实现：
 
@@ -1872,9 +1676,9 @@ Source Citation
 
 ---
 
-# Phase 5：Memory / Context / State
+# Phase 4：Memory / Context / State
 
-# Node 078：History 与 Memory
+# Node 064：History 与 Memory
 
 理解：
 
@@ -1896,7 +1700,7 @@ Memory
 
 ---
 
-# Node 079：Short-term Memory
+# Node 065：Short-term Memory
 
 实现：
 
@@ -1910,7 +1714,7 @@ Message Window。
 
 ---
 
-# Node 080：Token Window Memory
+# Node 066：Token Window Memory
 
 比：
 
@@ -1926,7 +1730,7 @@ Message Window。
 
 ---
 
-# Node 081：Summary Memory
+# Node 067：Summary Memory
 
 历史：
 
@@ -1943,7 +1747,7 @@ Message Window。
 
 ---
 
-# Node 082：Long-term Memory
+# Node 068：Long-term Memory
 
 理解：
 
@@ -1960,7 +1764,7 @@ Message Window。
 
 ---
 
-# Node 083：Semantic Memory
+# Node 069：Semantic Memory
 
 保存“事实”。
 
@@ -1972,7 +1776,7 @@ Message Window。
 
 ---
 
-# Node 084：Episodic Memory
+# Node 070：Episodic Memory
 
 保存“事件”。
 
@@ -1984,7 +1788,7 @@ Message Window。
 
 ---
 
-# Node 085：Working Memory
+# Node 071：Working Memory
 
 当前任务：
 
@@ -1998,7 +1802,7 @@ Message Window。
 
 ---
 
-# Node 086：Agent State
+# Node 072：Agent State
 
 设计：
 
@@ -2019,7 +1823,7 @@ class AgentState {
 
 ---
 
-# Node 087：State Persistence
+# Node 073：State Persistence
 
 实现：
 
@@ -2033,7 +1837,7 @@ Redis / MySQL
 
 ---
 
-# Node 088：State Version
+# Node 074：State Version
 
 考虑 Agent 升级：
 
@@ -2046,7 +1850,7 @@ State V2
 
 ---
 
-# Node 089：Memory 隐私
+# Node 075：Memory 隐私
 
 考虑：
 
@@ -2060,7 +1864,7 @@ State V2
 
 ---
 
-# Node 090：Memory Retrieval
+# Node 076：Memory Retrieval
 
 长期 Memory 很多时：
 
@@ -2078,7 +1882,7 @@ Memory Search
 
 ---
 
-# Node 091：Memory 项目
+# Node 077：Memory 项目
 
 给 Campaign Assistant 加：
 
@@ -2099,11 +1903,11 @@ Agent 能理解上下文。
 
 ---
 
-# Phase 6：Workflow 与 Agent Orchestration
+# Phase 5：Workflow 与 Agent Orchestration
 
 第三个超级核心阶段。
 
-# Node 092：Workflow vs Agent 再理解
+# Node 078：Workflow vs Agent 再理解
 
 Workflow：
 
@@ -2123,7 +1927,7 @@ Agent：
 
 ---
 
-# Node 093：State Machine
+# Node 079：State Machine
 
 复习：
 
@@ -2137,7 +1941,7 @@ Agent Workflow 可以理解为一种智能状态机。
 
 ---
 
-# Node 094：Workflow Node（工作流节点）
+# Node 080：Workflow Node（工作流节点）
 
 例如：
 
@@ -2153,7 +1957,7 @@ ExecuteAction
 
 ---
 
-# Node 095：Edge
+# Node 081：Edge
 
 理解：
 
@@ -2165,7 +1969,7 @@ Node B
 
 ---
 
-# Node 096：Conditional Edge
+# Node 082：Conditional Edge
 
 例如：
 
@@ -2177,7 +1981,7 @@ Risk ─────┤
 
 ---
 
-# Node 097：Sequential Workflow
+# Node 083：Sequential Workflow
 
 实现：
 
@@ -2193,7 +1997,7 @@ Review
 
 ---
 
-# Node 098：Parallel Workflow
+# Node 084：Parallel Workflow
 
 实现：
 
@@ -2207,7 +2011,7 @@ Query ──┼→ Meta
 
 ---
 
-# Node 099：Routing
+# Node 085：Routing
 
 用户：
 
@@ -2235,7 +2039,7 @@ RAG
 
 ---
 
-# Node 100：Planner / Executor
+# Node 086：Planner / Executor
 
 理解：
 
@@ -2252,7 +2056,7 @@ Executor
 
 ---
 
-# Node 101：Plan 动态修改
+# Node 087：Plan 动态修改
 
 Tool 失败后：
 
@@ -2266,7 +2070,7 @@ Re-plan
 
 ---
 
-# Node 102：Reflection
+# Node 088：Reflection
 
 让模型：
 
@@ -2286,7 +2090,7 @@ Re-plan
 
 ---
 
-# Node 103：Retry
+# Node 089：Retry
 
 区分：
 
@@ -2299,7 +2103,7 @@ Workflow Retry
 
 ---
 
-# Node 104：错误分类
+# Node 090：错误分类
 
 建议建立：
 
@@ -2315,7 +2119,7 @@ Fatal Error
 
 ---
 
-# Node 105：Checkpoint
+# Node 091：Checkpoint
 
 Workflow：
 
@@ -2341,7 +2145,7 @@ C ×
 
 ---
 
-# Node 106：Durable Execution
+# Node 092：Durable Execution
 
 理解：
 
@@ -2349,7 +2153,7 @@ C ×
 
 ---
 
-# Node 107：Interrupt
+# Node 093：Interrupt
 
 执行到：
 
@@ -2363,7 +2167,7 @@ Delete Campaign
 
 ---
 
-# Node 108：Resume
+# Node 094：Resume
 
 用户批准：
 
@@ -2375,7 +2179,7 @@ approve
 
 ---
 
-# Node 109：Human-in-the-loop
+# Node 095：Human-in-the-loop
 
 掌握三种结果：
 
@@ -2387,7 +2191,7 @@ Reject
 
 ---
 
-# Node 110：Compensation
+# Node 096：Compensation
 
 例如：
 
@@ -2403,7 +2207,7 @@ Reject
 
 ---
 
-# Node 111：Multi-Agent
+# Node 097：Multi-Agent
 
 终于开始学 Multi-Agent。
 
@@ -2418,7 +2222,7 @@ Executor
 
 ---
 
-# Node 112：什么时候不要 Multi-Agent
+# Node 098：什么时候不要 Multi-Agent
 
 记住：
 
@@ -2462,7 +2266,7 @@ Save Result
 
 ---
 
-# Phase 7：MCP
+# Phase 6：MCP
 
 当前 Agent 工程的重要协议能力。
 
@@ -2470,7 +2274,7 @@ MCP 核心采用 Host / Client / Server 架构；Server 可以暴露 Tools、Res
 
 ---
 
-# Node 113：为什么需要 MCP
+# Node 099：为什么需要 MCP
 
 过去：
 
@@ -2496,7 +2300,7 @@ MCP
 
 ---
 
-# Node 114：Host / Client / Server
+# Node 100：Host / Client / Server
 
 理解：
 
@@ -2508,7 +2312,7 @@ Host
 
 ---
 
-# Node 115：JSON-RPC
+# Node 101：JSON-RPC
 
 学习：
 
@@ -2531,20 +2335,60 @@ Notification
 
 ---
 
-# Node 116：Lifecycle
+# Node 102：协议版本与 Lifecycle
 
-学习：
+MCP 需要建立“协议版本意识”。
+
+重点以当前现代规范：
 
 ```text
-Initialize
-Capability Negotiation
-Operation
-Shutdown
+MCP 2026-07-28
 ```
+
+理解：
+
+```text
+Request
+ ↓
+携带 Protocol Version / Client Info / Capabilities
+ ↓
+Server
+ ↓
+Response
+```
+
+现代规范的核心变化：
+
+- 协议核心转向 Stateless
+- 不再依赖 `initialize / initialized` 握手
+- 不再依赖 `Mcp-Session-Id`
+- Client 可以先调用 `server/discover` 获取 Server 能力，但不是每次业务调用的前置条件
+- 每次 Request 自己携带必要的协议与能力信息
+
+同时必须认识旧版兼容模型：
+
+```text
+MCP 2025-11-25 及更早
+ ↓
+Initialize
+ ↓
+Capability Negotiation
+ ↓
+Session / Operation
+```
+
+原因：
+
+> 真实生态不会在同一天全部升级。
+
+所以这里学的不是“背某一版流程”，而是：
+
+> **理解 MCP 如何演进，以及客户端 / 服务端为什么要处理版本兼容。**
+
 
 ---
 
-# Node 117：MCP Tools
+# Node 103：MCP Tools
 
 Tools 是：
 
@@ -2559,9 +2403,23 @@ pause_campaign
 
 MCP 官方将 Tool 定位为模型可发现和调用的能力。
 
+除了输入参数，还要理解 Tool 的输出契约：
+
+```text
+inputSchema
+outputSchema
+structuredContent
+```
+
+尤其要建立：
+
+> Tool Result 不应该永远只是一坨自由文本。
+
+当结果适合机器继续处理时，应优先考虑结构化输出。
+
 ---
 
-# Node 118：MCP Resources
+# Node 104：MCP Resources
 
 Resource：
 
@@ -2590,7 +2448,7 @@ Resource 更偏：
 
 ---
 
-# Node 119：MCP Prompts
+# Node 105：MCP Prompts
 
 理解：
 
@@ -2604,7 +2462,7 @@ Prompt Template
 
 ---
 
-# Node 120：stdio
+# Node 106：stdio
 
 理解：
 
@@ -2620,7 +2478,7 @@ MCP Server
 
 ---
 
-# Node 121：Streamable HTTP
+# Node 107：Streamable HTTP
 
 理解远程 MCP：
 
@@ -2633,9 +2491,16 @@ Agent Server
 Remote MCP Server
 ```
 
+结合 2026-07-28 规范理解：
+
+- Remote MCP 的核心仍然是 HTTP
+- 现代协议核心已经 Stateless，更适合普通负载均衡与横向扩容
+- 不要把旧版 `Mcp-Session-Id` 当成现代 MCP 的必备概念
+- 旧的 HTTP + SSE transport 已进入淘汰路径，学习资料要注意版本
+
 ---
 
-# Node 122：写第一个 MCP Server
+# Node 108：写第一个 MCP Server
 
 做：
 
@@ -2651,17 +2516,37 @@ get_weather
 
 ---
 
-# Node 123：Java MCP Server
+# Node 109：Java MCP Server
 
-使用 Java / Spring AI 实现：
+使用 **MCP Java SDK** 实现：
 
 ```text
 Campaign MCP Server
 ```
 
+先直接接触：
+
+```text
+McpServer
+Tool Registration
+Schema
+Transport
+Request / Response
+```
+
+这一 Node **不依赖 Spring AI 的高层封装**。
+
+目标是：
+
+> 先理解 Java 世界里 MCP Server 本身怎么工作，再在后面的 Spring AI Phase 学习 Boot Starter / Annotation 等框架整合。
+
+实践时要注意：
+
+> MCP 规范演进速度很快，Java SDK 的具体 API 与其支持的协议版本以学习当时的官方稳定版为准。
+ 
 ---
 
-# Node 124：MCP Client
+# Node 110：MCP Client
 
 写 Client：
 
@@ -2672,7 +2557,7 @@ callTool
 
 ---
 
-# Node 125：MCP Security
+# Node 111：MCP Security
 
 重点理解：
 
@@ -2687,14 +2572,25 @@ MCP 并不等于：
 ```text
 Authentication
 Authorization
+OAuth / Token
+User Consent
+Tool-level Permission
 Approval
 Input Validation
 Audit
 ```
 
+重点理解：
+
+- MCP Server 不是因为“接入了协议”就自动安全
+- Remote MCP 要认真处理身份、Token、Scope 与资源权限
+- 公开 Tool 和受保护 Tool 可以有不同授权策略
+- Agent 的身份、用户的身份、Tool 的权限不能混成一层
+- 敏感操作仍然需要 Human Approval
+
 ---
 
-# Node 126：MCP 项目
+# Node 112：MCP 项目
 
 让 Campaign Agent 通过 MCP 使用：
 
@@ -2706,15 +2602,53 @@ pauseCampaign
 
 而不是直接调用本地 Java 方法。
 
+### 本阶段补充认知
+
+主线不额外增加 Node，但要知道当前 MCP 生态还包括：
+
+```text
+Tasks Extension
+MCP Apps
+Extensions Framework
+```
+
+其中 Tasks 用于长时间运行、可轮询 / 可恢复的任务。
+
+同时知道：
+
+```text
+Roots
+Sampling
+Logging
+```
+
+在 2026-07-28 规范中已被标记为 Deprecated。
+
+所以学习旧教程时，不要把这些旧能力当成未来主线重点。
+
 ---
 
-# Phase 8：Java AI 工程化
+# Phase 7：Java AI 工程化
 
 Spring AI 当前已经覆盖模型 API、Tool Calling、RAG、Memory、MCP、Evaluation 与 Observability，因此很适合作为 Java Agent 工程的主路线之一。
 
+这个学习项目使用独立的现代 Java 环境，不被公司历史项目的 JDK 版本绑定。
+
+当前参考（2026-09）：
+
+```text
+JDK：21
+Spring Boot：4.x
+Spring AI：2.x
+```
+
+原则：
+
+> **真正实践时优先使用当时的稳定兼容版本，以官方文档为准，不为了兼容旧业务项目而故意学习过时 AI 栈。**
+
 ---
 
-# Node 127：Spring AI Architecture
+# Node 113：Spring AI Architecture
 
 认识：
 
@@ -2730,7 +2664,7 @@ Memory
 
 ---
 
-# Node 128：ChatClient
+# Node 114：ChatClient
 
 理解它与：
 
@@ -2743,7 +2677,7 @@ WebClient
 
 ---
 
-# Node 129：Spring AI Structured Output
+# Node 115：Spring AI Structured Output
 
 实现：
 
@@ -2755,7 +2689,7 @@ Java POJO
 
 ---
 
-# Node 130：Spring AI Tool Calling
+# Node 116：Spring AI Tool Calling
 
 Spring AI 当前的 Tool Calling 流程同样是：
 
@@ -2783,7 +2717,7 @@ public Campaign getCampaign(...) {
 
 ---
 
-# Node 131：Spring AI Memory
+# Node 117：Spring AI Memory
 
 学习：
 
@@ -2794,7 +2728,7 @@ Memory Advisor
 
 ---
 
-# Node 132：Spring AI RAG
+# Node 118：Spring AI RAG
 
 实现：
 
@@ -2810,7 +2744,7 @@ ChatClient
 
 ---
 
-# Node 133：Spring AI Vector Store
+# Node 119：Spring AI Vector Store
 
 选择一个：
 
@@ -2824,7 +2758,7 @@ pgvector
 
 ---
 
-# Node 134：Spring AI Advisors
+# Node 120：Spring AI Advisors
 
 理解 Advisor 的价值：
 
@@ -2851,7 +2785,7 @@ Policy
 
 ---
 
-# Node 135：Spring AI MCP
+# Node 121：Spring AI MCP
 
 实现：
 
@@ -2871,7 +2805,7 @@ MCP Server
 
 ---
 
-# Node 136：Spring AI Observability
+# Node 122：Spring AI Observability
 
 研究：
 
@@ -2888,7 +2822,7 @@ Spring AI 当前会为 AI 相关组件提供 metrics/tracing，并专门记录 T
 
 ---
 
-# Node 137：Spring AI Evaluation
+# Node 123：Spring AI Evaluation
 
 第一次正式建立：
 
@@ -2902,7 +2836,7 @@ Score
 
 ---
 
-# Node 138：LangChain4j
+# Node 124：LangChain4j
 
 认识：
 
@@ -2916,7 +2850,7 @@ RAG
 
 ---
 
-# Node 139：LangChain4j Tool + Memory + RAG
+# Node 125：LangChain4j Tool + Memory + RAG
 
 实现同一个 Assistant：
 
@@ -2932,7 +2866,7 @@ LangChain4j 官方目前明确区分 Chat History 与 Chat Memory，同时支持
 
 ---
 
-# Node 140：Spring AI vs LangChain4j
+# Node 126：Spring AI vs LangChain4j
 
 不要背：
 
@@ -2956,6 +2890,247 @@ Workflow
 注意：
 
 LangChain4j 当前的 `langchain4j-agentic` 模块官方仍标记为 experimental，因此学习可以，但生产选型时要注意稳定性。
+
+---
+
+# Phase 8：Python Agent 必要基础
+
+目标：
+
+> 不是成为 Python 后端专家。
+
+而是达到：
+
+> 看得懂 Agent 项目，并能独立写 Python Agent。
+
+---
+
+# Node 127：Python 环境
+
+学习：
+
+```text
+python
+pip
+venv
+uv
+```
+
+理解虚拟环境为什么存在。
+
+---
+
+# Node 128：Python 基础语法
+
+学习：
+
+- int
+- float
+- str
+- bool
+- None
+- if
+- for
+- while
+
+不用刷算法题。
+
+---
+
+# Node 129：List / Dict / Set / Tuple
+
+重点掌握：
+
+```python
+list
+dict
+set
+tuple
+```
+
+尤其是：
+
+```python
+dict
+```
+
+AI 项目极其常见。
+
+---
+
+# Node 130：函数
+
+学习：
+
+```python
+def
+return
+default parameter
+keyword argument
+```
+
+---
+
+# Node 131：类型注解
+
+学习：
+
+```python
+str
+int
+list[str]
+dict[str, Any]
+Optional
+Union
+```
+
+理解：
+
+Python 虽然动态类型，但现代 Agent 项目大量使用 typing。
+
+---
+
+# Node 132：Class
+
+学习：
+
+- class
+- `__init__`
+- self
+- instance
+- inheritance 基础
+
+不要深入 Python 元编程。
+
+---
+
+# Node 133：Dataclass
+
+学习：
+
+```python
+@dataclass
+```
+
+理解数据对象。
+
+---
+
+# Node 134：Pydantic
+
+重点。
+
+学习：
+
+```python
+BaseModel
+Field
+validation
+serialization
+```
+
+理解它与 Java DTO + Validation 的对应关系。
+
+---
+
+# Node 135：Exception
+
+掌握：
+
+```python
+try
+except
+finally
+raise
+```
+
+---
+
+# Node 136：Module 与 Package
+
+理解：
+
+```text
+project/
+  app/
+    agent/
+    tools/
+    models/
+```
+
+以及：
+
+```python
+import
+from xxx import xxx
+```
+
+---
+
+# Node 137：HTTP Client
+
+学习：
+
+```python
+httpx
+```
+
+调用一个 REST API。
+
+---
+
+# Node 138：async / await
+
+重点理解：
+
+```text
+同步等待
+vs
+异步等待
+```
+
+学习：
+
+```python
+async def
+await
+asyncio
+```
+
+无需深入事件循环源码。
+
+---
+
+# Node 139：FastAPI
+
+完成：
+
+```text
+GET /hello
+POST /chat
+```
+
+理解它与 Spring MVC 的对应关系。
+
+---
+
+# Node 140：Python 小项目
+
+写：
+
+```text
+FastAPI
+  ↓
+POST /chat
+  ↓
+LLM API
+  ↓
+Structured Output
+```
+
+做到：
+
+> Python Agent 代码已经不再看不懂。
 
 ---
 
@@ -3008,6 +3183,20 @@ Tracing
 ```
 
 OpenAI Agents SDK 当前采用少量核心抽象，并内置 Agent Loop、Sessions、Human-in-the-loop 与 Tracing。
+
+同时理解层级：
+
+```text
+Model / Responses API
+        ↓
+Agents SDK Runtime
+        ↓
+Agent Loop / Tools / Guardrails / Handoffs / Sessions
+```
+
+框架不是“另一种模型”。
+
+它是在模型 API 之上帮你管理 Agent 运行时。
 
 ---
 
@@ -3349,18 +3538,34 @@ Workflow
 
 ---
 
-# Node 164：Retry / Timeout
+# Node 164：Resilience：Retry / Timeout / Rate Limit / Circuit Breaker / Fallback
 
-定义：
+设计：
 
 ```text
-LLM timeout
-Tool timeout
-Workflow timeout
-Retry policy
+LLM Timeout
+Tool Timeout
+Workflow Timeout
+Retry Policy
+Rate Limit
+Exponential Backoff
+Circuit Breaker
+Provider / Model Fallback
 ```
 
-避免无限等待。
+重点：
+
+- 什么错误可以重试，什么错误不能重试
+- Retry 为什么可能把有副作用的 Tool 执行两遍
+- 如何和 Idempotency Key 配合
+- 模型供应商限流时怎么办
+- Provider 不可用时是否降级到备用模型
+- Circuit Breaker 如何避免故障扩散
+- 整个 Workflow 必须有总预算 / 总超时
+
+原则：
+
+> **可靠性不是“失败了再调一次”，而是要明确失败边界、重试条件和降级策略。**
 
 ---
 
@@ -3420,14 +3625,20 @@ Resource Permission
 
 # Node 168：Production Checklist
 
+这一 Node 不只是“检查有没有写代码”，还要真正理解 Agent 怎么上线和升级。
+
 至少建立：
 
 ```text
 □ Authentication
 □ Authorization
+□ Secret / API Key Management
 □ Tool Validation
 □ Timeout
-□ Retry
+□ Retry / Backoff
+□ Rate Limit
+□ Circuit Breaker
+□ Provider / Model Fallback
 □ Max Turn
 □ Token Limit
 □ Cost Limit
@@ -3438,6 +3649,14 @@ Resource Permission
 □ Human Approval
 □ Memory Privacy
 □ Prompt Injection Protection
+□ Health Check
+□ Deployment / Container
+□ Concurrency / Backpressure
+□ Prompt Version
+□ Tool Version
+□ Model Version
+□ Eval Dataset Version
+□ Canary / Gray Release
 □ Rollback
 ```
 
@@ -3732,7 +3951,7 @@ Streaming
 
 ## Project 2：Tool Agent
 
-Node 036～056。
+Node 022～042。
 
 掌握：
 
@@ -3746,7 +3965,7 @@ Tool Security
 
 ## Project 3：Knowledge Agent
 
-Node 057～091。
+Node 043～077。
 
 掌握：
 
@@ -3758,9 +3977,9 @@ State
 
 ---
 
-## Project 4：Workflow Agent
+## Project 4：Workflow / Framework Agent
 
-Node 092～154。
+Node 078～154。
 
 掌握：
 
@@ -3911,6 +4130,47 @@ Swarm
 
 ---
 
+## F：Agent Interoperability / A2A
+
+作为选修理解：
+
+```text
+MCP
+=
+Agent ↔ Tools / Data
+
+A2A
+=
+Agent ↔ Agent
+```
+
+重点认识：
+
+```text
+A2A
+Agent Card
+Agent Discovery
+Message
+Task
+Task Lifecycle
+Artifact
+Streaming
+Remote Agent
+Authentication
+```
+
+目标不是立刻搭复杂多 Agent 网络。
+
+而是知道：
+
+> 当多个独立 Agent 跨进程、跨框架甚至跨组织协作时，需要比“函数调用”更明确的互操作协议。
+
+前提仍然是：
+
+> **单 Agent、Workflow、权限和可靠性已经真正掌握。**
+
+---
+
 # 八、知识掌握等级
 
 以后每个知识点可以标：
@@ -3999,14 +4259,19 @@ LangGraph          L4
 
 ## Node 030
 
-应该已经知道：
+应该已经真正理解：
 
 ```text
-LLM 到底是什么
-API 怎么调用
+LLM API
+Prompt
 Structured Output
-Python 基础
+Tool Calling 基础
+Tool Definition / Schema
+Tool Dispatcher
+Tool Error
 ```
+
+这时已经开始从“调用模型”进入“让模型使用业务能力”。
 
 ---
 
@@ -4017,11 +4282,16 @@ Python 基础
 ```text
 Tool Calling
 Agent Loop
+RAG 主流程
 Embedding
-RAG 原理
+Hybrid Search
+Rerank
+Source Citation
 ```
 
-这是第一个质变。
+这是第一个明显质变：
+
+> 模型已经不只会聊天，而是开始能够调用能力并基于外部知识工作。
 
 ---
 
@@ -4033,25 +4303,34 @@ RAG 原理
 RAG
 Memory
 State
+Workflow
+Routing
+Planner / Executor
+Retry / Error Classification
 ```
 
-这时已经能做非常不错的 AI 应用。
+这时已经进入真正的 Agent Orchestration。
 
 ---
 
 ## Node 120
 
-应该理解：
+应该已经理解并实践：
 
 ```text
-Workflow
-Checkpoint
-HITL
-Multi-Agent
 MCP
+MCP Java
+Spring AI
+ChatClient
+Structured Output
+Tool Calling
+Memory
+RAG
+Vector Store
+Advisors
 ```
 
-这时开始真正进入 Agent Engineering。
+这时 Java 主线已经形成完整 Agent 工程骨架。
 
 ---
 
@@ -4061,14 +4340,19 @@ MCP
 
 ```text
 Java Agent
-Python Agent
-Spring AI
-Agents SDK
-LangGraph
-MCP
+Python 基础
+FastAPI / Pydantic / asyncio
+OpenAI Agents SDK
+Sessions
+Guardrails
+Tracing
+Handoff
+Agent as Tool
 ```
 
-跨生态看懂 Agent。
+这时已经能够跨 Java / Python 两套生态理解 Agent Runtime。
+
+LangGraph 会在后续 Node 151～154 完成。
 
 ---
 
