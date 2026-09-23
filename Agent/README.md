@@ -144,8 +144,8 @@ Note
 
 例如：
 
-- Phase 0：建立 Agent 世界观
-- Phase 1：LLM 应用基础
+- Phase 0：LLM 与 Agent 基础认知
+- Phase 1：LLM 应用开发基础
 - Phase 3：Tool Calling 与 Agent Loop
 
 ### Node
@@ -222,20 +222,34 @@ Agent/
 
 ### `notes`
 
-按知识领域保存系统学习笔记。
+按 **Phase** 保存系统学习笔记，与 roadmap 的阶段划分保持一致。
 
 例如：
 
 ```text
-01-LLM
-02-Prompt
-03-Structured-Output
-04-Tool-Calling
-05-Agent-Loop
-06-RAG
-07-Memory-State
+00-LLM与Agent基础认知
+01-LLM应用开发基础
+02-Python-Agent必要基础
+03-Tool-Calling与Agent-Loop
+04-RAG
+05-Memory-Context-State
 ...
 ```
+
+其中：
+
+```text
+Phase
+= notes/ 下的第一层阶段目录
+
+Node
+= roadmap / progress 中用于推进学习的知识节点
+
+Note
+= 某个 Node 学习过程中形成的具体 Markdown 笔记
+```
+
+一个 Node 可以对应多个 Note，例如主笔记、补充笔记和实验记录。
 
 当前主要学习方式：
 
@@ -433,15 +447,15 @@ dev-lab
 学习过程中的关键变化都会尽量留下 Commit，例如：
 
 ```text
-learn(agent): call DeepSeek API for the first time
+首次接入 DeepSeek API
 
-learn(agent): add structured output
+新增 Structured Output 实验
 
-learn(agent): implement first tool call
+实现第一次 Tool Calling
 
-learn(agent): implement agent loop
+实现 Agent Loop
 
-docs(agent): add RAG notes
+补充 RAG 学习笔记
 ```
 
 希望未来回头看 Git History 时，可以完整看到：
