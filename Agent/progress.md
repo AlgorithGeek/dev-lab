@@ -17,7 +17,7 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 0 / LLM 与 Agent 基础认知
-当前节点：Node 005 - Context Window
+当前节点：Node 006 - 什么是 Agent
 
 主项目：projects/agent-learning-lab
 项目状态：⬜ 尚未正式创建
@@ -39,8 +39,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 002：训练与推理
 - ✅ Node 003：LLM 幻觉
 - ✅ Node 004：Token
-- 🟡 Node 005：Context Window
-- ⬜ Node 006：什么是 Agent
+- ✅ Node 005：Context Window
+- 🟡 Node 006：什么是 Agent
 - ⬜ Node 007：Workflow 与 Agent
 
 > 这里只展开当前 Phase。后续完整节点请查看 roadmap。
@@ -52,6 +52,8 @@ API 风格：OpenAI-compatible
 - ⬜ Token 切分 / Token Usage 对比实验
   - 暂不单独折腾 Tokenizer
   - 留到首次接入 Qwen3.8-Max API 时，结合真实 API Usage 一起观察
+- ⬜ Context Budget / Lost in the Middle 对比实验
+  - 留到首次接入 Qwen3.8-Max API 时，比较不同长度、位置和噪声下的回答质量、Token 消耗与延迟
 - ⬜ 创建 `projects/agent-learning-lab`
   - 等进入首次模型 API 实践时正式创建
 - ⬜ 第一次 Codex 学习协作
@@ -61,30 +63,34 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 005：Context Window**
+> **Node 006：什么是 Agent**
 
 重点理解：
 
 ```text
-Context
-Context Window
-上下文长度
-为什么模型不会天然拥有无限记忆
-Lost in the Middle
-Context Overflow
-Memory ≠ 模型永久记住
+Agent = LLM + Tools + State + Loop
+普通 Chat 与 Agent 的区别
+为什么 Agent 需要 Tool
+为什么 Agent 需要 State
+Agent Loop 如何持续决策与执行
 ```
 
 完成后：
 
 ```text
-Node 005：✅
-当前节点：Node 006 - 什么是 Agent
+Node 006：✅
+当前节点：Node 007 - Workflow 与 Agent
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-09-24
+
+- 完成 Node 005「Context Window」
+- Context Budget、Lost in the Middle 与 Context Noise 实验留待首次模型 API 实践时进行
+- 当前进入 Node 006「什么是 Agent」
 
 ### 2026-09-23
 
