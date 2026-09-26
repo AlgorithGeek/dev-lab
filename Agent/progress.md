@@ -16,8 +16,8 @@
 
 ```text
 状态：🟡 学习中
-阶段：Phase 0 / LLM 与 Agent 基础认知
-当前节点：Node 007 - Workflow 与 Agent
+阶段：Phase 1 / LLM 应用开发基础
+当前节点：Node 008 - 第一次调用模型 API
 
 主项目：projects/agent-learning-lab
 项目状态：⬜ 尚未正式创建
@@ -33,15 +33,22 @@ API 风格：OpenAI-compatible
 
 ## 当前阶段进度
 
-### Phase 0：LLM 与 Agent 基础认知
+### Phase 1：LLM 应用开发基础
 
-- ✅ Node 001：LLM 到底是什么
-- ✅ Node 002：训练与推理
-- ✅ Node 003：LLM 幻觉
-- ✅ Node 004：Token
-- ✅ Node 005：Context Window
-- ✅ Node 006：什么是 Agent
-- 🟡 Node 007：Workflow 与 Agent
+- 🟡 Node 008：第一次调用模型 API
+- ⬜ Node 009：Message 模型
+- ⬜ Node 010：System Prompt
+- ⬜ Node 011：Prompt 基础
+- ⬜ Node 012：Few-shot
+- ⬜ Node 013：Structured Output
+- ⬜ Node 014：JSON Schema
+- ⬜ Node 015：Java DTO 与 Structured Output
+- ⬜ Node 016：Streaming
+- ⬜ Node 017：模型参数
+- ⬜ Node 018：模型选择
+- ⬜ Node 019：Context Engineering
+- ⬜ Node 020：LLM API 异常
+- ⬜ Node 021：第一阶段项目
 
 > 这里只展开当前 Phase。后续完整节点请查看 roadmap。
 
@@ -63,24 +70,23 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 007：Workflow 与 Agent**
+> **Node 008：第一次调用模型 API**
 
 重点理解：
 
 ```text
-Workflow 的执行路径主要由程序定义
-Agent 可以让模型动态决定下一步
-确定性与动态决策的取舍
-可靠性与灵活性的取舍
-什么时候使用 Workflow，什么时候使用 Agent
-为什么生产系统经常组合使用 Workflow 与 Agent
+使用 Apifox 或 cURL 发出第一条模型请求
+理解 HTTP Request → Provider → Model → HTTP Response
+看懂 URL、Header、Request Body 和 HTTP Status
+读取模型返回内容、finish_reason 和 Usage
+确认 API Key 只通过环境变量提供
 ```
 
 完成后：
 
 ```text
-Node 007：✅
-当前节点：Node 008 - 第一次调用模型 API
+Node 008：✅
+当前节点：Node 009 - Message 模型
 ```
 
 ---
@@ -89,6 +95,8 @@ Node 007：✅
 
 ### 2026-09-26
 
+- 完成 Node 007「Workflow 与 Agent」，Phase 0 完成
+- 当前进入 Phase 1 / Node 008「第一次调用模型 API」
 - 完成 Node 006「什么是 Agent」
 - 增加 RAG 与 Memory 区别的补充笔记
 - 当前进入 Node 007「Workflow 与 Agent」
