@@ -56,30 +56,32 @@ API 风格：OpenAI-compatible
 
 ## 当前实践
 
-- ⬜ Token 切分 / Token Usage 对比实验
-  - 暂不单独折腾 Tokenizer
-  - 留到首次接入 Qwen3.8-Max API 时，结合真实 API Usage 一起观察
+- ✅ 第一轮 Token Usage 对比实验
+  - 已通过 Apifox 对比短 / 长 Prompt 与短 / 长回答
+  - 已观察 `prompt_tokens`、`completion_tokens` 和 `total_tokens`
+- ⬜ Token 切分 / Tokenizer 实验
+  - 暂不单独折腾 Tokenizer，后续结合真实需要再做
 - ⬜ Context Budget / Lost in the Middle 对比实验
   - 留到首次接入 Qwen3.8-Max API 时，比较不同长度、位置和噪声下的回答质量、Token 消耗与延迟
 - ⬜ 创建 `projects/agent-learning-lab`
-  - 等进入首次模型 API 实践时正式创建
+  - 在 008-3 Java 实验中正式创建
 - ⬜ 第一次 Codex 学习协作
-  - 等进入真实代码阶段后开始使用 `codex/prompts` 与 `codex/handoffs`
+  - 在 008-3 进入真实代码阶段后开始使用 `codex/prompts` 与 `codex/handoffs`
 
 ---
 
 ## 下一步
 
-> **Node 008：第一次调用模型 API**
+> **Node 008-3：使用 Java 第一次调用模型 API**
 
 重点理解：
 
 ```text
-使用 Apifox 或 cURL 发出第一条模型请求
-理解 HTTP Request → Provider → Model → HTTP Response
-看懂 URL、Header、Request Body 和 HTTP Status
-读取模型返回内容、finish_reason 和 Usage
-确认 API Key 只通过环境变量提供
+创建 projects/agent-learning-lab
+使用 Java 复现 Apifox 中已经成功的模型请求
+对应理解 URL、Header、Request Body 和 Response
+从环境变量读取 API Key，不写入代码或 Git
+读取并打印 content、finish_reason 和 Usage
 ```
 
 完成后：
@@ -92,6 +94,13 @@ Node 008：✅
 ---
 
 ## 最近进度
+
+### 2026-09-28
+
+- 完成 008-1「第一次调用模型 API」基础认知
+- 完成 008-2「使用 Apifox 第一次调用模型 API」实验
+- 成功调用 qwen3.8-max，并完成第一轮 Token Usage 对比
+- Node 008 继续学习，下一步进入 008-3 Java 实验
 
 ### 2026-09-26
 
