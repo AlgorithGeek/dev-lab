@@ -18,7 +18,7 @@
 > 
 > 008-2 ✅ 使用 Apifox 成功调用 qwen3.8-max
 > 
-> 008-3 🟡 使用 Java 重新完成同一件事情
+> 008-3 ✅ Java HTTP 调用、FastJSON2 解析、错误模型与恢复实验已完成（2026-10-09）
 > ```
 >
 > 这一篇完成以后：
@@ -1022,6 +1022,10 @@ Base URL 从环境变量读取：
 
 DASHSCOPE_BASE_URL
 
+本次由我在 IDEA 的 FirstModelCall 运行配置中填写这两个环境变量，
+不配置为电脑全局变量，也不要求 Codex 获取真实值。
+IDEA 的运行配置不会自动传给 Codex 执行命令的环境。
+
 我的实际地域是华北2（北京）。
 
 DASHSCOPE_BASE_URL 应由我本地设置为类似：
@@ -1141,9 +1145,10 @@ handoff 至少记录：
 
 代码编译是否成功；
 运行卡在哪个环境变量；
-我应该在本地执行什么命令。
+我应该如何在 IDEA 配置环境变量并运行（终端命令可作为备用）。
 
-如果环境变量已经存在，则实际发送请求并记录真实结果。
+如果 Codex 执行命令的环境变量已经存在，则实际发送请求并记录真实结果。
+如果变量只配置在 IDEA 中，明确记录真实调用待我在 IDEA 验证，不要读取 IDEA 配置中的凭证。
 
 --------------------------------
 十、完成后停止
@@ -1227,37 +1232,41 @@ Apifox 的环境变量：
 不会自动变成 macOS Shell 环境变量
 ```
 
-这是两个不同环境。
+这是两个不同环境。IDEA 运行配置中的环境变量同样不会自动传给 Codex 或终端。
+因此 Codex 提示缺少变量，不代表 IDEA 中配置失败。
 
-# 二十四、macOS 临时设置 API Key
+# 二十四、在 IDEA 运行配置中设置 API Key
 
-如果需要：
+本次使用 IDEA 的运行配置，不需要修改电脑全局环境变量。
 
 # 🛑 停下来操作
 
-在当前 Terminal 会话中：
+打开“运行/调试配置”，选择 `FirstModelCall`，点击“环境变量”右侧的列表图标，新增：
 
 ```
-export DASHSCOPE_API_KEY="你的真实 API Key"
+名称：DASHSCOPE_API_KEY
+值：你的真实 API Key
 ```
 
-注意：
+保持“存储为项目文件”不勾选，不共享或提交含凭证的运行配置。
+“包括系统环境变量”可以保持勾选，它只让程序继承现有环境，不会把新增变量变成全局变量。
 
-```
-真实 Key 不要复制进笔记
-不要截图
-不要 commit
-```
+真实 Key 不要复制进笔记、聊天或截图，也不要 commit。
 
 # 二十五、设置 Base URL
 
 我们不希望源码里出现真实 Workspace ID。
 
-所以：
+在同一个环境变量表格中再新增：
 
 ```
-export DASHSCOPE_BASE_URL="https://你的WorkspaceId.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+名称：DASHSCOPE_BASE_URL
+值：https://你的WorkspaceId.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
 ```
+
+把 `你的WorkspaceId` 替换为 Apifox 中使用的实际值，不保留 `{{WORKSPACE_ID}}`。
+`{{...}}` 是 Apifox 的变量替换语法，本次 Java 程序不处理它。
+建议去掉末尾 `/`，然后点击表格和外层运行配置的“确定”保存。
 
 注意：
 
@@ -1344,6 +1353,18 @@ Provider Config
 
 # 二十八、如何检查 API Key 环境变量存在？
 
+在 IDEA 的运行配置中确认 `DASHSCOPE_API_KEY` 已填写。
+程序后续通过 `System.getenv("DASHSCOPE_API_KEY")` 读取，缺少值时应明确报错，不打印真实值。
+
+如果改用终端运行，才需要在当前终端单独设置这两个变量：
+
+```bash
+export DASHSCOPE_API_KEY="你的真实 API Key"
+export DASHSCOPE_BASE_URL="https://你的WorkspaceId.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+```
+
+以下检查只针对当前终端，不能用来判断 IDEA 运行配置是否生效。
+
 不要：
 
 ```
@@ -1386,11 +1407,13 @@ echo ${DASHSCOPE_BASE_URL:+configured}
 
 即可。
 
-# 三十、重新运行 Codex / Java 程序
+# 三十、在 IDEA 重新运行 Java 程序
 
 环境变量设置完成以后：
 
-根据 Codex Handoff 给出的命令：
+等 Codex 已加入 HTTP 请求代码后，在 IDEA 运行 `FirstModelCall`。
+若当前 main 仍只有启动提示，先继续完成请求代码。
+如果选择终端运行，则按 Codex Handoff 的命令编译和运行，并确保变量在该终端单独设置。
 
 ```
 重新编译 / 运行
@@ -1739,14 +1762,14 @@ Code
 
 | Apifox        | Java   |
 | ------------- | ------ |
-| POST          | ______ |
-| URL           | ______ |
-| Authorization | ______ |
-| Content-Type  | ______ |
-| JSON Body     | ______ |
-| Send          | ______ |
-| 200           | ______ |
-| Response JSON | ______ |
+| POST          | `.POST(HttpRequest.BodyPublishers.ofString(requestBody))` |
+| URL           | `.uri(endpoint)` |
+| Authorization | `.header("Authorization", "Bearer " + apiKey)` |
+| Content-Type  | `.header("Content-Type", "application/json")` |
+| JSON Body     | `requestBody` 文本，由 `BodyPublishers.ofString` 写入请求 |
+| Send          | `client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))` |
+| 200           | `response.statusCode()` |
+| Response JSON | `response.body()` |
 
 如果能全部填出来：
 
@@ -1785,7 +1808,7 @@ JSON
 ```
 JSON
 ↓
-Jackson / SDK
+JSON 库 / SDK
 ↓
 Java Object
 ```
@@ -1813,72 +1836,89 @@ Java Object 是：
 
 # 四十八、第一轮实验记录
 
+日期：2026-10-09。环境与编译结果来自 Codex 检查，真实 API 响应来自我在 IDEA 运行后的控制台输出。
+
 ### JDK
 
 ```
-【根据 Codex Handoff 填写】
+Eclipse Temurin 21.0.12.1（ARM64），项目编译目标 Java 21
 ```
 
 ### Maven
 
 ```
-【填写】
+Apache Maven 3.9.16，使用 Temurin 21.0.12.1
 ```
 
 ### HTTP Client
 
 ```
-【填写】
+JDK 自带的 java.net.http.HttpClient
 ```
 
 ### 编译是否成功
 
 ```
-【填写】
+成功，mvn compile 输出 BUILD SUCCESS
 ```
 
 ### Java 第一次真实调用是否成功
 
 ```
-【填写】
+成功，在 IDEA 的 FirstModelCall 运行配置中设置环境变量后调用 qwen3.8-max
 ```
 
 ### HTTP Status
 
 ```
-【填写】
+200
 ```
 
 ### 是否看到原始 Response
 
 ```
-【填写】
+是，控制台输出完整的 Chat Completions 原始 JSON
 ```
+
+本轮响应中的 model 为 qwen3.8-max，finish_reason 为 stop。
+prompt_tokens = 19，completion_tokens = 35，total_tokens = 54。
+这些值是从原始 JSON 中人工查看的，当前 Java 尚未解析字段。
+
+模型回答：
+
+> Java 是一种跨平台、面向对象的编程语言，其核心理念是“一次编写，到处运行”，被广泛用于开发企业级应用、移动应用和Web系统。
 
 # 四十九、第一轮遇到的问题
 
 ### 问题现象
 
 ```
-【填写】
+创建项目后的首次离线 Maven 编译失败：缺少编译所需的插件依赖。
+IDEA 运行时出现 JVM 类共享警告，但仍正常输出结果。
+真实模型请求返回 200，本轮未观察到 API 调用错误。
 ```
 
 ### 原因
 
 ```
-【填写】
+本地 Maven 缓存尚未包含所需的全部插件依赖。
+JVM 类共享警告表示当前类加载配置限制了共享能力，具体触发来源未排查。
 ```
 
 ### 修复
 
 ```
-【填写】
+联网执行 mvn compile，下载缺少的插件依赖后编译成功。
+类共享警告未影响本次实验，暂未处理。
 ```
 
 ### 学到什么
 
 ```
-【填写】
+Java 与 Apifox 都在构造并发送 HTTP 请求。
+IDEA 运行配置可以独立提供环境变量，不需要修改电脑全局环境。
+Apifox 的 {{WORKSPACE_ID}} 不会被 Java 自动替换，IDEA 中应填写完整 Base URL。
+编译和运行结果需要分别验证；HTTP 200 不代表模型回答一定正确。
 ```
 
 # 五十、第一阶段 PASS 条件
@@ -2004,7 +2044,10 @@ PromptTokensDetails
 
 所以这一次建议：
 
-> **使用 Jackson 的树模型 / JsonNode 做最小解析。**
+> **使用 FastJSON2 的 JSONObject / JSONArray 做最小解析。**
+
+本次选择 FastJSON2，沿用熟悉的 FastJSON 风格读取字段；不引入旧 FastJSON 1.x。
+JSON 对象对应 `JSONObject`，数组对应 `JSONArray`，不需要先定义 DTO。
 
 目的只是：
 
@@ -2068,9 +2111,10 @@ PromptTokensDetails
 二、JSON 技术
 --------------------------------
 
-可以引入 Jackson。
+使用已加入项目的 FastJSON2 依赖。
 
-当前优先使用 JsonNode / Tree Model。
+使用 JSON.parseObject、JSONObject 和 JSONArray 读取字段。
+导入包名为 com.alibaba.fastjson2，不使用旧的 com.alibaba.fastjson。
 
 不要为了这次实验建立一整套：
 
@@ -2195,7 +2239,7 @@ handoff 记录：
 我们重点看：
 
 ```
-JsonNode
+JSONObject / JSONArray
 ```
 
 到底做了什么。
@@ -2222,15 +2266,25 @@ String JSON
 }
 ```
 
-Jackson：
+FastJSON2：
 
 ```
 JSON String
 ↓
-Parser
+JSON.parseObject
 ↓
-JsonNode Tree
+JSONObject / JSONArray 组成的结构
 ```
+
+例如先读取顶层字段：
+
+```java
+JSONObject root = JSON.parseObject(response.body());
+String model = root.getString("model");
+```
+
+后续用 `getJSONArray` 进入数组、`getJSONObject` 进入对象、`getString` 读取文本。
+读取前要检查响应结构和字段类型，解析失败或缺失字段时明确报错。
 
 然后代码就可以：
 
@@ -2383,40 +2437,42 @@ Context Budget
 
 # 六十二、第二阶段实验记录
 
+2026-10-09：以下为恢复正确模型后，在 IDEA 运行的真实输出。FastJSON2 已读取并打印全部字段。
+
 ### model
 
 ```
-【填写】
+qwen3.8-max
 ```
 
 ### content
 
 ```
-【填写】
+Java 是一种跨平台、面向对象的编程语言，其核心特点是“一次编写，到处运行”。
 ```
 
 ### finish_reason
 
 ```
-【填写】
+stop
 ```
 
 ### prompt_tokens
 
 ```
-【填写】
+19
 ```
 
 ### completion_tokens
 
 ```
-【填写】
+20
 ```
 
 ### total_tokens
 
 ```
-【填写】
+39
 ```
 
 # 六十三、现在比较 Java 与 Apifox 的 Response
@@ -2533,6 +2589,8 @@ choices[0].message.content
 
 # 六十九、记录错误实验
 
+2026-10-09：在 IDEA 临时修改模型名后实际运行，以下为控制台结果。
+
 ### 错误 Model
 
 ```
@@ -2542,25 +2600,25 @@ this-model-does-not-exist
 ### HTTP Status
 
 ```
-【填写】
+404
 ```
 
 ### Error Code
 
 ```
-【填写】
+model_not_found（type: invalid_request_error）
 ```
 
 ### Error Message
 
 ```
-【填写】
+Model not exist.
 ```
 
 ### Java 是否错误地尝试解析 choices
 
 ```
-【填写】
+否。输出错误状态和原始错误响应后以退出码 1 结束，没有输出 Model、Content、Finish Reason 或 Token 字段。
 ```
 
 # 七十、恢复正确模型
@@ -2584,6 +2642,8 @@ HTTP 200
 重新出现。
 
 # 七十一、为什么一定要恢复后再测一次？
+
+本次已恢复 qwen3.8-max 并重新运行：HTTP 200，model/content/finish_reason/usage 均正常输出，Token 合计 39。
 
 因为：
 
@@ -3083,7 +3143,7 @@ DASHSCOPE_BASE_URL
      Status              JSON Body
                              │
                              ▼
-                          Jackson
+                         FastJSON2
                              │
             ┌────────────────┼────────────────┐
             ▼                ▼                ▼
@@ -3240,7 +3300,7 @@ Response Body
 
 # 九十五、自测 7
 
-Jackson 做了什么？
+FastJSON2 的 JSON.parseObject 做了什么？
 
 # 九十六、自测 8
 
@@ -3308,7 +3368,7 @@ choices[0]
 >
 > 第一版 Java 代码可以直接打印原始 Response JSON。
 >
-> 第二版再使用 Jackson 从 JSON 中读取 content、finish_reason 和 usage。
+> 第二版再使用 FastJSON2 的 JSONObject / JSONArray 从 JSON 中读取 content、finish_reason 和 usage。
 >
 > Apifox 和 Java 做的本质上是同一件事情，只不过一个通过 GUI 构造 HTTP Request，一个通过代码构造。
 >

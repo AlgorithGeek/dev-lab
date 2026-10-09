@@ -17,10 +17,10 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 008 - 第一次调用模型 API
+当前节点：Node 009 - Message 模型
 
 主项目：projects/agent-learning-lab
-项目状态：⬜ 尚未正式创建
+项目状态：✅ 已创建，Java HTTP 调用与 FastJSON2 响应解析已跑通
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -35,8 +35,8 @@ API 风格：OpenAI-compatible
 
 ### Phase 1：LLM 应用开发基础
 
-- 🟡 Node 008：第一次调用模型 API
-- ⬜ Node 009：Message 模型
+- ✅ Node 008：第一次调用模型 API
+- 🟡 Node 009：Message 模型
 - ⬜ Node 010：System Prompt
 - ⬜ Node 011：Prompt 基础
 - ⬜ Node 012：Few-shot
@@ -63,37 +63,37 @@ API 风格：OpenAI-compatible
   - 暂不单独折腾 Tokenizer，后续结合真实需要再做
 - ⬜ Context Budget / Lost in the Middle 对比实验
   - 留到首次接入 Qwen3.8-Max API 时，比较不同长度、位置和噪声下的回答质量、Token 消耗与延迟
-- ⬜ 创建 `projects/agent-learning-lab`
-  - 在 008-3 Java 实验中正式创建
-- ⬜ 第一次 Codex 学习协作
-  - 在 008-3 进入真实代码阶段后开始使用 `codex/prompts` 与 `codex/handoffs`
+- ✅ 创建 `projects/agent-learning-lab`
+  - 最小 Maven Java 21 项目；HttpClient 调用、FastJSON2 解析与错误路径已验证
+- ✅ 第一次 Codex 学习协作
+  - 已保存两轮 `codex/prompts` 与 `codex/handoffs`
 
 ---
 
 ## 下一步
 
-> **Node 008-3：使用 Java 第一次调用模型 API**
+> **Node 009：Message 模型**
 
 重点理解：
 
 ```text
-创建 projects/agent-learning-lab
-使用 Java 复现 Apifox 中已经成功的模型请求
-对应理解 URL、Header、Request Body 和 Response
-从环境变量读取 API Key，不写入代码或 Git
-读取并打印 content、finish_reason 和 Usage
-```
-
-完成后：
-
-```text
-Node 008：✅
-当前节点：Node 009 - Message 模型
+System / User / Assistant / Tool Message
+messages 如何构成对话上下文
+为什么聊天历史需要由应用程序保存并重新发送
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-10-09
+
+- 完成 008-3「使用 Java 第一次调用模型 API」，用户确认本篇结束
+- 在 IDEA 独立配置环境变量，成功调用 qwen3.8-max
+- 使用 FastJSON2 读取 model、content、finish_reason 和 Token Usage
+- 错误模型返回 404 / model_not_found，程序以退出码 1 结束且不解析成功字段
+- 恢复正确模型后重新验证 HTTP 200，Token 用量为 19 + 20 = 39
+- 已补齐实验记录，当前进入 Node 009「Message 模型」
 
 ### 2026-09-28
 
