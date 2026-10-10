@@ -18,6 +18,7 @@
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
 当前节点：Node 009 - Message 模型
+当前笔记：009-1 理论篇已读完，下一步 009-2 Java 多轮对话实验
 
 主项目：projects/agent-learning-lab
 项目状态：✅ 已创建，Java HTTP 调用与 FastJSON2 响应解析已跑通
@@ -72,19 +73,26 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 009：Message 模型**
+> **009-2：实验：使用 Java 实现多轮对话**
 
 重点理解：
 
 ```text
-System / User / Assistant / Tool Message
-messages 如何构成对话上下文
-为什么聊天历史需要由应用程序保存并重新发送
+在现有 agent-learning-lab 中实现多轮对话
+对比第二轮不带历史与携带历史的结果
+保存并按顺序追加 User / Assistant Message
+观察历史增加对 prompt_tokens 的影响
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-10-10
+
+- 已读完 009-1「Message 模型到底是什么？」理论篇
+- 按用户要求跳过单独口述确认，下一步进入 009-2 Java 多轮对话实验
+- Node 009 整体仍在学习中，完成实验后再更新节点状态
 
 ### 2026-10-09
 
