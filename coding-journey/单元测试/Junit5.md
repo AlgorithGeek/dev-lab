@@ -51,8 +51,8 @@
 | **`@DisplayName("描述")`** | 为测试类或测试方法提供一个自定义的、更易读的显示名称。       | `@DisplayName("测试加法功能")`                               |
 | **`@BeforeEach`**          | 标记一个方法，该方法在**每个** `@Test` 方法运行**之前**执行。 | 初始化测试对象、准备测试数据。                               |
 | **`@AfterEach`**           | 标记一个方法，该方法在**每个** `@Test` 方法运行**之后**执行。 | 清理资源、恢复环境。                                         |
-| **`@BeforeAll`**           | 标记一个**静态(static)方法，该方法在当前测试类中所有**测试方法运行**之前**执行一次。 | 建立数据库连接、启动昂贵的外部资源。                         |
-| **`@AfterAll`**            | 标记一个**静态(static)方法，该方法在当前测试类中所有**测试方法运行**之后**执行一次。 | 关闭数据库连接、释放外部资源。                               |
+| **`@BeforeAll`**           | 在当前测试类的所有测试方法运行之前执行一次。默认 `PER_METHOD` 生命周期下要求 `static`；使用 `PER_CLASS` 时允许非静态方法。 | 建立数据库连接、启动昂贵的外部资源。                         |
+| **`@AfterAll`**            | 在当前测试类的所有测试方法运行之后执行一次。默认 `PER_METHOD` 生命周期下要求 `static`；使用 `PER_CLASS` 时允许非静态方法。 | 关闭数据库连接、释放外部资源。                               |
 | **`@Disabled`**            | 暂时**禁用**一个测试类或测试方法。被禁用的测试不会被执行。   | 当某个功能暂时不可用或正在重构时。                           |
 | **`@Nested`**              | 用于创建一个**内嵌测试类**，可以将相关的测试分组，使结构更清晰。 | `class UserAuthenticationTests { @Nested class LoginTests { ... } }` |
 
@@ -241,13 +241,28 @@
 
     | 注解                 | `static` 要求        | 为什么？                                         |
     | -------------------- | -------------------- | ------------------------------------------------ |
-    | `@BeforeAll`         | ⭐**必须是** `static` | 作用于整个测试类，在任何测试实例创建前执行。     |
-    | `@AfterAll`          | ⭐**必须是** `static` | 作用于整个测试类，在所有测试实例销毁后执行。     |
+    | `@BeforeAll`         | 默认需要 `static`，`PER_CLASS` 可非静态 | 默认 `PER_METHOD` 不共享实例，`PER_CLASS` 共享一个实例。 |
+    | `@AfterAll`          | 默认需要 `static`，`PER_CLASS` 可非静态 | 默认 `PER_METHOD` 不共享实例，`PER_CLASS` 共享一个实例。 |
     | `@BeforeEach`        | **不能是** `static`  | 为每个测试实例做准备，需要访问实例级别的成员。   |
     | `@Test`              | **不能是** `static`  | 每个测试都在一个独立的实例上运行。               |
     | `@RepeatedTest`      | **不能是** `static`  | 同 `@Test`，在实例上运行。                       |
     | `@ParameterizedTest` | **不能是** `static`  | 同 `@Test`，在实例上运行。                       |
     | `@AfterEach`         | **不能是** `static`  | 清理每个测试实例的资源，需要访问实例级别的成员。 |
+
+  - **例外示例**：测试类标注 `@TestInstance(TestInstance.Lifecycle.PER_CLASS)` 后，生命周期方法可以不写 `static`：
+
+    ```java
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class UserServiceTest {
+        @BeforeAll
+        void initAll() { /* 不要求 static */ }
+
+        @AfterAll
+        void cleanUpAll() { /* 不要求 static */ }
+    }
+    ```
+
+    注意：`PER_CLASS` 会让测试方法共享一个测试类实例，应避免可变共享状态导致测试互相影响。参考 [JUnit 5 User Guide](https://docs.junit.org/5.13.1/user-guide/index.html#writing-tests-test-instance-lifecycle)。
 
 - **其他强制要求**
 

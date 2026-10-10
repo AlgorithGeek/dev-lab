@@ -1746,7 +1746,9 @@ config.setWriterFeatures(
 
 ### 4. 安全红线：AutoType 反序列化漏洞
 
-虽然 Fastjson 2.x 已经大幅强化了安全性（默认开启 SafeMode），但作为开发者，必须警惕 `AutoType` 机制
+Fastjson 2.x **默认禁用 AutoType**，但**并不是默认开启 SafeMode**。SafeMode 是可额外启用的更严格保护模式（如 JVM 参数 `-Dfastjson2.parser.safeMode=true`）；开启后，即使代码显式指定 `SupportAutoType`，自动类型识别也不会生效。处理不可信 JSON 时应保持 AutoType 禁用，不要全局打开。
+
+> 参考：[Fastjson2 AutoType 与 SafeMode 官方说明](https://github.com/alibaba/fastjson2/blob/main/docs/autotype_cn.md)
 
 - **漏洞背景**： 
 

@@ -2338,7 +2338,7 @@
   
 - 事务回滚影响的是**数据库操作**，它会撤销已经执行的 SQL 语句，别的不怎么影响，当然在这范围内的所有SQL语句都会回滚！
 
-- @Transactional注解不能写到私有方法上
+- **在 Spring AOP 代理事务模式下**，写在 `private` 方法上的 `@Transactional` 无法被代理拦截；`protected` 与包级可见方法需要区分 Spring 版本和代理类型（见下文 3.3）。
 
   > 因为 Spring 的事务（`@Transactional`）是基于 AOP 代理实现的，而代理对象无法拦截到私有方法的调用
 
@@ -2527,7 +2527,7 @@ public class UserServiceImpl implements UserService {
 
 - **`readOnly` (boolean)**
   
-  - 将事务设置为只读。可以帮助数据库进行查询优化，并防止意外的写操作。建议在所有查询方法上都开启此属性
+  - 表达事务只读意图，部分事务管理器、ORM 或数据库可以利用此提示优化；它**并非跨数据库统一的强制禁止写操作机制**。是否开启只读事务应结合一致性需求、调用方式与数据库行为决定。
   
     - **示例**:
   
@@ -2535,21 +2535,20 @@ public class UserServiceImpl implements UserService {
       @Transactional(readOnly = true)
       ```
   
-- **`timeout` (int)**: 设置事务的超时时间(秒)。如果事务执行时间超过该值，将被强制回滚
+- **`timeout` (int)**: 设置事务的超时时间（秒）。这不代表 Spring 能在任意业务代码运行到指定秒数时立即中断线程并回滚；实际超时检测及回滚时机取决于事务管理器、数据库访问等。
 
 
 
 ### 3.3 `@Transactional` 失效场景及原因
 
-1. **应用在非 `public` 方法上**
+1. **方法可见性与代理类型（需区分版本）**
 
-   - **原因**
+   - **Spring Framework 5.x（常见于 Spring Boot 2.x）**：默认的代理事务拦截主要面向 `public` 方法，不要假定 `protected` / 包级可见方法上的事务注解会生效。
+   - **Spring Framework 6.0+（常见于 Spring Boot 3.x）**：使用 **CGLIB 类代理**时，外部通过代理调用的 `protected` 和包级可见方法默认也能启用事务；**JDK 接口代理**要求被代理方法是接口定义的 `public` 方法。
+   - **不变的限制**：`private` 方法无法经由代理拦截；同类内部 `this` 自调用也不会经过事务代理；`final` 方法同样无法被类代理重写并拦截。
+   - **建议**：跨版本维护时，优先使用 `public` 事务入口，并通过 Spring Bean 代理调用。
 
-     - Spring AOP 的代理机制决定了它只能代理 `public` 方法。
-
-       `protected`, `private` 或 `default` 访问权限的方法上的 `@Transactional` 注解将不会生效
-
-   
+   > 官方参考：[Spring Framework - @Transactional Method Visibility](https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html)。
 
 2. **方法内部调用 (this 调用)**
 
@@ -2605,7 +2604,7 @@ public class UserServiceImpl implements UserService {
 5. **`propagation` 配置错误**
 
    - **原因**
-     - 如果一个需要事务的方法（如 `save`）被一个配置为 `NOT_SUPPORTED` 或 `NEVER` 的外部方法调用，那么 `save` 方法的事务将不会开启
+     - **不能据此推断被调用方法永远不会开启事务**：`NOT_SUPPORTED` 仅规定当前方法在非事务环境中执行（必要时挂起已有事务）；它若通过 Spring 代理调用带 `REQUIRED` 的 `save()`，后者仍可以开启新事务。`NEVER` 在进入时发现已有事务会直接抛异常；否则之后被调用的方法依然遵循自己的传播规则。
 
    
 
@@ -2665,7 +2664,7 @@ logging:
 
    - **类级别注解 - 提供默认配置**
 
-     - 当 `@Transactional` 放在一个类上时，它会为该类中**所有 `public` 方法**设置一个统一的事务规则
+     - 当 `@Transactional` 放在一个类上时，它会为该类中**符合当前 Spring 版本与代理方式、能够被拦截的方法**设置默认事务规则（通常首先考虑 `public` 方法）
 
        如果某个方法需要特殊的规则（如只读），可以在该方法上再次使用 `@Transactional` 注解，**方法级的配置会覆盖类级的配置**。这对于批量配置写操作事务非常方便
 
@@ -2674,7 +2673,7 @@ logging:
      - **破坏接口纯粹性**：
        - 事务管理属于**实现细节**，不应该污染作为“契约”的接口定义
      - **代理失效风险**：
-       - Spring Boot 默认使用 CGLIB 代理，它会忽略接口上的注解，只识别实现类上的注解，这可能导致事务在不经意间失效
+       - `@Transactional` 可以声明在接口上，但识别行为与代理方式、Spring 版本及是否使用 AspectJ 有关，**不能断言 CGLIB 一律忽略所有接口事务注解**；为降低歧义，通常更推荐在实现类或方法上声明事务规则。
 
 2. **明确职责**: 事务注解应只用于业务逻辑层（Service 层）
 
@@ -2682,7 +2681,7 @@ logging:
 
    - 尽量缩小事务的范围，避免在事务中包含耗时操作（如 RPC 远程调用、大量计算），以减少数据库锁的持有时间，提高并发性能
 
-4. **善用 `readOnly`**: 对于所有只读的查询操作，都应该添加 `@Transactional(readOnly = true)`，这能提升查询效率
+4. **按需使用 `readOnly`**：只读查询可以考虑 `@Transactional(readOnly = true)` 表达意图，但是否带来性能提升、是否限制写入取决于底层实现，并非所有查询都必须加事务
 
 5. **注意回滚规则**: 明确你的方法可能抛出的异常类型，并使用 `rollbackFor` 妥善处理受检异常的回滚场景
 
@@ -3041,8 +3040,9 @@ logging:
   - **`@SpringBootTest`**: 用于**集成测试**，会加载完整的 Spring 应用上下文，功能最全但启动较慢。
   - **`@WebMvcTest`**: **切片测试**，只加载 Web 层的相关 Bean（如 Controller, Filter），不加载 Service 和 Repository。用于专门测试表现层，可以配合 `MockMvc` 模拟 HTTP 请求。
   - **`@DataJpaTest`**: **切片测试**，只加载数据访问层的相关 Bean。用于专门测试 Repository，默认使用内存数据库并回滚事务。
-  - **`@MockBean`**: 在测试中，用一个 Mockito 创建的 Mock 对象替换掉 Spring 容器中的真实 Bean，从而隔离依赖。
-    **场景**：在 `@WebMvcTest` 中测试 Controller 时，可以用 `@MockBean` 来模拟 Service 层，使其返回预设的数据，而无需真正执行业务逻辑。
+  - **`@MockBean`（Spring Boot 2.x、3.0～3.3 常见） / `@MockitoBean`（Spring Framework 6.2、Spring Boot 3.4+）**：用 Mockito Mock 替换 Spring 测试上下文中的指定 Bean，隔离测试依赖。**Spring Boot 3.4 起 `@MockBean` 被标记为废弃，推荐使用 `@MockitoBean`；旧项目应依实际依赖版本选择，不能直接套用新版注解。**
+    **场景**：在 `@WebMvcTest` 中测试 Controller，可通过对应版本的 Mock Bean 注解替换 Service，使其返回预设数据，而无需真正执行业务逻辑。
+    **迁移提示**：两套注解的能力并非完全等价，迁移需核对使用位置和覆盖行为。官方参考：[Spring Boot 3.4 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.4-Release-Notes)。
 
 
 
