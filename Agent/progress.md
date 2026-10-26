@@ -17,8 +17,8 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 010 - System Prompt（准备学习）
-当前笔记：009-2 阅读与必做实验已完成，下一步学习 System Prompt（对应笔记尚未创建）
+当前节点：Node 010 - System Prompt（学习中）
+当前笔记：010-1 理论篇已读完，下一步 010-2 System Prompt 行为对照实验（实验笔记尚未创建）
 
 主项目：projects/agent-learning-lab
 项目状态：Java 单轮、A/B 对照和三轮自动历史均已真实跑通
@@ -38,7 +38,7 @@ API 风格：OpenAI-compatible
 
 - ✅ Node 008：第一次调用模型 API
 - ✅ Node 009：Message 模型（阅读、代码学习与必做实验完成）
-- 🟡 Node 010：System Prompt（准备学习）
+- 🟡 Node 010：System Prompt（010-1 已读完，实验待开始）
 - ⬜ Node 011：Prompt 基础
 - ⬜ Node 012：Few-shot
 - ⬜ Node 013：Structured Output
@@ -78,14 +78,14 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 010：System Prompt**
+> **010-2：实验：使用 System Prompt 控制模型行为**（待补充实验笔记）
 
 重点理解：
 
 ```text
-system 与 user 消息各自的作用
-通过 system 设置角色、回答风格和任务约束
-system 消息在多轮请求中如何携带
+同一模型、同一 User 输入和参数，对比无 System / 有 System
+以 Java Code Review Assistant 为例，观察关注点、回答结构和 Token Usage
+再验证多轮请求如何继续携带 System Message
 ```
 
 ---
@@ -97,7 +97,8 @@ system 消息在多轮请求中如何携带
 - 用户确认 009-2 已全部看完，要求进入下一章节
 - Node 009 阅读与代码学习收尾，当前进入 Node 010「System Prompt」准备阶段
 - 用户补齐 --history 实际输出，三轮均为 HTTP 200 / stop；第三轮携带并复述第二轮真实回答，已补齐笔记、交接报告和实验检查项
-- 目前 notes 中尚无 Node 010 笔记，下一节点内容以 roadmap 为准
+- 用户新增并确认读完 010-1「System Prompt 到底是什么？」理论篇
+- 下一步按 010-1 预告进入 010-2 行为对照实验；实验笔记尚未创建，未修改 Java 代码或开始模型调用
 
 ### 2026-10-10
 
