@@ -18,10 +18,10 @@
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
 当前节点：Node 010 - System Prompt（准备学习）
-当前笔记：009-2 已读完，下一步学习 System Prompt（对应笔记尚未创建）
+当前笔记：009-2 阅读与必做实验已完成，下一步学习 System Prompt（对应笔记尚未创建）
 
 主项目：projects/agent-learning-lab
-项目状态：Java 单轮与 A/B 对照已真实跑通；自动历史代码及本地模拟已完成
+项目状态：Java 单轮、A/B 对照和三轮自动历史均已真实跑通
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -37,7 +37,7 @@ API 风格：OpenAI-compatible
 ### Phase 1：LLM 应用开发基础
 
 - ✅ Node 008：第一次调用模型 API
-- ✅ Node 009：Message 模型（阅读与代码学习完成；自动历史真实运行记录待补）
+- ✅ Node 009：Message 模型（阅读、代码学习与必做实验完成）
 - 🟡 Node 010：System Prompt（准备学习）
 - ⬜ Node 011：Prompt 基础
 - ⬜ Node 012：Few-shot
@@ -70,9 +70,9 @@ API 风格：OpenAI-compatible
   - 已保存两轮 `codex/prompts` 与 `codex/handoffs`
 - ✅ 有历史 / 无历史对照实验
   - IDEA 真实运行：A 回答“无法确定”，B 回答“青柠47”；输入 Token 为 32 / 63
-- 🟡 自动维护 Chat History
+- ✅ 自动维护 Chat History
   - 代码、三轮请求 JSON 注释、编译与本地模拟检查已完成
-  - 用户已读完并理解历史追加；尚未提供 --history 的真实三轮输出，实验记录留待补齐
+  - IDEA --history 三轮真实成功：发送 1/3/5 条，保存 2/4/6 条；输入 Token 为 28/51/90，完整历史已记录
 
 ---
 
@@ -96,7 +96,7 @@ system 消息在多轮请求中如何携带
 
 - 用户确认 009-2 已全部看完，要求进入下一章节
 - Node 009 阅读与代码学习收尾，当前进入 Node 010「System Prompt」准备阶段
-- A/B 对照已有用户提供的真实结果；自动历史仅有编译与本地模拟证据，其真实三轮回答和 Token 用量仍待补，不填写预期值冒充实际结果
+- 用户补齐 --history 实际输出，三轮均为 HTTP 200 / stop；第三轮携带并复述第二轮真实回答，已补齐笔记、交接报告和实验检查项
 - 目前 notes 中尚无 Node 010 笔记，下一节点内容以 roadmap 为准
 
 ### 2026-10-10
