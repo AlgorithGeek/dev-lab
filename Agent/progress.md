@@ -17,11 +17,11 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 009 - Message 模型
-当前笔记：009-1 理论篇已读完，下一步 009-2 Java 多轮对话实验
+当前节点：Node 010 - System Prompt（准备学习）
+当前笔记：009-2 已读完，下一步学习 System Prompt（对应笔记尚未创建）
 
 主项目：projects/agent-learning-lab
-项目状态：✅ 已创建，Java HTTP 调用与 FastJSON2 响应解析已跑通
+项目状态：Java 单轮与 A/B 对照已真实跑通；自动历史代码及本地模拟已完成
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -37,8 +37,8 @@ API 风格：OpenAI-compatible
 ### Phase 1：LLM 应用开发基础
 
 - ✅ Node 008：第一次调用模型 API
-- 🟡 Node 009：Message 模型
-- ⬜ Node 010：System Prompt
+- ✅ Node 009：Message 模型（阅读与代码学习完成；自动历史真实运行记录待补）
+- 🟡 Node 010：System Prompt（准备学习）
 - ⬜ Node 011：Prompt 基础
 - ⬜ Node 012：Few-shot
 - ⬜ Node 013：Structured Output
@@ -68,25 +68,36 @@ API 风格：OpenAI-compatible
   - 最小 Maven Java 21 项目；HttpClient 调用、FastJSON2 解析与错误路径已验证
 - ✅ 第一次 Codex 学习协作
   - 已保存两轮 `codex/prompts` 与 `codex/handoffs`
+- ✅ 有历史 / 无历史对照实验
+  - IDEA 真实运行：A 回答“无法确定”，B 回答“青柠47”；输入 Token 为 32 / 63
+- 🟡 自动维护 Chat History
+  - 代码、三轮请求 JSON 注释、编译与本地模拟检查已完成
+  - 用户已读完并理解历史追加；尚未提供 --history 的真实三轮输出，实验记录留待补齐
 
 ---
 
 ## 下一步
 
-> **009-2：实验：使用 Java 实现多轮对话**
+> **Node 010：System Prompt**
 
 重点理解：
 
 ```text
-在现有 agent-learning-lab 中实现多轮对话
-对比第二轮不带历史与携带历史的结果
-保存并按顺序追加 User / Assistant Message
-观察历史增加对 prompt_tokens 的影响
+system 与 user 消息各自的作用
+通过 system 设置角色、回答风格和任务约束
+system 消息在多轮请求中如何携带
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-10-26
+
+- 用户确认 009-2 已全部看完，要求进入下一章节
+- Node 009 阅读与代码学习收尾，当前进入 Node 010「System Prompt」准备阶段
+- A/B 对照已有用户提供的真实结果；自动历史仅有编译与本地模拟证据，其真实三轮回答和 Token 用量仍待补，不填写预期值冒充实际结果
+- 目前 notes 中尚无 Node 010 笔记，下一节点内容以 roadmap 为准
 
 ### 2026-10-10
 
