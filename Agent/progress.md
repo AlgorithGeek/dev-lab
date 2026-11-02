@@ -17,11 +17,11 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 010 - System Prompt（学习中）
-当前笔记：010-1 理论篇已读完，下一步 010-2 System Prompt 行为对照实验（实验笔记尚未创建）
+当前节点：Node 011 - Prompt 基础（准备学习）
+当前笔记：010-1 / 010-2 学习及两阶段正常实测已收尾，下一步 Node 011（对应笔记尚未创建）
 
 主项目：projects/agent-learning-lab
-项目状态：Java 单轮、A/B 对照和三轮自动历史均已真实跑通
+项目状态：单轮、历史对照、自动历史、System A/B 与多轮 System 均已真实跑通正常路径
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -38,8 +38,8 @@ API 风格：OpenAI-compatible
 
 - ✅ Node 008：第一次调用模型 API
 - ✅ Node 009：Message 模型（阅读、代码学习与必做实验完成）
-- 🟡 Node 010：System Prompt（010-1 已读完，实验待开始）
-- ⬜ Node 011：Prompt 基础
+- ✅ Node 010：System Prompt（学习与两阶段正常实测完成；新增本地模拟待执行）
+- 🟡 Node 011：Prompt 基础（准备学习）
 - ⬜ Node 012：Few-shot
 - ⬜ Node 013：Structured Output
 - ⬜ Node 014：JSON Schema
@@ -73,24 +73,43 @@ API 风格：OpenAI-compatible
 - ✅ 自动维护 Chat History
   - 代码、三轮请求 JSON 注释、编译与本地模拟检查已完成
   - IDEA --history 三轮真实成功：发送 1/3/5 条，保存 2/4/6 条；输入 Token 为 28/51/90，完整历史已记录
+- ✅ System Prompt 两阶段真实正常调用
+  - A/B 输入 Token 为 40/138，输出为 1001/398；完整回答及观察已记录
+  - 多轮请求角色为 [system,user] / [system,user,assistant,user]，历史最终四条且不含 System
+  - 多轮输入/输出/总 Token 为 70/36/106、134/60/194，两次回答均带 JAVA-REVIEW: 前缀
+- ⬜ Node 010 新增本地模拟检查
+  - 检查脚本已编写，尚未执行；真实正常调用不代表错误路径已验证
 
 ---
 
 ## 下一步
 
-> **010-2：实验：使用 System Prompt 控制模型行为**（待补充实验笔记）
+> **Node 011：Prompt 基础**（先读理论，再安排实验）
 
 重点理解：
 
 ```text
-同一模型、同一 User 输入和参数，对比无 System / 有 System
-以 Java Code Review Assistant 为例，观察关注点、回答结构和 Token Usage
-再验证多轮请求如何继续携带 System Message
+Instruction：明确要完成的任务
+Context：提供必要背景
+Input：本次处理的材料
+Output Format：说明期望的回答形式
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-11-02
+
+- 用户提供 SystemPromptDemo A/B 的完整真实输出；两组均 HTTP 200 / stop
+- A 输入/输出/总 Token 为 40/1001/1041，B 为 138/398/536；完整消息和回答已补入 010-2
+- B 本样本先给结论并列三项主要问题，内容更集中；仍有过强判断，不能据此声明 System 绝对可靠
+- 第一阶段正常调用已验证；新增本地模拟的错误路径检查仍未执行，保留待授权状态
+- 已增加 SystemPromptDemo --history 两轮模式，System 与 history 分开，附中文及 JSON 注释；三个入口编译通过
+- 用户提供第二阶段真实两轮成功输出，Roles 为 [system,user] / [system,user,assistant,user]；最终历史四条、不含 System，两次回答均带 JAVA-REVIEW: 前缀
+- 第二阶段实际输入/输出/总 Token 为 70/36/106、134/60/194；已补齐原始消息、回答、历史及交接记录
+- 用户要求同步进度和补齐实验文档，Node 010 学习及两阶段正常实测收尾，当前准备进入 Node 011「Prompt 基础」
+- 新增本地检查仍未执行，作为独立待办保留；未把可选删 System 实验或逐题口述测试记为已执行
 
 ### 2026-10-26
 
@@ -98,7 +117,8 @@ API 风格：OpenAI-compatible
 - Node 009 阅读与代码学习收尾，当前进入 Node 010「System Prompt」准备阶段
 - 用户补齐 --history 实际输出，三轮均为 HTTP 200 / stop；第三轮携带并复述第二轮真实回答，已补齐笔记、交接报告和实验检查项
 - 用户新增并确认读完 010-1「System Prompt 到底是什么？」理论篇
-- 下一步按 010-1 预告进入 010-2 行为对照实验；实验笔记尚未创建，未修改 Java 代码或开始模型调用
+- 用户新增 010-2 实验笔记，已实现 SystemPromptDemo 第一阶段 A/B、JSON 注释及协作记录；三个入口编译通过，尚未真实调用模型
+- 本地模拟脚本已扩展，执行被自动审批以“未明确授权测试”为由拒绝；新增检查尚未运行，待用户授权后执行
 
 ### 2026-10-10
 

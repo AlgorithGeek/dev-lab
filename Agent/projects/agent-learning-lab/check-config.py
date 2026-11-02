@@ -266,9 +266,143 @@ with tempfile.TemporaryDirectory() as directory:
                 if failure[0] == 400:
                     assert "Error Response: mock error" in output
                     assert "响应 JSON 解析失败" not in output
+        system_prompt = "\n".join([
+            "你是一名 Java Code Review Assistant。", "",
+            "你的任务是审查用户提供的 Java 代码。", "", "规则：",
+            "1. 先给一句总体结论。", "2. 最多指出 3 个最重要的问题。",
+            "3. 优先关注正确性、空指针风险、并发安全和资源管理。",
+            "4. 只分析用户实际提供的代码；如果信息不足，明确说明，不要虚构不存在的上下文。",
+            "5. 使用中文回答。",
+        ])
+        review_prompt = ("请帮我 Review 下面这段代码：\n\n"
+                         "public String getUserName(User user) {\n"
+                         "    return user.getProfile().getName();\n}")
+        review_messages = [
+            [{"role": "user", "content": review_prompt}],
+            [{"role": "system", "content": system_prompt},
+             {"role": "user", "content": review_prompt}],
+        ]
+        system_cases = [(None, None, None), (0, (400, "mock error"), "HTTP 请求未成功"),
+                        (1, (400, "mock error"), "HTTP 请求未成功"),
+                        (0, (200, "not json"), "响应 JSON 解析失败")]
+        for field, value, expected in [
+            ("model", None, "model 字段"), ("choices", [], "choices 必须是非空数组"),
+            ("content", None, "message.content 文本字段"),
+            ("finish_reason", None, "finish_reason 字段"),
+            ("usage", None, "usage 对象"), ("prompt_tokens", -1, "usage.prompt_tokens"),
+            ("completion_tokens", 1.5, "usage.completion_tokens"),
+        ]:
+            payload = json.loads(success("模拟回答")[1])
+            if field == "content":
+                payload["choices"][0]["message"][field] = value
+            elif field == "finish_reason":
+                payload["choices"][0][field] = value
+            elif field.endswith("_tokens"):
+                payload["usage"][field] = value
+            else:
+                payload[field] = value
+            system_cases.append((0, (200, json.dumps(payload)), expected))
+        for failed_at, failure, expected in system_cases:
+            received.clear()
+            Handler.queued_responses = [success('模拟 A 回答："风险"\n不应进入 B'), success("模拟 B 回答")]
+            if failed_at is not None:
+                Handler.queued_responses[failed_at] = failure
+            result = subprocess.run([
+                "java", f"-Djavax.net.ssl.trustStore={trust}",
+                "-Djavax.net.ssl.trustStorePassword=test-password", "-cp", classpath,
+                "com.avexvertex.agent.SystemPromptDemo",
+            ], cwd=project, env=env, capture_output=True, text=True, timeout=20)
+            output = result.stdout + result.stderr
+            assert result.returncode == (0 if failed_at is None else 1), output
+            assert fake_key not in output and fake_url not in output
+            assert len(received) == (2 if failed_at is None else failed_at + 1), output
+            for index, (path, headers, body) in enumerate(received):
+                assert path == "/compatible-mode/v1/chat/completions"
+                assert headers["Authorization"] == "Bearer " + fake_key
+                assert headers["Content-Type"] == "application/json"
+                assert body == {"model": "qwen3.8-max", "messages": review_messages[index],
+                                "reasoning_effort": "none"}, body
+                assert json.loads(output.split("Messages: ")[index + 1].splitlines()[0]) == review_messages[index]
+                assert json.loads(output.split("Roles: ")[index + 1].splitlines()[0]) == [
+                    message["role"] for message in review_messages[index]]
+            completed = 2 if failed_at is None else failed_at
+            for expected_field in ["Model: qwen3.8-max", "Finish Reason: stop", "Prompt Tokens: 30",
+                                   "Completion Tokens: 4", "Total Tokens: 34"]:
+                assert output.count(expected_field) == completed, output
+            if failed_at is None:
+                assert "发送前消息条数: 1" in output and "发送前消息条数: 2" in output
+                assert 'Content: 模拟 A 回答："风险"\n不应进入 B' in output
+                assert "Content: 模拟 B 回答" in output
+            else:
+                assert expected in output, output
+                if failure[0] == 400:
+                    assert "Error Response: mock error" in output
+                    assert "响应 JSON 解析失败" not in output
+        history_system_prompt = "\n".join([
+            "你是一名 Java Code Review Assistant。",
+            "回答每个问题时，第一行必须以“JAVA-REVIEW:”开头。",
+            "只讨论 Java 代码或 Java 后端工程问题。", "使用中文回答。",
+        ])
+        system_questions = ["ThreadLocal 最常见的风险是什么？请用一句话回答。",
+                            "那在线程池里为什么更需要小心？仍然用一句话回答。"]
+        system_answers = ['模拟首轮回复："原话"\n路径 C:\\demo', "模拟第二轮回复"]
+        saved_history = []
+        system_requests = []
+        for question, answer in zip(system_questions, system_answers):
+            current_user = {"role": "user", "content": question}
+            system_requests.append([{"role": "system", "content": history_system_prompt}]
+                                   + saved_history + [current_user])
+            saved_history = saved_history + [current_user, {"role": "assistant", "content": answer}]
+        system_history_cases = [(None, None, None)]
+        for failed_at in range(2):
+            system_history_cases.extend([
+                (failed_at, (400, "mock error"), "HTTP 请求未成功"),
+                (failed_at, (200, "not json"), "响应 JSON 解析失败"),
+                (failed_at, (200, success("不得保存")[1].replace('"usage"', '"missing_usage"')),
+                 "响应缺少有效的 usage 对象"),
+            ])
+        for failed_at, failure, expected in system_history_cases:
+            received.clear()
+            Handler.queued_responses = [success(answer) for answer in system_answers]
+            if failed_at is not None:
+                Handler.queued_responses[failed_at] = failure
+            result = subprocess.run([
+                "java", f"-Djavax.net.ssl.trustStore={trust}",
+                "-Djavax.net.ssl.trustStorePassword=test-password", "-cp", classpath,
+                "com.avexvertex.agent.SystemPromptDemo", "--history",
+            ], cwd=project, env=env, capture_output=True, text=True, timeout=20)
+            output = result.stdout + result.stderr
+            assert result.returncode == (0 if failed_at is None else 1), output
+            assert fake_key not in output and fake_url not in output
+            assert len(received) == (2 if failed_at is None else failed_at + 1), output
+            for index, (path, headers, body) in enumerate(received):
+                assert path == "/compatible-mode/v1/chat/completions"
+                assert headers["Authorization"] == "Bearer " + fake_key
+                assert headers["Content-Type"] == "application/json"
+                assert body == {"model": "qwen3.8-max", "messages": system_requests[index],
+                                "reasoning_effort": "none"}, body
+                assert json.loads(output.split("Messages: ")[index + 1].splitlines()[0]) == system_requests[index]
+                assert json.loads(output.split("Roles: ")[index + 1].splitlines()[0]) == [
+                    message["role"] for message in system_requests[index]]
+            completed = 2 if failed_at is None else failed_at
+            assert output.count("Total Tokens: 34") == completed, output
+            before = [int(part.splitlines()[0]) for part in output.split("Chat History Count before: ")[1:]]
+            after = [int(part.splitlines()[0]) for part in output.split("Chat History Count after: ")[1:]]
+            counts = [int(part.splitlines()[0]) for part in output.split("发送前消息条数: ")[1:]]
+            assert before == [0, 2][:len(received)], output
+            assert after == [2, 4][:completed], output
+            assert counts == [2, 4][:len(received)], output
+            assert f"已保存历史条数: {completed * 2}" in output
+            saved = json.loads(output.split("已保存历史 JSON: ")[1].splitlines()[0])
+            assert saved == saved_history[:completed * 2], saved
+            if failed_at is not None:
+                assert expected in output, output
+                if failure[0] == 400:
+                    assert "Error Response: mock error" in output
+                    assert "响应 JSON 解析失败" not in output
     finally:
         server.shutdown()
         server.server_close()
         thread.join()
 
-print("检查通过：单轮、A/B 默认和显式模式、自动历史 1/3/5 与 2/4/6、各轮失败不保存；不访问百炼。")
+print("检查通过：单轮、历史对照与自动历史、System A/B 与两轮 System 历史；不访问百炼。")
