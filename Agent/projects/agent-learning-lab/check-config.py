@@ -400,9 +400,79 @@ with tempfile.TemporaryDirectory() as directory:
                 if failure[0] == 400:
                     assert "Error Response: mock error" in output
                     assert "响应 JSON 解析失败" not in output
+        counter_input = ("public class CounterService {\n    private int count = 0;\n\n"
+                         "    public int increase() {\n        return ++count;\n    }\n}")
+        vague_prompt = "帮我看看下面这段代码有什么问题：\n\n" + counter_input
+        structured_prompt = "\n".join([
+            "Role:", "你是一名 Java 后端代码审查助手。", "",
+            "Task:", "检查下面代码中最值得优先修复的问题，重点判断是否存在并发安全风险。", "",
+            "Context:", "这段代码位于 Spring Boot 单例 Service 中，同一个 Service 实例可能被多个 HTTP 请求线程并发访问。", "",
+            "Input:", counter_input, "", "Constraints:", "1. 最多指出 3 个问题。",
+            "2. 只基于给出的代码和 Context 分析。", "3. 不要虚构不存在的数据库、缓存、接口或调用链。", "",
+            "Output Format:", "先给一句总体结论。", "然后按“问题 / 原因 / 建议”输出。",
+        ])
+        # C 只去掉背景段，并按手册调整两条约束；其余结构和代码与 B 相同。
+        contextless_prompt = structured_prompt.replace(
+            "Context:\n这段代码位于 Spring Boot 单例 Service 中，同一个 Service 实例可能被多个 HTTP 请求线程并发访问。\n\n", "")
+        contextless_prompt = contextless_prompt.replace(
+            "2. 只基于给出的代码和 Context 分析。", "2. 只基于给出的代码分析。")
+        contextless_prompt = contextless_prompt.replace(
+            "3. 不要虚构不存在的数据库、缓存、接口或调用链。",
+            "3. 信息不足时明确说明，不要自行假设对象生命周期或并发场景。")
+        assert "Context:" not in contextless_prompt and "Spring Boot" not in contextless_prompt
+        for mode_args, prompt_texts in [([], [vague_prompt, structured_prompt]),
+                                       (["--context"], [structured_prompt, contextless_prompt])]:
+            # 沿用前面定义的成功、HTTP 错误、非法 JSON 和缺失/无效字段场景。
+            for failed_at, failure, expected in system_cases:
+                received.clear()
+                Handler.queued_responses = [success('模拟 A："问题"\n不要放进 B'), success("模拟 B 回答")]
+                if failed_at is not None:
+                    Handler.queued_responses[failed_at] = failure
+                result = subprocess.run([
+                    "java", f"-Djavax.net.ssl.trustStore={trust}",
+                    "-Djavax.net.ssl.trustStorePassword=test-password", "-cp", classpath,
+                    "com.avexvertex.agent.PromptBasicsDemo", *mode_args,
+                ], cwd=project, env=env, capture_output=True, text=True, timeout=20)
+                output = result.stdout + result.stderr
+                assert result.returncode == (0 if failed_at is None else 1), output
+                assert fake_key not in output and fake_url not in output
+                assert len(received) == (2 if failed_at is None else failed_at + 1), output
+                for index, (path, headers, body) in enumerate(received):
+                    assert path == "/compatible-mode/v1/chat/completions"
+                    assert headers["Authorization"] == "Bearer " + fake_key
+                    assert headers["Content-Type"] == "application/json"
+                    messages = [{"role": "user", "content": prompt_texts[index]}]
+                    assert body == {"model": "qwen3.8-max", "messages": messages,
+                                    "reasoning_effort": "none"}, body
+                    assert json.loads(output.split("Messages: ")[index + 1].splitlines()[0]) == messages
+                    assert json.loads(output.split("Roles: ")[index + 1].splitlines()[0]) == ["user"]
+                    assert body["messages"][0]["content"].count(counter_input) == 1
+                    if index == 0 and not mode_args:
+                        assert body["messages"][0]["content"].split("\n\n", 1)[1] == counter_input
+                    else:
+                        assert body["messages"][0]["content"].split("Input:\n", 1)[1].split("\n\nConstraints:", 1)[0] == counter_input
+                    assert f"User Prompt 字符数: {len(prompt_texts[index])}" in output
+                completed = 2 if failed_at is None else failed_at
+                for field in ["Model: qwen3.8-max", "Finish Reason: stop", "Prompt Tokens: 30",
+                              "Completion Tokens: 4", "Total Tokens: 34"]:
+                    assert output.count(field) == completed, output
+                if failed_at is None:
+                    assert output.count("发送前消息条数: 1") == 2
+                    assert 'Content: 模拟 A："问题"\n不要放进 B' in output
+                    assert "Content: 模拟 B 回答" in output
+                    if mode_args:
+                        assert "=== B（有 Context） ===" in output and "=== C（无 Context） ===" in output
+                        assert "=== A（模糊 Prompt） ===" not in output
+                    else:
+                        assert "=== A（模糊 Prompt） ===" in output and "=== B（结构化 Prompt） ===" in output
+                else:
+                    assert expected in output, output
+                    if failure[0] == 400:
+                        assert "Error Response: mock error" in output
+                        assert "响应 JSON 解析失败" not in output
     finally:
         server.shutdown()
         server.server_close()
         thread.join()
 
-print("检查通过：单轮、历史对照与自动历史、System A/B 与两轮 System 历史；不访问百炼。")
+print("检查通过：单轮、历史、System 和 Prompt 基础对照；不访问百炼。")

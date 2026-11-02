@@ -17,11 +17,11 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 011 - Prompt 基础（学习中）
-当前笔记：011-1 理论篇已读完，下一步 011-2 模糊 Prompt / 结构化 Prompt 对照实验（实验笔记尚未创建）
+当前节点：Node 012 - Few-shot（准备学习）
+当前笔记：011-1 / 011-2 阅读讲解与两阶段正常实测已收尾，下一步 Node 012（对应笔记尚未创建）
 
 主项目：projects/agent-learning-lab
-项目状态：单轮、历史对照、自动历史、System A/B 与多轮 System 均已真实跑通正常路径
+项目状态：已跑通单轮、历史、System 及 Prompt A/B、B/C 的真实正常调用
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -39,8 +39,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 008：第一次调用模型 API
 - ✅ Node 009：Message 模型（阅读、代码学习与必做实验完成）
 - ✅ Node 010：System Prompt（学习与两阶段正常实测完成；新增本地模拟待执行）
-- 🟡 Node 011：Prompt 基础（011-1 已读完，实验待开始）
-- ⬜ Node 012：Few-shot
+- ✅ Node 011：Prompt 基础（阅读讲解与两阶段正常实测完成；新增本地模拟待执行）
+- 🟡 Node 012：Few-shot（准备学习）
 - ⬜ Node 013：Structured Output
 - ⬜ Node 014：JSON Schema
 - ⬜ Node 015：Java DTO 与 Structured Output
@@ -79,19 +79,25 @@ API 风格：OpenAI-compatible
   - 多轮输入/输出/总 Token 为 70/36/106、134/60/194，两次回答均带 JAVA-REVIEW: 前缀
 - ⬜ Node 010 新增本地模拟检查
   - 检查脚本已编写，尚未执行；真实正常调用不代表错误路径已验证
+- ✅ Prompt 基础 A/B 与 B/C 真实正常调用
+  - 同一代码、固定 user 角色，对比模糊/结构化 Prompt，再观察删除背景与约束调整的效果
+  - 两阶段完整消息、原始回答、Token 和模型错误已记录，未将本次 B 覆盖旧 B
+- ⬜ Node 011 新增本地模拟检查
+  - 代码已编写，尚未执行；不将真实正常调用等同于错误路径验证
 
 ---
 
 ## 下一步
 
-> **011-2：实验：对比模糊 Prompt 与结构化 Prompt**（待补充实验笔记）
+> **Node 012：Few-shot**（先读理论，再安排实验）
 
 重点理解：
 
 ```text
-同一 Input、同一模型和参数，对比模糊 / 结构化 Prompt
-观察任务聚焦、上下文使用、回答边界、输出结构与 Token Usage
-真实实验结果再用于分析，不凭单次回答判断 Prompt 稳定性
+Zero-shot：只有任务说明，不给示范答案
+One-shot：提供一个输入 → 输出示例
+Few-shot：提供少量输入 → 输出示例
+观察示例如何补充任务标准和回答格式，同时注意 Token 与样本偏差
 ```
 
 ---
@@ -101,7 +107,15 @@ API 风格：OpenAI-compatible
 ### 2026-11-02
 
 - 用户新增并确认读完 011-1「Prompt 基础到底是什么？」理论篇，已同步笔记阅读记录及进度
-- Node 011 仍在学习中，下一步 011-2 模糊 / 结构化 Prompt 对照实验；实验笔记及代码尚未创建，未提前进入 Node 012
+- 用户新增 011-2，已实现 PromptBasicsDemo 第一阶段：同一代码 Input、两组均为单条 User，Prompt 清晰度和背景信息不同；附中文及 JSON 注释
+- 四个入口按 Java 21 编译通过；用户提供 PromptBasicsDemo 真实 A/B 输出，两组均 HTTP 200 / stop、单条 user
+- A 字符数 135，Token 为 52/730/782；B 字符数 396，Token 为 177/497/674；完整消息、回答和观察已保存
+- B 使用了单例并发背景并遵循三项格式，但第三项混淆原始 int 与改写后的 AtomicInteger 引用，已如实记录；新增本地模拟仍未执行
+- 已增加 PromptBasicsDemo --context 模式，复用原 B 与相同代码，C 删除 Context 并调整不自行假设约束；四个入口编译通过
+- 用户提供本次 B/C 实测，两边均 HTTP 200 / stop；B Token 为 177/634/811，C 为 147/396/543，完整消息、回答和观察已保存
+- C 明确承认无法确认单例/共享场景；B 仍扩展到未提供的全局 ID 需求，相关推断问题已记录；没有覆盖第一阶段旧 B 的结果
+- 已结合实际回复讲解 Prompt 各部分、Context 对条件性判断的作用及模型回复中的错误，Node 011 阅读讲解与两阶段正常实测收尾
+- 当前准备学习 Node 012「Few-shot」，对应笔记尚未创建；未另行逐题口述，新增加的本地模拟检查仍是独立待办
 
 - 用户提供 SystemPromptDemo A/B 的完整真实输出；两组均 HTTP 200 / stop
 - A 输入/输出/总 Token 为 40/1001/1041，B 为 138/398/536；完整消息和回答已补入 010-2
