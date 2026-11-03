@@ -18,7 +18,7 @@
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
 当前节点：Node 015 - Java DTO 与 Structured Output（准备学习）
-当前笔记：014-1 理论阅读与 User Schema 练习修正已按用户确认收尾；下一步 Node 015，暂未开始代码实验
+当前笔记：014 理论阅读与 User Schema 练习修正已按用户确认收尾；下一步 Node 015，暂未开始代码实验
 
 主项目：projects/agent-learning-lab
 项目状态：已跑通单轮、历史、System 及 Prompt A/B、B/C 的真实正常调用
@@ -92,7 +92,7 @@ API 风格：OpenAI-compatible
   - 用户已读完 Node 013，理解结构化结果、数据契约以及结构正确不等于事实正确
   - 按笔记安排不单独新增 Java Demo 或 API 实验
 - ✅ JSON Schema 基础认知与 User 手写练习
-  - 用户已读完 014-1，并提交 name/string、age/integer 的 User Schema
+  - 用户已读完 014，并提交 name/string、age/integer 的 User Schema
   - 已指出并修正 required 应与 properties 同级、最外层缺闭合括号的问题；用户确认本节收尾，不再追加其他练习
   - 其余三项建议练习未执行，未运行 Schema 校验器或模型 API，不将这些项目记为已完成
 
@@ -114,7 +114,7 @@ Schema → 模型结构化结果 → 校验与反序列化 → Java DTO → 业�
 
 ### 2026-11-03
 
-- 用户新增并确认读完 013「Structured Output 到底是什么？」与 014-1「JSON Schema 到底是什么？」
+- 用户新增并确认读完 013「Structured Output 到底是什么？」与 014「JSON Schema 到底是什么？」
 - Node 013 按纯理论节点收尾，不新增 Java Demo / API 实验；笔记正文标题与文件名统一为 013
 - 用户提供 User Schema 手写结果，已讲解并修正 required 的层级及缺失闭合括号；用户确认本节结束
 - Node 014 按用户确认收尾，当前准备进入 Node 015；其余建议练习未做、未运行校验器，不伪造完成记录

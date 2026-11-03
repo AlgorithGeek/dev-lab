@@ -1,4 +1,4 @@
-# 014-1 - JSON Schema 到底是什么？
+# 014 - JSON Schema 到底是什么？
 
 > Node 014：JSON Schema\
 > Phase 1：LLM 应用开发基础
