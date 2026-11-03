@@ -22,6 +22,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
     status = 200
     response = '{"model":"qwen3.8-max","message":"模拟响应"}'
     queued_responses = None
+    content_type = "application/json; charset=utf-8"
 
     def do_POST(self):
         body = self.rfile.read(int(self.headers["Content-Length"]))
@@ -29,7 +30,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         status, response = (self.queued_responses.pop(0) if self.queued_responses is not None
                             else (self.status, self.response))
         self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", self.content_type)
         self.end_headers()
         self.wfile.write(response.encode())
 
@@ -541,9 +542,78 @@ with tempfile.TemporaryDirectory() as directory:
                 "response_format": {"type": "json_schema", "json_schema": {
                     "name": "campaign_analysis", "strict": True, "schema": campaign_schema}},
             }, body
+        # SSE 样例包含空角色块、空格正文、多 data 行事件、独立 Usage 和结束标记。
+        def sse_event(payload):
+            return "data: " + json.dumps(payload, ensure_ascii=False) + "\n\n"
+
+        role_event = sse_event({"model": "qwen3.8-max", "choices": [
+            {"delta": {"role": "assistant", "content": ""}, "finish_reason": None}]})
+        text_event = sse_event({"choices": [{"delta": {"content": "HashMap"}, "finish_reason": None}]})
+        space_event = sse_event({"choices": [{"delta": {"content": " "}, "finish_reason": None}]})
+        multiline_event = "\n".join("data: " + line for line in json.dumps({"choices": [
+            {"delta": {"content": "不是线程安全的。\n"}, "finish_reason": None}]},
+            ensure_ascii=False, indent=2).splitlines()) + "\n\n"
+        finish_event = sse_event({"choices": [{"delta": {}, "finish_reason": "stop"}]})
+        usage_event = sse_event({"choices": [], "usage": {
+            "prompt_tokens": 30, "completion_tokens": 20, "total_tokens": 50}})
+        done_event = "data: [DONE]\n\n"
+        prefix = ": heartbeat\n\nevent: message\n" + role_event + text_event + space_event + multiline_event
+        complete_stream = prefix + finish_event + usage_event + done_event
+        for mode_args, status, response_text, content_type, expected_error in [
+            ([], 200, complete_stream, "text/event-stream; charset=utf-8", None),
+            (["--debug"], 200, complete_stream, "text/event-stream; charset=utf-8", None),
+            ([], 400, "mock error", "application/json", "HTTP 请求未成功"),
+            ([], 200, prefix + finish_event + usage_event, "text/event-stream", "未收到 [DONE]"),
+            ([], 200, prefix + finish_event + done_event, "text/event-stream", "缺少正文、Model、Finish Reason 或 Usage"),
+            ([], 200, role_event + "data: not json\n\n", "text/event-stream", "SSE 数据不是有效 JSON"),
+            ([], 200, role_event + sse_event({"choices": [{"delta": {"content": 123}}]}),
+             "text/event-stream", "delta.content 必须是文本"),
+            ([], 200, prefix + finish_event + usage_event.replace('"prompt_tokens": 30', '"prompt_tokens": -1') + done_event,
+             "text/event-stream", "usage.prompt_tokens 必须是非负整数"),
+            ([], 200, complete_stream, "application/json", "不是 text/event-stream"),
+        ]:
+            received.clear()
+            Handler.content_type = content_type
+            Handler.queued_responses = [(status, response_text)]
+            env = os.environ.copy()
+            env.update(DASHSCOPE_API_KEY=fake_key, DASHSCOPE_BASE_URL=fake_url)
+            result = subprocess.run([
+                "java", f"-Djavax.net.ssl.trustStore={trust}",
+                "-Djavax.net.ssl.trustStorePassword=test-password", "-cp", classpath,
+                "com.avexvertex.agent.StreamingDemo", *mode_args,
+            ], cwd=project, env=env, capture_output=True, text=True, timeout=20)
+            output = result.stdout + result.stderr
+            assert result.returncode == (0 if expected_error is None else 1), output
+            assert fake_key not in output and fake_url not in output
+            assert len(received) == 1, output
+            path, headers, body = received[0]
+            assert path == "/compatible-mode/v1/chat/completions"
+            assert headers["Authorization"] == "Bearer " + fake_key
+            assert body == {"model": "qwen3.8-max", "messages": [{"role": "user", "content":
+                "请用 3 到 5 句话解释 Java HashMap 为什么不是线程安全的。"}],
+                "stream": True, "stream_options": {"include_usage": True}, "reasoning_effort": "none"}, body
+            if expected_error is None:
+                assert "Full Content（已拼接正文）:\nHashMap 不是线程安全的。\n" in output
+                assert 'First Content: "HashMap"' in output
+                assert "Finish Reason: stop" in output and "[DONE] received: true" in output
+                for field in ["Model: qwen3.8-max", "Prompt Tokens: 30", "Completion Tokens: 20", "Total Tokens: 50"]:
+                    assert field in output, output
+                ttft = float(output.split("TTFT（首个非空正文，ms）: ")[1].splitlines()[0])
+                total_time = float(output.split("Total Time（收到 DONE，ms）: ")[1].splitlines()[0])
+                assert 0 <= ttft <= total_time
+                assert ("[SSE]" in output) == bool(mode_args), output
+                if mode_args:
+                    assert "[SSE] [DONE]" in output
+            else:
+                assert expected_error in output, output
+                assert "Full Content（已拼接正文）:" not in output
+                assert "[DONE] received: true" not in output
+                if status == 400:
+                    assert "Error Response: mock error" in output
+                    assert "SSE 数据不是有效 JSON" not in output
     finally:
         server.shutdown()
         server.server_close()
         thread.join()
 
-print("检查通过：既有实验及 Structured Output DTO 转换与最小字段检查；不访问百炼。")
+print("检查通过：既有实验、Structured Output DTO 与 Streaming SSE 场景；不访问百炼。")

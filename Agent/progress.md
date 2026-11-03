@@ -17,11 +17,11 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 016 - Streaming（准备学习）
-当前笔记：015-1 / 015-2 已按用户确认收尾，下一步 Node 016；当前未开始 Streaming 代码
+当前节点：Node 017 - 模型参数（准备学习）
+当前笔记：016-1 / 016-2 阅读讲解及默认/Debug 正常实测已收尾，下一步 Node 017；新增本地模拟仍未执行
 
 主项目：projects/agent-learning-lab
-项目状态：已跑通单轮、历史、Prompt 对照及 Schema → 模型 JSON → DTO/getter 的真实正常链路
+项目状态：已跑通单轮、历史、Prompt 对照、Structured Output → DTO 及文本 Streaming 的真实正常链路
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -44,8 +44,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 013：Structured Output（理论阅读完成，不单独安排 Java 实验）
 - ✅ Node 014：JSON Schema（理论阅读、User Schema 练习与修正，按用户确认收尾）
 - ✅ Node 015：Java DTO 与 Structured Output（理论、真实正常链路与两个本地坏数据样本完成）
-- 🟡 Node 016：Streaming（准备学习）
-- ⬜ Node 017：模型参数
+- ✅ Node 016：Streaming（默认/Debug 正常实测与讲解完成；新增本地模拟待执行）
+- 🟡 Node 017：模型参数（准备学习）
 - ⬜ Node 018：模型选择
 - ⬜ Node 019：Context Engineering
 - ⬜ Node 020：LLM API 异常
@@ -99,25 +99,43 @@ API 风格：OpenAI-compatible
   - IDEA 真实 Schema 请求、业务 JSON、FastJSON2 反序列化及四个 getter 输出已完成，三次实际结果分别保留
   - --errors 已在本地执行：缺少 suggestion、非法 riskLevel 均可转 DTO，再由共用字段检查拒绝
   - 非法 JSON / 错误字段类型样本及完整 HTTPS 脚本未执行，未引入完整 Schema 或业务事实校验
+- ✅ Streaming 默认 / Debug 真实正常调用
+  - 读取 SSE、提取正文增量、实时 print/flush、拼接最终回答、finish / Usage / DONE 均有实际结果与代码路径支撑
+  - 默认与 Debug 两次耗时、Token、完整回答分别记录，已保存五类代表事件
+- ⬜ Node 016 新增本地模拟检查
+  - 九种场景已编写但未运行；读流空闲超时没有单独实现，不记为生产级容错完成
 
 ---
 
 ## 下一步
 
-> **Node 016：Streaming（准备学习）**
+> **Node 017：模型参数（准备学习）**
 
 ```text
-当前：等待完整响应再读取
-下一步：模型边生成，程序边接收
+temperature / top_p
+输出长度限制
+seed
+reasoning effort 等模型相关能力
+理解什么时候需要更稳定，什么时候需要更多样
 ```
 
-本次只收尾 Node 015，不提前创建 Streaming 笔记或代码。
+先读理论，按具体模型和任务理解参数，不直接做批量调用或性能压测。
 
 ---
 
 ## 最近进度
 
 ### 2026-11-03
+
+- 用户新增 016-1 / 016-2 并确认读完理论篇，要求实现 Streaming 实验
+- 已新增带中文和 JSON/SSE 注释的 StreamingDemo，默认实时正文，--debug 查看 payload；支持事件边界、Usage 空 choices、DONE 与中断识别，七个源码文件编译通过
+- 九种 Streaming 本地模拟已编写但尚未执行；Codex 未读取 IDEA 密钥或调用百炼，真实结果待用户运行后填写
+- 用户提供 StreamingDemo 默认模式真实 HTTP 200 输出：首段 "Java"，正文延迟 657.241167 ms，总耗时 3899.898959 ms，stop，Token 为 30/138/168，DONE received=true；完整正文与汇总已记录
+- 原始 Debug 事件尚未提供，粘贴日志不单独证明现场逐段展示；本地模拟仍未执行，不把本样本当性能基准
+- 用户随后提供 --debug 实际输出并观察到每块只含新增 content；已保存五类代表性原始事件，拼接文本与 Full Content 一致
+- Debug 本次延迟 786.463 ms、总耗时 4358.231667 ms，Token 为 30/166/196，stop，DONE=true；不覆盖默认模式的原数据
+- 已讲解增量拼接、SSE 如何通过一次 HTTP 响应持续传输，以及首段正文延迟与总耗时的区别；Node 016 当前学习范围收尾，准备进入 Node 017
+- 未另行逐题口述或测量 GUI 刷新时序，未运行新增本地模拟，不增加流式框架或新功能
 
 - 用户新增 015-1 理论篇及 015-2 实验篇，并确认已读完 015-1
 - 当前进入 Node 015 实验准备，按笔记顺序先 DTO、再请求、再真实结果和反序列化，必要错误模拟放在正常链路之后
