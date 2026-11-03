@@ -18,7 +18,7 @@
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
 当前节点：Node 013 - Structured Output（准备学习）
-当前笔记：012-1 Few-shot 理论篇已读完并由用户确认理解；本 Node 不单独安排 Java 实验，下一步进入 Node 013 Structured Output
+当前笔记：012 Few-shot 理论篇已读完并由用户确认理解；本 Node 不单独安排 Java 实验，下一步进入 Node 013 Structured Output
 
 主项目：projects/agent-learning-lab
 项目状态：已跑通单轮、历史、System 及 Prompt A/B、B/C 的真实正常调用
@@ -111,9 +111,9 @@ API 风格：OpenAI-compatible
 
 ### 2026-11-03
 
-- 用户读完 012-1「Few-shot 到底是什么？」并确认理论理解，Node 012 以 Zero-shot / One-shot / Few-shot 基础认知收尾
+- 用户读完 012「Few-shot 到底是什么？」并确认理论理解，Node 012 以 Zero-shot / One-shot / Few-shot 基础认知收尾
 - 按用户决定，不单独创建 Few-shot Java Demo、额外实验笔记或 Codex 实验记录，不进行本 Node 的真实 API / Token 实验
-- 012-1 已改写强制实验预告、完成标准和停止点，保留未来业务通过样本集和 Evaluation 评估示例收益的认知
+- 012 已改写强制实验预告、完成标准和停止点，保留未来业务通过样本集和 Evaluation 评估示例收益的认知
 - 当前准备进入 Node 013「Structured Output」；未创建其笔记，未开始 Node 014 / 015，也未改动 roadmap 或已有 Java 代码
 
 ### 2026-11-02

@@ -1,8 +1,8 @@
-# 012-1 - Few-shot 到底是什么？
+# 012 - Few-shot 到底是什么？
 
 > Phase 1：LLM 应用开发基础\
 > Node 012：Few-shot\
-> Note 012-1：Few-shot 理论篇
+> Note 012：Few-shot 理论篇
 >
 > 前置 Node：
 >
@@ -1839,7 +1839,7 @@ Example 也属于 Context Engineering 的一部分。
 如果能自然讲清：
 
 ```text
-012-1
+012
 基本理解完成
 ```
 
@@ -1868,7 +1868,7 @@ Example 也属于 Context Engineering 的一部分。
 完成状态：
 
 ```text
-012-1 理论篇：✅ 完成
+012 理论篇：✅ 完成
 Node 012：Few-shot ✅ PASS
 
 本 Node 不单独安排 Java 实验。
