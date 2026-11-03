@@ -17,8 +17,8 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 012 - Few-shot（准备学习）
-当前笔记：011-1 / 011-2 阅读讲解与两阶段正常实测已收尾，下一步 Node 012（对应笔记尚未创建）
+当前节点：Node 013 - Structured Output（准备学习）
+当前笔记：012-1 Few-shot 理论篇已读完并由用户确认理解；本 Node 不单独安排 Java 实验，下一步进入 Node 013 Structured Output
 
 主项目：projects/agent-learning-lab
 项目状态：已跑通单轮、历史、System 及 Prompt A/B、B/C 的真实正常调用
@@ -40,8 +40,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 009：Message 模型（阅读、代码学习与必做实验完成）
 - ✅ Node 010：System Prompt（学习与两阶段正常实测完成；新增本地模拟待执行）
 - ✅ Node 011：Prompt 基础（阅读讲解与两阶段正常实测完成；新增本地模拟待执行）
-- 🟡 Node 012：Few-shot（准备学习）
-- ⬜ Node 013：Structured Output
+- ✅ Node 012：Few-shot（理论理解完成，不单独安排 Java 实验）
+- 🟡 Node 013：Structured Output（准备学习）
 - ⬜ Node 014：JSON Schema
 - ⬜ Node 015：Java DTO 与 Structured Output
 - ⬜ Node 016：Streaming
@@ -84,25 +84,37 @@ API 风格：OpenAI-compatible
   - 两阶段完整消息、原始回答、Token 和模型错误已记录，未将本次 B 覆盖旧 B
 - ⬜ Node 011 新增本地模拟检查
   - 代码已编写，尚未执行；不将真实正常调用等同于错误路径验证
+- ✅ Few-shot 基础认知
+  - 已理解 Zero-shot / One-shot / Few-shot，以及示例属于 Context 而不是训练
+  - 已理解示例质量、覆盖、偏差及 Token 成本，Few-shot 不保证优于 Zero-shot
+  - 当前不单独做 Few-shot Java/API 实验；真实业务需要时再结合样本集和 Evaluation 验证
 
 ---
 
 ## 下一步
 
-> **Node 012：Few-shot**（先读理论，再安排实验）
+> **Node 013：Structured Output（准备学习）**
 
 重点理解：
 
 ```text
-Zero-shot：只有任务说明，不给示范答案
-One-shot：提供一个输入 → 输出示例
-Few-shot：提供少量输入 → 输出示例
-观察示例如何补充任务标准和回答格式，同时注意 Token 与样本偏差
+自然语言输出
+↓
+结构化输出
+↓
+为什么程序和企业应用更喜欢结构化结果
 ```
 
 ---
 
 ## 最近进度
+
+### 2026-11-03
+
+- 用户读完 012-1「Few-shot 到底是什么？」并确认理论理解，Node 012 以 Zero-shot / One-shot / Few-shot 基础认知收尾
+- 按用户决定，不单独创建 Few-shot Java Demo、额外实验笔记或 Codex 实验记录，不进行本 Node 的真实 API / Token 实验
+- 012-1 已改写强制实验预告、完成标准和停止点，保留未来业务通过样本集和 Evaluation 评估示例收益的认知
+- 当前准备进入 Node 013「Structured Output」；未创建其笔记，未开始 Node 014 / 015，也未改动 roadmap 或已有 Java 代码
 
 ### 2026-11-02
 
