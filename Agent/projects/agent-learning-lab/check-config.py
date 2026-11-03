@@ -470,9 +470,80 @@ with tempfile.TemporaryDirectory() as directory:
                     if failure[0] == 400:
                         assert "Error Response: mock error" in output
                         assert "响应 JSON 解析失败" not in output
+        campaign_schema = {
+            "type": "object",
+            "properties": {
+                "campaignId": {"type": "integer", "description": "广告活动 ID"},
+                "riskLevel": {"type": "string", "enum": ["HIGH", "MEDIUM", "LOW"],
+                              "description": "广告活动当前风险等级"},
+                "reason": {"type": "string", "description": "风险判断的主要原因"},
+                "suggestion": {"type": "string", "description": "给出的简短优化建议"},
+            },
+            "required": ["campaignId", "riskLevel", "reason", "suggestion"],
+            "additionalProperties": False,
+        }
+        # 本步继续将 content 转成 DTO，并做最小字段检查；不声称完成全部 Schema 校验。
+        mock_content = '{"campaignId":10001,"riskLevel":"HIGH","reason":"模拟原因","suggestion":"模拟建议"}'
+        wrong_id = mock_content.replace('10001', '"abc"')
+        missing_suggestion = '{"campaignId":10001,"riskLevel":"HIGH","reason":"模拟原因"}'
+        invalid_risk = mock_content.replace('"HIGH"', '"CRITICAL"')
+        for status, raw_response, expected_content, error in [
+            (200, success(mock_content)[1], mock_content, None),
+            (200, success("普通文本")[1], "普通文本", "Structured Content 无法反序列化"),
+            (200, success(wrong_id)[1], wrong_id, "Structured Content 无法反序列化"),
+            (200, success(missing_suggestion)[1], missing_suggestion, "reason 和 suggestion 必须有非空白文本"),
+            (200, success(invalid_risk)[1], invalid_risk, "riskLevel 必须是 HIGH、MEDIUM 或 LOW"),
+            (200, success("null")[1], "null", "DTO 或 campaignId 为空"),
+            (200, "not json", None, "响应 JSON 解析失败"),
+            (200, "null", None, "choices 必须是非空数组"),
+            (200, '{"choices":[]}', None, "choices 必须是非空数组"),
+            (200, '{"choices":[{}]}', None, "message.content 文本字段"),
+            (200, '{"choices":[{"message":{"content":123}}]}', None, "message.content 文本字段"),
+            (200, success("  ")[1], None, "message.content 文本字段"),
+            (400, "mock error", None, "HTTP 请求未成功"),
+        ]:
+            received.clear()
+            Handler.queued_responses = [(status, raw_response)]
+            env = os.environ.copy()
+            env.update(DASHSCOPE_API_KEY=fake_key, DASHSCOPE_BASE_URL=fake_url)
+            result = subprocess.run([
+                "java", f"-Djavax.net.ssl.trustStore={trust}",
+                "-Djavax.net.ssl.trustStorePassword=test-password", "-cp", classpath,
+                "com.avexvertex.agent.StructuredOutputDemo",
+            ], cwd=project, env=env, capture_output=True, text=True, timeout=20)
+            output = result.stdout + result.stderr
+            assert result.returncode == (0 if error is None else 1), output
+            assert f"HTTP Status: {status}" in output and raw_response in output
+            assert fake_key not in output and fake_url not in output
+            assert "Model: " not in output
+            if expected_content is not None:
+                assert "Structured Content:\n" + expected_content in output
+            else:
+                assert "Structured Content:" not in output
+            if error is None:
+                assert "CampaignAnalysis: CampaignAnalysis{" in output
+                assert "Campaign ID: 10001" in output and "Risk Level: HIGH" in output
+                assert "Reason: 模拟原因" in output and "Suggestion: 模拟建议" in output
+                assert "响应 JSON 解析失败" not in output
+            else:
+                assert error in output, output
+                assert "Campaign ID: " not in output and "CampaignAnalysis: " not in output
+                if status == 400:
+                    assert "响应 JSON 解析失败" not in output
+            assert len(received) == 1, output
+            path, headers, body = received[0]
+            assert path == "/compatible-mode/v1/chat/completions"
+            assert headers["Authorization"] == "Bearer " + fake_key
+            assert headers["Content-Type"] == "application/json"
+            assert body == {
+                "model": "qwen3.8-max", "reasoning_effort": "none",
+                "messages": [{"role": "user", "content": "请分析下面广告活动的风险。Campaign ID：10001；日预算：5000 元；近 7 天转化率：0.3%。"}],
+                "response_format": {"type": "json_schema", "json_schema": {
+                    "name": "campaign_analysis", "strict": True, "schema": campaign_schema}},
+            }, body
     finally:
         server.shutdown()
         server.server_close()
         thread.join()
 
-print("检查通过：单轮、历史、System 和 Prompt 基础对照；不访问百炼。")
+print("检查通过：既有实验及 Structured Output DTO 转换与最小字段检查；不访问百炼。")

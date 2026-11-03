@@ -17,11 +17,11 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 015 - Java DTO 与 Structured Output（准备学习）
-当前笔记：014 理论阅读与 User Schema 练习修正已按用户确认收尾；下一步 Node 015，暂未开始代码实验
+当前节点：Node 016 - Streaming（准备学习）
+当前笔记：015-1 / 015-2 已按用户确认收尾，下一步 Node 016；当前未开始 Streaming 代码
 
 主项目：projects/agent-learning-lab
-项目状态：已跑通单轮、历史、System 及 Prompt A/B、B/C 的真实正常调用
+项目状态：已跑通单轮、历史、Prompt 对照及 Schema → 模型 JSON → DTO/getter 的真实正常链路
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -43,8 +43,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 012：Few-shot（理论理解完成，不单独安排 Java 实验）
 - ✅ Node 013：Structured Output（理论阅读完成，不单独安排 Java 实验）
 - ✅ Node 014：JSON Schema（理论阅读、User Schema 练习与修正，按用户确认收尾）
-- 🟡 Node 015：Java DTO 与 Structured Output（准备学习）
-- ⬜ Node 016：Streaming
+- ✅ Node 015：Java DTO 与 Structured Output（理论、真实正常链路与两个本地坏数据样本完成）
+- 🟡 Node 016：Streaming（准备学习）
 - ⬜ Node 017：模型参数
 - ⬜ Node 018：模型选择
 - ⬜ Node 019：Context Engineering
@@ -95,24 +95,51 @@ API 风格：OpenAI-compatible
   - 用户已读完 014，并提交 name/string、age/integer 的 User Schema
   - 已指出并修正 required 应与 properties 同级、最外层缺闭合括号的问题；用户确认本节收尾，不再追加其他练习
   - 其余三项建议练习未执行，未运行 Schema 校验器或模型 API，不将这些项目记为已完成
+- ✅ Structured Output → Java DTO
+  - IDEA 真实 Schema 请求、业务 JSON、FastJSON2 反序列化及四个 getter 输出已完成，三次实际结果分别保留
+  - --errors 已在本地执行：缺少 suggestion、非法 riskLevel 均可转 DTO，再由共用字段检查拒绝
+  - 非法 JSON / 错误字段类型样本及完整 HTTPS 脚本未执行，未引入完整 Schema 或业务事实校验
 
 ---
 
 ## 下一步
 
-> **Node 015：Java DTO 与 Structured Output（准备学习）**
+> **Node 016：Streaming（准备学习）**
 
 ```text
-Schema → 模型结构化结果 → 校验与反序列化 → Java DTO → 业务逻辑
+当前：等待完整响应再读取
+下一步：模型边生成，程序边接收
 ```
 
-具体实践待对应笔记和后续任务安排，本次不提前创建代码或调用模型。
+本次只收尾 Node 015，不提前创建 Streaming 笔记或代码。
 
 ---
 
 ## 最近进度
 
 ### 2026-11-03
+
+- 用户新增 015-1 理论篇及 015-2 实验篇，并确认已读完 015-1
+- 当前进入 Node 015 实验准备，按笔记顺序先 DTO、再请求、再真实结果和反序列化，必要错误模拟放在正常链路之后
+- 用户要求开始且后续代码都加注释；已创建 CampaignAnalysis 普通 class，Long campaignId 和三个 String 字段，带 getter/setter、toString 和中文说明
+- Maven Java 21 编译通过（五个源码文件）；尚未新增 StructuredOutputDemo、调用模型或验证反序列化，Node 015 整体仍在学习中
+- 第二步新增 StructuredOutputDemo，使用 FastJSON2 逐层构造 Prompt、四字段 Schema 和 response_format.json_schema，附中文注释与完整 JSON 示例；六个源码文件编译通过
+- 已核对百炼官方 response_format / json_schema 及模型支持文档；当前仅有打印代码，未执行 main、未真实调用或验证模型输出
+- 第三步已接入环境变量、HTTPS 地址校验、POST、状态码与原始响应打印；六个源码文件编译通过，尚未在 IDEA 真实运行
+- 补充本地 HTTP 模拟的三种检查场景，但未执行；不解析 content、不创建 DTO，不将编译成功记作实测成功
+- 用户提供首次 Structured Output 实际请求和响应：HTTP 200、qwen3.8-max、stop，Token 为 52/98/150，完整原文已保存
+- 原始 content 呈四字段目标结构，但尚未由 Java 提取或转 DTO；模型引用了未提供的行业平均水平，已记录结构与事实可靠性的边界
+- 第四步加入外层 JSON 解析、choices/message/content 类型检查及 Structured Content 打印，附中文说明和两层 JSON 示例；六个源码文件编译通过
+- 当前仍不解析 content 内部的业务 JSON 或创建 DTO；本地检查更新为九种外层解析场景但未执行，等待用户 IDEA 实际输出
+- 用户提供第二次实际输出，Java 已打印 Structured Content；HTTP 200 / stop，Token 为 52/76/128，原始响应与 content 已分别保存，下一步转 DTO
+- 第五步已加入 content → CampaignAnalysis、空对象/字段/风险等级检查与四个 getter 打印，附中文注释；六个源码文件编译通过，真实 DTO 输出仍待用户运行
+- 本地检查随 DTO 增量更新为十三种场景但尚未执行；不引入新框架或完整 Schema 校验器，不提前标记 Node 015 完成
+- 用户提供第三次实际输出：HTTP 200 / stop，JSON 已转成 CampaignAnalysis，四个 getter 成功读取；Token 为 52/192/244，原始结果已补齐
+- 记录模型无依据补充行业基准、点击量和 ROI/ROAS 判断的局限；正常类型链路完成，错误路径和完整业务校验未验证
+- 用户授权执行两个本地坏数据样本，已新增 --errors 并实际运行：缺少 suggestion 时 DTO 字段为 null，CRITICAL 被 String 接受；均被共用字段检查按预期拒绝，退出码 0
+- 本地模式在读取环境变量之前返回，没有 API 调用；仅这两项实际执行，非法 JSON / 错误类型及完整 check-config.py 未跑，不将其一并记成通过
+- 用户确认 Node 015 收尾并要求提交推送；理论阅读、真实 DTO 正常链路及本地 C/D 结果已同步，当前准备进入 Node 016「Streaming」
+- 本轮不增加新功能或重跑真实 API；其余错误样本和完整 HTTPS 检查仍如实保留未执行状态
 
 - 用户新增并确认读完 013「Structured Output 到底是什么？」与 014「JSON Schema 到底是什么？」
 - Node 013 按纯理论节点收尾，不新增 Java Demo / API 实验；笔记正文标题与文件名统一为 013
