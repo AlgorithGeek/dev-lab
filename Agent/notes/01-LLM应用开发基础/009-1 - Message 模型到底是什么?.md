@@ -1497,7 +1497,7 @@ Agent/projects/agent-learning-lab/
 
 ### 当前仓库内的学习基础
 
-- `Agent/roadmap/Agent Engineer 循序渐进学习路线.md` — Node 009 明确要求认识四种 Role，并理解聊天记录的消息结构。
+- `Agent/Agent Engineer 循序渐进学习路线.md` — Node 009 明确要求认识四种 Role，并理解聊天记录的消息结构。
 - `Agent/progress.md` — 当前 Node 009，Node 008 已完成。
 - `Agent/projects/agent-learning-lab/src/main/java/com/avexvertex/agent/FirstModelCall.java` — 已实现单条 User Message 的 Java 调用及 FastJSON2 响应读取。
 

@@ -571,7 +571,7 @@ Phase 1 / Node 011 - Prompt 基础
 
 - Agent/README.md
 - Agent/progress.md
-- Agent/roadmap/Agent Engineer 循序渐进学习路线.md
+- Agent/Agent Engineer 循序渐进学习路线.md
 - Agent/notes/01-LLM应用开发基础/011-1 - Prompt 基础到底是什么？.md
 - Agent/notes/01-LLM应用开发基础/011-2 - 实验：对比模糊 Prompt 与结构化 Prompt.md
 - Agent/projects/agent-learning-lab/pom.xml

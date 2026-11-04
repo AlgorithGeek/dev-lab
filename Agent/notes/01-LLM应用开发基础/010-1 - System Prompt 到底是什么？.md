@@ -3831,7 +3831,7 @@ Constraints
 ## 当前仓库
 
 - `Agent/progress.md`：Node 009 已完成，当前进入 Node 010 `System Prompt`。
-- `Agent/roadmap/Agent Engineer 循序渐进学习路线.md`：Node 010 要求理解身份、规则、输出要求、行为边界和任务上下文。
+- `Agent/Agent Engineer 循序渐进学习路线.md`：Node 010 要求理解身份、规则、输出要求、行为边界和任务上下文。
 - `Agent/notes/01-LLM应用开发基础/009-1 - Message 模型到底是什么?.md`：本篇 Message / Role / Context 概念的直接前置知识。
 - `Agent/notes/01-LLM应用开发基础/009-2 - 实验：使用 Java 实现多轮对话.md`：已通过真实实验验证应用维护并重传 User / Assistant 历史。
 

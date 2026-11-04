@@ -466,7 +466,7 @@ Phase 1 / Node 010 - System Prompt
 请先阅读：
 - Agent/README.md
 - Agent/progress.md
-- Agent/roadmap/Agent Engineer 循序渐进学习路线.md
+- Agent/Agent Engineer 循序渐进学习路线.md
 - Agent/notes/01-LLM应用开发基础/010-1 - System Prompt 到底是什么？.md
 - Agent/notes/01-LLM应用开发基础/010-2 - 实验：使用 System Prompt 控制模型行为.md
 - Agent/projects/agent-learning-lab/pom.xml

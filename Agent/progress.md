@@ -5,10 +5,10 @@
 > Node 表示知识节点，不对应自然日。
 >
 > - `README.md`：说明这个 Agent 学习区怎么使用
-> - `roadmap/`：记录完整学习路线
+> - `Agent Engineer 循序渐进学习路线.md`：记录完整学习路线
 > - `progress.md`：只记录当前学到哪里
 >
-> 完整路线以 `roadmap/Agent Engineer 循序渐进学习路线.md` 为准。
+> 完整路线以 `Agent Engineer 循序渐进学习路线.md` 为准。
 
 ---
 

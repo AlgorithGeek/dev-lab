@@ -200,8 +200,7 @@ Agent/
 ├── README.md
 ├── progress.md
 │
-├── roadmap/
-│   └── Agent Engineer 循序渐进学习路线.md
+├── Agent Engineer 循序渐进学习路线.md
 │
 ├── notes/
 │   └── ...
@@ -216,9 +215,9 @@ Agent/
 └── resources/
 ```
 
-### `roadmap`
+### `Agent Engineer 循序渐进学习路线.md`
 
-存放长期学习路线和专项学习路线。
+记录 Agent Engineer 的完整学习路线。
 
 ### `notes`
 
