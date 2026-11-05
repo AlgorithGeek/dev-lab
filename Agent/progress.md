@@ -17,8 +17,8 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 019 - Context Engineering（准备学习）
-当前笔记：017「模型参数」与 018「模型选择」已读完并按理论学习收尾，下一步 Node 019；既有待执行本地模拟仍保留
+当前节点：Node 020 - LLM API 异常（准备学习）
+当前笔记：019-1 已读完，019-2 五组真实调用与结果记录已完成；下一步 Node 020
 
 主项目：projects/agent-learning-lab
 项目状态：已跑通单轮、历史、Prompt 对照、Structured Output → DTO 及文本 Streaming 的真实正常链路
@@ -47,8 +47,8 @@ API 风格：OpenAI-compatible
 - ✅ Node 016：Streaming（默认/Debug 正常实测与讲解完成；新增本地模拟待执行）
 - ✅ Node 017：模型参数（理论阅读完成，不单独安排参数实验）
 - ✅ Node 018：模型选择（理论阅读完成，不单独安排跨模型实验）
-- 🟡 Node 019：Context Engineering（准备学习）
-- ⬜ Node 020：LLM API 异常
+- ✅ Node 019：Context Engineering（理论阅读与五组实验完成）
+- 🟡 Node 020：LLM API 异常（准备学习）
 - ⬜ Node 021：第一阶段项目
 
 > 这里只展开当前 Phase。后续完整节点请查看 roadmap。
@@ -114,20 +114,19 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 019：Context Engineering（准备学习）**
+> **Node 020：LLM API 异常（准备学习）**
 
-```text
-这一轮到底应该给模型看到什么？
-System Prompt / 历史消息 / 当前用户输入
-用户信息 / RAG 文档 / Tool Result / State / Memory
-按任务选择必要信息，控制上下文预算和噪声
-```
-
-先阅读理论，再决定是否需要最小实验；当前尚未开始 Node 019，不提前新增代码或框架。
+先读 HTTP 错误、限流、超时、请求无效、上下文过长和 Provider 错误，再学习如何区分错误以及何时适合重试。
 
 ---
 
 ## 最近进度
+
+### 2026-11-05
+
+- 已读完 019-1，019-2 的 A、B、C1、C2、C3 五组真实调用均返回 HTTP 200 并答对。
+- A / B 输入为 102 / 331 Token，追加无关资料多用 229 Token。C1/C2/C3 输入均为 331 Token，本次未观察到资料位置影响答案。
+- 已记录答案、用量和耗时。每组一次调用，无法据此判断耗时规律。下一步准备学习 Node 020。
 
 ### 2026-11-04
 
