@@ -1972,14 +1972,12 @@ HttpClient client = ...
 4. HttpClient + FastJSON2
 5. JDK HttpServer 做本地模拟
 6. 支持五种运行模式
-7. 定义 Scenario
-8. 定义 RetryPolicy 三态
-9. 有统一 classifyHttpError
-10. 429 / 503 最多 Retry 一次
-11. Timeout 不自动 Retry
-12. 打印结构化错误决策
-13. 中文注释
-14. Maven compile
+7. 区分 HTTP 错误响应与传输超时
+8. 429 / 503 最多 Retry 一次
+9. Timeout 标记为 CONDITIONAL，实验中不自动 Retry
+10. 打印错误细节与对应决策
+11. 中文注释
+12. Maven compile
 ```
 
 ---
@@ -2274,11 +2272,9 @@ LLM Retry
 - [x] 新增 `LlmApiErrorDemo.java`
 - [x] Java 21 编译通过
 - [x] 支持五种运行模式
-- [ ] 定义 `Scenario`
-- [ ] 定义 `RetryPolicy`：RETRY / DO_NOT_RETRY / CONDITIONAL
+- [x] 区分有 HTTP 响应的错误和未收到 HTTP 响应的客户端超时
 - [x] 能解析 Provider Error Body
 - [x] 能读取 code / message / request_id
-- [ ] 有统一 `classifyHttpError`
 - [x] Invalid Model 真实调用完成
 - [x] 真实观察 404 返回 `HttpResponse`，而不是因为状态码自动抛异常
 - [x] 429 本地模拟完成
@@ -2287,7 +2283,7 @@ LLM Retry
 - [x] 503 第一次失败、Backoff 后第二次成功
 - [x] Timeout 本地模拟完成
 - [x] 观察到 `HttpTimeoutException`
-- [x] Timeout 没有伪造 HTTP Status
+- [x] Timeout 输出 HTTP Status: NONE 与 CONDITIONAL，实验中只发送一次
 - [x] Context Too Long 本地模拟完成
 - [x] Context Too Long 被识别为 `DO_NOT_RETRY`
 - [x] Context Too Long 动作为 `REDUCE_CONTEXT`
@@ -2295,7 +2291,9 @@ LLM Retry
 - [x] 日志没有打印 API Key
 - [x] 没有引入 Spring Boot / Resilience4j / Circuit Breaker
 
-当前 Demo 用程序实参选择场景，在发送分支决定是否重试，并统一打印 HTTP 错误细节。上面三项是笔记建议的代码组织形式，本次实测覆盖的是五种行为。
+### 可选实现方式
+
+`Scenario` 枚举、`RetryPolicy` 枚举、`ErrorDecision` record 和 `classifyHttpError()` 都是可选的代码组织方式。当前 Demo 用 `String mode` 和 `switch` 选择场景，用 `boolean retry` 控制重试，通过 `printErrorDecision(...)` 输出 HTTP 错误细节。超时由独立分支输出 `CONDITIONAL`。验收以五组实测行为为准。
 
 ---
 

@@ -62,8 +62,9 @@ API 风格：OpenAI-compatible
   - 已观察 `prompt_tokens`、`completion_tokens` 和 `total_tokens`
 - ⬜ Token 切分 / Tokenizer 实验
   - 暂不单独折腾 Tokenizer，后续结合真实需要再做
-- ⬜ Context Budget / Lost in the Middle 对比实验
-  - 留到首次接入 Qwen3.8-Max API 时，比较不同长度、位置和噪声下的回答质量、Token 消耗与延迟
+- ✅ Context Budget / Lost in the Middle 对比实验（Node 019）
+  - A 组输入 102 Token，B 组加入无关资料后为 331 Token，两组答案相同。
+  - C1 / C2 / C3 分别把目标资料放在开头、中间和结尾，三组均答对，输入均为 331 Token。本次未观察到位置影响答案。
 - ✅ 创建 `projects/agent-learning-lab`
   - 最小 Maven Java 21 项目；HttpClient 调用、FastJSON2 解析与错误路径已验证
 - ✅ 第一次 Codex 学习协作
