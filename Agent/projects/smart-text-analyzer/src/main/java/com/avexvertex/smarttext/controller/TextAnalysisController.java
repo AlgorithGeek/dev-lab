@@ -37,7 +37,7 @@ public class TextAnalysisController {
             summary = "分析文本",
             description = "对输入文本进行摘要、分类、情感分析以及关键词提取"
     )
-    private AnalyzeResponse analyze(@RequestBody AnalyzeRequest request){
+    public AnalyzeResponse analyze(@RequestBody AnalyzeRequest request){
 
         return textAnalysisService.analyze(request);
 
