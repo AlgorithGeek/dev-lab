@@ -90,7 +90,7 @@ public class QwenLlmClient implements LlmClient {
             // 构造最终 JSON
             JSONObject requestBody = new JSONObject();
             requestBody.put("model", model);
-            requestBody.put("message", messages);
+            requestBody.put("messages", messages);
 
             // 转换成真正发送给服务器的 JSON 字符串
             String requestJson = requestBody.toJSONString();
