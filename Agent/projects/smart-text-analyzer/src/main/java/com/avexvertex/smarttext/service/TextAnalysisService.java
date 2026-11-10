@@ -11,9 +11,6 @@ import java.util.List;
 
 /**
  * 文本分析业务服务
- *
- * 当前阶段暂时返回模拟数据，
- * 后续会将这里替换为真实的 LLM 调用。
  */
 @Service
 @RequiredArgsConstructor
