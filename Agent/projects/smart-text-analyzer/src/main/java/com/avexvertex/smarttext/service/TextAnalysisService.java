@@ -2,6 +2,8 @@ package com.avexvertex.smarttext.service;
 
 import com.avexvertex.smarttext.dto.AnalyzeRequest;
 import com.avexvertex.smarttext.dto.AnalyzeResponse;
+import com.avexvertex.smarttext.llm.LlmClient;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +15,10 @@ import java.util.List;
  * 后续会将这里替换为真实的 LLM 调用。
  */
 @Service
+@RequiredArgsConstructor
 public class TextAnalysisService {
+
+    private final LlmClient llmClient;
 
     /**
      * 分析用户提交的文本
@@ -23,13 +28,14 @@ public class TextAnalysisService {
      */
     public AnalyzeResponse analyze(AnalyzeRequest request) {
 
-        // 当前暂不调用 AI，先返回固定数据，
-        // 用于验证 Controller → Service → Response 整条链路。
+        // 将用户输入直接发送给大模型
+        String content = llmClient.chat(request.getText());
+
         return new AnalyzeResponse(
-                "这是一段模拟的文本摘要",
-                "科技",
-                "positive",
-                List.of("AI", "ChatGPT", "程序员")
+                content,
+                "待实现",
+                "待实现",
+                List.of()
         );
     }
 }
