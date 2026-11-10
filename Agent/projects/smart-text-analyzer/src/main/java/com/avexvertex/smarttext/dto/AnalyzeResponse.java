@@ -2,14 +2,17 @@ package com.avexvertex.smarttext.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
  * 文本分析响应对象
  */
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "文本分析结果")
 public class AnalyzeResponse {

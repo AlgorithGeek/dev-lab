@@ -91,6 +91,15 @@ public class QwenLlmClient implements LlmClient {
             JSONObject requestBody = new JSONObject();
             requestBody.put("model", model);
             requestBody.put("messages", messages);
+            // 要求模型返回合法的JSON字符串
+            /*
+                "response_format": {
+                    "type": "json_object"
+                }
+             */
+            JSONObject responseFormat = new JSONObject();
+            responseFormat.put("type", "json_object");
+            requestBody.put("response_format", responseFormat);
 
             // 转换成真正发送给服务器的 JSON 字符串
             String requestJson = requestBody.toJSONString();
