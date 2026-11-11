@@ -1,5 +1,6 @@
 package com.avexvertex.smarttext.llm;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,8 +98,7 @@ public class QwenLlmClient implements LlmClient {
                     "type": "json_object"
                 }
              */
-            JSONObject responseFormat = new JSONObject();
-            responseFormat.put("type", "json_object");
+            JSONObject responseFormat = buildResponseFormat();
             requestBody.put("response_format", responseFormat);
 
             // 转换成真正发送给服务器的 JSON 字符串
@@ -187,5 +187,130 @@ public class QwenLlmClient implements LlmClient {
             throw new IllegalStateException("Qwen API 调用发生 I/O 异常", e);
         }
 
+    }
+
+    /**
+     * 构造文本分析结果的 JSON Schema
+     *
+     * 用于约束大模型必须按照指定字段和类型返回结果
+     */
+    private JSONObject buildResponseFormat() {
+        /*
+         * summary:
+         * {
+         *   "type": "string"
+         * }
+         */
+        JSONObject summary = new JSONObject();
+        summary.put("type","string");
+        summary.put("description", "对原始文本的简洁摘要");
+
+        /*
+         * category:
+         * {
+         *   "type": "string"
+         * }
+         */
+        JSONObject category = new JSONObject();
+        category.put("type", "string");
+        category.put("description", "文本最合适的分类");
+
+        /*
+         * sentiment:
+         * {
+         *   "type": "string",
+         *   "enum": ["positive", "neutral", "negative"]
+         * }
+         */
+        JSONObject sentiment = new JSONObject();
+        sentiment.put("type", "string");
+        sentiment.put("description", "文本的情感倾向");
+
+        JSONArray sentimentEnum = new JSONArray();
+        sentimentEnum.add("positive");
+        sentimentEnum.add("neutral");
+        sentimentEnum.add("negative");
+
+        sentiment.put("enum",sentimentEnum);
+
+        /*
+         * keywords:
+         * {
+         *   "type": "array",
+         *   "items": {
+         *     "type": "string"
+         *   },
+         *   "minItems": 3,
+         *   "maxItems": 5
+         * }
+         */
+        JSONObject keywordItem = new JSONObject();
+        keywordItem.put("type", "string");
+
+        JSONObject keywords = new JSONObject();
+        keywords.put("type", "array");
+        keywords.put("description", "从文本中提取出的关键词");
+        keywords.put("items", keywordItem);
+        keywords.put("minItems", 3);
+        keywords.put("maxItems", 5);
+
+        // 定义对象允许包含哪些字段
+        JSONObject properties = new JSONObject();
+        properties.put("summary", summary);
+        properties.put("category", category);
+        properties.put("sentiment", sentiment);
+        properties.put("keywords", keywords);
+
+        // 四个字段全部必填
+        JSONArray required = new JSONArray();
+        required.add("summary");
+        required.add("category");
+        required.add("sentiment");
+        required.add("keywords");
+
+        /*
+         * 真正的 JSON Schema：
+         *
+         * {
+         *   "type": "object",
+         *   "properties": {...},
+         *   "required": [...],
+         *   "additionalProperties": false
+         * }
+         */
+        JSONObject schema = new JSONObject();
+        schema.put("type", "object");
+        schema.put("properties", properties);
+        schema.put("required", required);
+
+        // 不允许模型偷偷增加其他字段
+        schema.put("additionalProperties", false);
+
+        /*
+         * 百炼要求的 json_schema 外层结构
+         */
+        JSONObject jsonSchema = new JSONObject();
+
+        // Schema 名称，只是这个结构的标识
+        jsonSchema.put("name", "text_analysis");
+
+        // 严格按照 Schema 输出
+        jsonSchema.put("strict", true);
+
+        jsonSchema.put("schema", schema);
+
+        /*
+         * 最终：
+         *
+         * {
+         *   "type": "json_schema",
+         *   "json_schema": {...}
+         * }
+         */
+        JSONObject responseFormat = new JSONObject();
+        responseFormat.put("type", "json_schema");
+        responseFormat.put("json_schema", jsonSchema);
+
+        return responseFormat;
     }
 }

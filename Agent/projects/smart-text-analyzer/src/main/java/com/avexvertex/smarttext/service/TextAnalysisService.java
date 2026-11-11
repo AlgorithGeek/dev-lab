@@ -27,23 +27,13 @@ public class TextAnalysisService {
     public AnalyzeResponse analyze(AnalyzeRequest request) {
 
         String prompt = """
-        请分析下面这段文本，并严格按照 JSON 格式返回结果。
+        请分析下面这段文本。
 
-        JSON 必须包含以下字段：
-
-        {
-          "summary": "文本摘要",
-          "category": "文本分类",
-          "sentiment": "positive、neutral 或 negative",
-          "keywords": ["关键词1", "关键词2"]
-        }
-
-        要求：
-        1. summary 简洁概括文本主要内容
-        2. category 给出一个最合适的分类
-        3. sentiment 只能是 positive、neutral、negative 之一
-        4. keywords 提取 3～5 个关键词
-        5. 只返回 JSON，不要输出其他解释
+        分析要求：
+        1. summary：简洁概括文本主要内容
+        2. category：给出一个最合适的文本分类
+        3. sentiment：判断文本整体情感倾向
+        4. keywords：提取最重要的关键词
 
         待分析文本：
         %s
