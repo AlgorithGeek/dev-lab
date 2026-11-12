@@ -1,8 +1,9 @@
 package com.avexvertex.smarttext.exception;
 
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class LlmApiException extends RuntimeException {
 
     /**
