@@ -94,7 +94,7 @@ public class QwenLlmClient implements LlmClient {
 
             // 构造 JSON Schema，严格约束模型返回的数据结构
             JSONObject responseFormat = buildResponseFormat();
-            requestBody.put("response_f ormat", responseFormat);
+            requestBody.put("response_format", responseFormat);
 
             // 转换成真正发送给服务器的 JSON 字符串
             String requestJson = requestBody.toJSONString();
