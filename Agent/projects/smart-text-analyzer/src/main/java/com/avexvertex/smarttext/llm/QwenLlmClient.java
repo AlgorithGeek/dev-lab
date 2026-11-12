@@ -2,6 +2,7 @@ package com.avexvertex.smarttext.llm;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.avexvertex.smarttext.exception.LlmApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -116,11 +117,9 @@ public class QwenLlmClient implements LlmClient {
 
             // 非 2xx 状态码统一视为调用失败
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new IllegalStateException(
-                        "Qwen API 调用失败，HTTP 状态码："
-                                + response.statusCode()
-                                + "，响应内容："
-                                + response.body()
+                throw new LlmApiException(
+                        response.statusCode(),
+                        response.body()
                 );
             }
 
@@ -186,7 +185,7 @@ public class QwenLlmClient implements LlmClient {
 
     /**
      * 构造文本分析结果的 JSON Schema
-     *
+     * <p>
      * 用于约束大模型必须按照指定字段和类型返回结果
      */
     private JSONObject buildResponseFormat() {
@@ -197,7 +196,7 @@ public class QwenLlmClient implements LlmClient {
          * }
          */
         JSONObject summary = new JSONObject();
-        summary.put("type","string");
+        summary.put("type", "string");
         summary.put("description", "对原始文本的简洁摘要");
 
         /*
@@ -226,7 +225,7 @@ public class QwenLlmClient implements LlmClient {
         sentimentEnum.add("neutral");
         sentimentEnum.add("negative");
 
-        sentiment.put("enum",sentimentEnum);
+        sentiment.put("enum", sentimentEnum);
 
         /*
          * keywords:
