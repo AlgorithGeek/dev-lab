@@ -2,6 +2,7 @@ package com.avexvertex.smarttext.controller;
 
 import com.avexvertex.smarttext.dto.AnalyzeRequest;
 import com.avexvertex.smarttext.dto.AnalyzeResponse;
+import com.avexvertex.smarttext.dto.Result;
 import com.avexvertex.smarttext.service.TextAnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,9 +39,10 @@ public class TextAnalysisController {
             summary = "分析文本",
             description = "对输入文本进行摘要、分类、情感分析以及关键词提取"
     )
-    public AnalyzeResponse analyze(@Valid @RequestBody AnalyzeRequest request){
+    public Result<AnalyzeResponse> analyze(@Valid @RequestBody AnalyzeRequest request){
 
-        return textAnalysisService.analyze(request);
-
+        return Result.success(
+                textAnalysisService.analyze(request)
+        );
     }
 }
