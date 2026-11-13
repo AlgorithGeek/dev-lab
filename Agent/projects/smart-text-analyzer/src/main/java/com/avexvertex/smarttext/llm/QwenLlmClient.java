@@ -3,6 +3,7 @@ package com.avexvertex.smarttext.llm;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.avexvertex.smarttext.exception.LlmApiException;
+import com.avexvertex.smarttext.exception.LlmTimeoutException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 
 /**
@@ -168,16 +170,18 @@ public class QwenLlmClient implements LlmClient {
             // 最终只把模型生成的文本返回给业务层。
             return content;
 
+        } catch (HttpTimeoutException e) {
+
+            throw new LlmTimeoutException("Qwen API 请求超时", e);
+
         } catch (InterruptedException e) {
 
-            // 恢复线程中断状态
             Thread.currentThread().interrupt();
 
             throw new IllegalStateException("Qwen API 调用被中断", e);
 
         } catch (IOException e) {
 
-            // HTTP 网络通信相关异常
             throw new IllegalStateException("Qwen API 调用发生 I/O 异常", e);
         }
 

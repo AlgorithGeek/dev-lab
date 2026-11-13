@@ -42,10 +42,20 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public Result<Void> handleLlmApiException(LlmApiException e){
 
-        // 记录上游 Provider 返回的 HTTP 状态码。
         log.error("LLM API 调用失败，Provider HTTP 状态码：{}", e.getStatusCode(), e);
 
         return Result.fail(502,"大模型服务调用失败，请稍后重试");
     }
 
+    /**
+     * 处理 LLM API 请求超时
+     */
+    @ExceptionHandler(LlmTimeoutException.class)
+    @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
+    public Result<Void> handleLlmApiTimeoutException(LlmTimeoutException e){
+
+        log.error("LLM API 请求超时", e);
+
+        return Result.fail(504, "大模型服务响应超时，请稍后重试");
+    }
 }
