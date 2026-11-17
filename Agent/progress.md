@@ -16,12 +16,15 @@
 
 ```text
 状态：🟡 学习中
-阶段：Phase 1 / LLM 应用开发基础
-当前节点：Node 021 - 第一阶段项目（准备学习）
-当前笔记：020-1 已读完，020-2 一组真实调用及四组本地模拟已完成；下一步 Node 021
+阶段：Phase 2 / Tool Calling 与 Agent Loop
+当前节点：Node 022 - Tool Calling 是什么（准备开始）
+当前笔记：Phase 1 已阶段性收尾；Smart Text Analyzer 核心实践完成，Node 021 的固定 Evaluation Case 与最小回归验证按用户决定跳过
 
 主项目：projects/agent-learning-lab
-项目状态：已跑通单轮、历史、Prompt 对照、Structured Output → DTO 及文本 Streaming 的真实正常链路
+项目状态：继续作为长期 Agent 实验项目；下一阶段使用 Java 实现 Tool Calling
+
+阶段项目：projects/smart-text-analyzer
+项目状态：核心功能已完成，按用户决定停止继续开发；不追加 Retry、项目级 Token Usage 或 Evaluation 功能
 
 主要语言：Java
 主要后端框架：Spring Boot
@@ -49,13 +52,36 @@ API 风格：OpenAI-compatible
 - ✅ Node 018：模型选择（理论阅读完成，不单独安排跨模型实验）
 - ✅ Node 019：Context Engineering（理论阅读与五组实验完成）
 - ✅ Node 020：LLM API 异常（理论阅读与五组实验完成）
-- 🟡 Node 021：第一阶段项目（准备学习）
+- 🟡 Node 021：第一阶段项目（核心实践已完成，按用户决定提前收尾）
+  - 已完成 Smart Text Analyzer 的 Spring Boot + Qwen 核心调用链路、Structured Output、DTO 解析、参数校验、统一响应与全局异常处理
+  - 按用户决定停止继续开发；未完成路线要求的至少 10 个固定 Evaluation Case 与最小回归验证，不标记为完整完成
 
-> 这里只展开当前 Phase。后续完整节点请查看 roadmap。
+### Phase 2：Tool Calling 与 Agent Loop
+
+- 🟡 Node 022：Tool Calling 是什么（准备开始）
+- ⬜ Node 023～041：待学习
+- ⬜ Node 042：Tool Agent 项目（Campaign Assistant V1）
+
+> Phase 1 为阶段性收尾：Node 021 的核心项目实践已完成，但固定 Case / 回归验证主动跳过。当前进入 Phase 2；后续完整节点请查看 roadmap。
 
 ---
 
 ## 当前实践
+
+### Node 021：Smart Text Analyzer 阶段项目归档
+
+- ✅ 项目核心实践已完成，项目路径：`projects/smart-text-analyzer`
+- ✅ 使用 Java 21、Spring Boot 与 Qwen API，完成 `POST /ai/analyze` 的文本分析调用链路
+- ✅ 完成 Request / Response DTO、Prompt、Structured Output / JSON Schema 与 FastJSON2 结果解析
+- ✅ 完成参数校验、统一响应 `Result` 与全局异常处理
+- ✅ 已验证应用能够正常启动，并通过接口获得摘要、分类、情感和关键词结果
+- ✅ 已补充 LLM API、超时、网络通信、线程中断等异常分类，以及 JSON 解析失败和未知异常兜底
+- ⏭️ 按用户决定停止项目后续开发；不继续实现 `LlmRetryExecutor`
+- ⏭️ 未实现项目级 Token Usage 统计功能
+- ⏭️ 未准备路线要求的至少 10 个固定 Evaluation Case，也未建立最小回归验证
+- ⏭️ 未进行专门的 MockMvc / Mockito 异常测试；不将未执行的测试记为完成
+
+> 该项目作为 Phase 1 的阶段性实践保留，不再作为当前主线持续迭代。后续主线回到 `projects/agent-learning-lab`，进入 Java Tool Calling。
 
 - ✅ 第一轮 Token Usage 对比实验
   - 已通过 Apifox 对比短 / 长 Prompt 与短 / 长回答
@@ -115,13 +141,23 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 021：第一阶段项目（准备学习）**
+> **Node 022：Tool Calling 是什么（准备开始）**
 
-Smart Text Analyzer 将前面学过的模型调用、结构化输出、DTO 和异常处理组合进一个 Spring Boot 接口。
+先理解 Tool Calling 的工作机制：模型如何根据工具定义生成 Tool Call 请求、为什么模型不会直接执行 Java 方法，以及应用如何解析请求并执行对应工具。下一步继续使用 Java，在 `projects/agent-learning-lab` 中实现工具定义、工具分发和完整的工具调用链路。
 
 ---
 
 ## 最近进度
+
+### 2026-11-17
+
+- Smart Text Analyzer 最新项目提交为 `6fa65df`（其他异常处理）；此前已完成 LLM API 调用线程中断异常处理
+- 用户决定将 Smart Text Analyzer 收尾，不再继续追加功能；Retry / `LlmRetryExecutor` 不实施
+- Node 021 核心项目实践已完成：Spring Boot + Qwen 调用、Structured Output、DTO、参数校验、统一响应与全局异常处理均已落地
+- Node 021 路线要求的至少 10 个固定 Evaluation Case 与最小回归验证按用户决定跳过；专门的 MockMvc / Mockito 异常测试也未执行
+- 不新增项目级 Token Usage 统计功能；此前 Node 008 的 Token Usage 对比实验记录仍保留，不与项目级统计混为一谈
+- Phase 1 阶段性收尾，Node 021 不标记为完整完成；当前学习位置切换至 Phase 2 / Node 022「Tool Calling 是什么」
+- 下一步继续使用 Java，在 `projects/agent-learning-lab` 中学习并实现 Tool Calling；Python 仍按原路线安排在 Phase 8，不提前切换
 
 ### 2026-11-06
 
