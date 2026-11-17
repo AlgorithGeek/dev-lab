@@ -58,4 +58,16 @@ public class GlobalExceptionHandler {
 
         return Result.fail(504, "大模型服务响应超时，请稍后重试");
     }
+
+    /**
+     * 处理 LLM API 网络通信异常
+     */
+    @ExceptionHandler(LlmNetworkException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public Result<Void> handleLlmNetworkException(LlmNetworkException e) {
+
+        log.error("LLM API 网络通信失败", e);
+
+        return Result.fail(502, "大模型服务通信失败，请稍后重试");
+    }
 }
