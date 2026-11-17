@@ -70,4 +70,16 @@ public class GlobalExceptionHandler {
 
         return Result.fail(502, "大模型服务通信失败，请稍后重试");
     }
+
+    /**
+     * 处理 LLM API 调用线程中断。
+     */
+    @ExceptionHandler(LlmInterruptedException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Result<Void> handleLlmInterruptedException(LlmInterruptedException e) {
+
+        log.warn("LLM API 调用线程被中断", e);
+
+        return Result.fail(503, "服务暂时无法完成请求，请稍后重试");
+    }
 }
