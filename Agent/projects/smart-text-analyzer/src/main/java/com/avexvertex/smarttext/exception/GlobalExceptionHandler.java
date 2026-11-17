@@ -3,6 +3,7 @@ package com.avexvertex.smarttext.exception;
 import com.avexvertex.smarttext.dto.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -81,5 +82,30 @@ public class GlobalExceptionHandler {
         log.warn("LLM API 调用线程被中断", e);
 
         return Result.fail(503, "服务暂时无法完成请求，请稍后重试");
+    }
+
+    /**
+     * 处理请求体 JSON 解析失败。
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException e) {
+
+        log.warn("请求体格式错误", e);
+
+        return Result.fail(400, "请求体格式不正确");
+    }
+
+    /**
+     * 处理其他未预期异常。
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<Void> handleException(Exception e) {
+
+        log.error("系统发生未预期异常", e);
+
+        return Result.fail(500, "服务器内部错误，请稍后重试");
     }
 }
