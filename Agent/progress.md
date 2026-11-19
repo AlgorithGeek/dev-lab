@@ -17,8 +17,8 @@
 ```text
 状态：🟡 学习中
 阶段：Phase 2 / Tool Calling 与 Agent Loop
-当前节点：Node 023 - Tool Definition（准备学习）
-当前笔记：022-1「Tool Calling 是什么？」理论阅读已完成
+当前节点：Node 024 - 参数 Schema（准备学习）
+当前笔记：023-1「Tool Definition 到底是什么？」理论阅读已完成
 
 主项目：projects/agent-learning-lab
 项目状态：继续作为长期 Agent 实验项目；下一阶段使用 Java 实现 Tool Calling
@@ -59,8 +59,9 @@ API 风格：OpenAI-compatible
 ### Phase 2：Tool Calling 与 Agent Loop
 
 - ✅ Node 022：Tool Calling 是什么（理论阅读完成）
-- 🟡 Node 023：Tool Definition（准备学习）
-- ⬜ Node 024～041：待学习
+- ✅ Node 023：Tool Definition（理论阅读完成）
+- 🟡 Node 024：参数 Schema（准备学习）
+- ⬜ Node 025～041：待学习
 - ⬜ Node 042：Tool Agent 项目（Campaign Assistant V1）
 
 > Phase 1 为阶段性收尾：Node 021 的核心项目实践已完成，但固定 Case / 回归验证主动跳过。当前进入 Phase 2；后续完整节点请查看 roadmap。
@@ -142,9 +143,9 @@ API 风格：OpenAI-compatible
 
 ## 下一步
 
-> **Node 023：Tool Definition（准备学习）**
+> **Node 024：参数 Schema（准备学习）**
 
-学习工具定义中的名称、描述和参数 Schema，理解工具描述如何帮助模型判断什么时候使用工具。
+沿用 `queryCampaign` 示例，学习如何用 `required`、`enum` 和数值范围等约束描述工具参数。
 
 ---
 
@@ -154,6 +155,7 @@ API 风格：OpenAI-compatible
 
 - 已确认读完 022-1「Tool Calling 是什么？」，按理论阅读范围收尾，未单独进行自测验收
 - Java Tool Calling 尚未实现，未运行本地模拟或真实 API 实验。下一步准备学习 Node 023「Tool Definition」
+- 随后已确认读完 023-1「Tool Definition 到底是什么？」，按理论阅读范围收尾，未单独进行自测验收。下一步准备学习 Node 024「参数 Schema」
 
 ### 2026-11-17
 
